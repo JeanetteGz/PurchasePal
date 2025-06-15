@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
+import ConfirmDeletion from "./pages/ConfirmDeletion";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/confirm-deletion" element={<ConfirmDeletion />} />
             <Route path="/" element={
               <ProtectedRoute>
                 <Index />
