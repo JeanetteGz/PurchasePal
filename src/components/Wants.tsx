@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -88,7 +89,7 @@ export const Wants = () => {
   const handleUrlChange = async (url: string) => {
     setNewWant(prev => ({ ...prev, product_url: url }));
     
-    if (url && !newWant.product_image_url) {
+    if (url) {
       const extractedImage = await extractImageFromUrl(url);
       if (extractedImage) {
         setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
@@ -259,18 +260,6 @@ export const Wants = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  value={newWant.product_image_url}
-                  onChange={(e) => setNewWant(prev => ({ ...prev, product_image_url: e.target.value }))}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="https://... (or leave empty for auto-detection)"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Notes
                 </label>
                 <textarea
@@ -347,20 +336,19 @@ export const Wants = () => {
                         {want.product_url && (
                           <Button
                             size="icon"
-                            className="bg-purple-500 hover:bg-purple-600 text-white shadow-lg"
+                            className="bg-purple-500 hover:bg-purple-600 text-white shadow-lg rounded-full h-8 w-8"
                             onClick={() => window.open(want.product_url, '_blank')}
                           >
-                            <span className="mr-1">➜</span>
-                            <ExternalLink className="w-3 h-3" />
+                            <span className="text-xs">➜</span>
                           </Button>
                         )}
                         <Button
                           size="icon"
                           variant="destructive"
-                          className="bg-red-500/90 hover:bg-red-600 shadow-lg"
+                          className="bg-red-500/90 hover:bg-red-600 shadow-lg rounded-full h-8 w-8"
                           onClick={() => deleteWant(want.id)}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3 h-3" />
                         </Button>
                       </div>
                     </div>
