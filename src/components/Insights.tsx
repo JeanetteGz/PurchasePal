@@ -287,7 +287,8 @@ export const Insights = ({ purchases }: InsightsProps) => {
               <LineChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
                 <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
-                <YAxis stroke="#6b7280" fontSize={12} tickFormatter={(value) => `$${value}`} />
+                <YAxis yAxisId="left" stroke="#6b7280" fontSize={12} tickFormatter={(value) => `$${value}`} />
+                <YAxis yAxisId="right" orientation="right" stroke="#6b7280" fontSize={12} />
                 <Tooltip 
                   formatter={(value, name) => name === 'amount' ? [`$${value}`, 'Amount Spent'] : [value, 'Purchases']}
                   labelFormatter={(label) => `Month: ${label}`}
@@ -300,6 +301,7 @@ export const Insights = ({ purchases }: InsightsProps) => {
                   strokeWidth={3}
                   dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 6 }}
                   name="Amount Spent"
+                  yAxisId="left"
                 />
                 <Line 
                   type="monotone" 
