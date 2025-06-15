@@ -136,14 +136,14 @@ export const Insights = ({ purchases }: InsightsProps) => {
     const monthlyData: { [key: string]: number } = {};
 
     lastSixMonths.forEach(date => {
-      const monthYear = format(date, 'MMM YYYY');
+      const monthYear = format(date, 'MMM yyyy');
       monthlyData[monthYear] = 0;
     });
 
     purchases.forEach(purchase => {
       const purchaseDate = new Date(purchase.date);
       if (isWithinInterval(purchaseDate, { start: subMonths(today, 5), end: today })) {
-        const monthYear = format(purchaseDate, 'MMM YYYY');
+        const monthYear = format(purchaseDate, 'MMM yyyy');
         monthlyData[monthYear] = (monthlyData[monthYear] || 0) + purchase.amount;
       }
     });
