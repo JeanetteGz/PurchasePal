@@ -63,17 +63,69 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
     return colors[trigger] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
   };
 
+  const getTriggerEmoji = (trigger: string) => {
+    const emojiMap: { [key: string]: string } = {
+      stress: '😰',
+      boredom: '😴',
+      happiness: '😊',
+      sadness: '😢',
+      anxiety: '😟',
+      excitement: '🤩',
+      peer_pressure: '👥',
+      sale: '🏷️',
+      impulse: '⚡',
+      necessities: '🛒',
+      planned: '📋',
+      other: '🤔'
+    };
+    return emojiMap[trigger] || '🤔';
+  };
+
+  const getStoreEmoji = (store: string) => {
+    const storeEmojis: { [key: string]: string } = {
+      amazon: '📦',
+      walmart: '🛒',
+      target: '🎯',
+      costco: '🏪',
+      'best buy': '💻',
+      starbucks: '☕',
+      mcdonalds: '🍟',
+      'home depot': '🔨',
+      lowes: '🔧',
+      kroger: '🥬',
+      safeway: '🛍️',
+      cvs: '💊',
+      walgreens: '💉',
+      'gas station': '⛽',
+      restaurant: '🍽️',
+      grocery: '🥕',
+      mall: '🏬',
+      online: '💻',
+      pharmacy: '💊'
+    };
+    
+    const lowerStore = store.toLowerCase();
+    for (const [key, emoji] of Object.entries(storeEmojis)) {
+      if (lowerStore.includes(key)) {
+        return emoji;
+      }
+    }
+    return '🏪';
+  };
+
   const totalSpent = filteredPurchases.reduce((sum, p) => sum + p.amount, 0);
   const averageSpent = filteredPurchases.length > 0 ? totalSpent / filteredPurchases.length : 0;
 
   return (
     <div className="space-y-6">
-      {/* Header with stats */}
+      {/* Header with stats and emojis */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Your Purchases</h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            {filteredPurchases.length} purchases • Total: ${totalSpent.toFixed(2)} • Average: ${averageSpent.toFixed(2)}
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+            🛍️ Your Purchases
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+            📊 {filteredPurchases.length} purchases • 💰 Total: ${totalSpent.toFixed(2)} • 📈 Average: ${averageSpent.toFixed(2)}
           </p>
         </div>
       </div>
@@ -83,7 +135,7 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Filter className="w-5 h-5" />
-            Filters & Search
+            🔍 Filters & Search
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -91,7 +143,7 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="Search purchases..."
+                placeholder="🔍 Search purchases..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-white/50 dark:bg-input/50"
@@ -100,37 +152,41 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
 
             <Select value={filterStore} onValueChange={setFilterStore}>
               <SelectTrigger className="bg-white/50 dark:bg-input/50">
-                <SelectValue placeholder="Filter by store" />
+                <SelectValue placeholder="🏪 Filter by store" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Stores</SelectItem>
+                <SelectItem value="all">🏬 All Stores</SelectItem>
                 {uniqueStores.map((store) => (
-                  <SelectItem key={store} value={store}>{store}</SelectItem>
+                  <SelectItem key={store} value={store}>
+                    {getStoreEmoji(store)} {store}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
             <Select value={filterTrigger} onValueChange={setFilterTrigger}>
               <SelectTrigger className="bg-white/50 dark:bg-input/50">
-                <SelectValue placeholder="Filter by trigger" />
+                <SelectValue placeholder="🎯 Filter by trigger" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Triggers</SelectItem>
+                <SelectItem value="all">🎯 All Triggers</SelectItem>
                 {uniqueTriggers.map((trigger) => (
-                  <SelectItem key={trigger} value={trigger}>{trigger}</SelectItem>
+                  <SelectItem key={trigger} value={trigger}>
+                    {getTriggerEmoji(trigger)} {trigger}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="bg-white/50 dark:bg-input/50">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder="📊 Sort by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="date">Date (Newest)</SelectItem>
-                <SelectItem value="amount">Amount (Highest)</SelectItem>
-                <SelectItem value="item">Item (A-Z)</SelectItem>
-                <SelectItem value="store">Store (A-Z)</SelectItem>
+                <SelectItem value="date">📅 Date (Newest)</SelectItem>
+                <SelectItem value="amount">💰 Amount (Highest)</SelectItem>
+                <SelectItem value="item">🔤 Item (A-Z)</SelectItem>
+                <SelectItem value="store">🏪 Store (A-Z)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -146,36 +202,36 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex-1 space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        {purchase.item}
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        🛒 {purchase.item}
                       </h3>
                       <Badge className={getTriggerColor(purchase.trigger)}>
                         <Tag className="w-3 h-3 mr-1" />
-                        {purchase.trigger}
+                        {getTriggerEmoji(purchase.trigger)} {purchase.trigger}
                       </Badge>
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-2">
                         <Store className="w-4 h-4" />
-                        <span>{purchase.store}</span>
+                        <span>{getStoreEmoji(purchase.store)} {purchase.store}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        <span>{format(new Date(purchase.date), 'MMM dd, yyyy')}</span>
+                        <span>📅 {format(new Date(purchase.date), 'MMM dd, yyyy')}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4" />
                         <span className="font-semibold text-lg text-gray-900 dark:text-gray-100">
-                          ${purchase.amount.toFixed(2)}
+                          💵 ${purchase.amount.toFixed(2)}
                         </span>
                       </div>
                     </div>
 
                     {purchase.notes && (
                       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                        <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-                          "{purchase.notes}"
+                        <p className="text-sm text-gray-700 dark:text-gray-300 italic flex items-start gap-2">
+                          📝 "{purchase.notes}"
                         </p>
                       </div>
                     )}
@@ -194,7 +250,7 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Purchase</AlertDialogTitle>
+                          <AlertDialogTitle>🗑️ Delete Purchase</AlertDialogTitle>
                           <AlertDialogDescription>
                             Are you sure you want to delete "{purchase.item}"? This action cannot be undone.
                           </AlertDialogDescription>
@@ -224,8 +280,8 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
                 {searchTerm || filterStore !== 'all' || filterTrigger !== 'all' 
-                  ? 'Try adjusting your filters or search terms.'
-                  : 'Start tracking your purchases to see them here!'
+                  ? 'Try adjusting your filters or search terms. 🔍'
+                  : 'Start tracking your purchases to see them here! 📝'
                 }
               </p>
             </CardContent>

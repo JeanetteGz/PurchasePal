@@ -4,7 +4,7 @@ import { SpendingChart } from './SpendingChart';
 import { format, subMonths, getMonth, getYear, parseISO, isSameMonth } from 'date-fns';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Delete, TrendingUp, TrendingDown, Store, ShoppingCart } from "lucide-react";
+import { Delete, TrendingUp, TrendingDown, Store, ShoppingCart, Lightbulb } from "lucide-react";
 import { useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
@@ -18,11 +18,27 @@ const PIE_COLORS = [
   "#ec4899", "#6366f1", "#a21caf", "#f472b6", "#34d399"
 ];
 
+const mindfulTips = [
+  "💭 Before buying, ask yourself: 'Do I really need this, or do I just want it?'",
+  "⏰ Try the 24-hour rule: Wait a day before making non-essential purchases.",
+  "📝 Make a shopping list and stick to it to avoid impulse buys.",
+  "💰 Set a monthly budget for discretionary spending and track it.",
+  "🛒 Shop with a full stomach to avoid impulse food purchases.",
+  "📱 Unsubscribe from promotional emails that tempt you to spend.",
+  "🎯 Focus on experiences over material possessions for lasting happiness.",
+  "💳 Leave your credit cards at home when window shopping.",
+  "🤔 Practice gratitude for what you already have before buying more.",
+  "👥 Avoid shopping when you're emotional or stressed.",
+];
+
 export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [statsOpen, setStatsOpen] = useState(false);
   const [monthComparisonOpen, setMonthComparisonOpen] = useState(false);
   const [avgPurchaseOpen, setAvgPurchaseOpen] = useState(false);
+
+  // Get a random mindful tip
+  const randomTip = mindfulTips[Math.floor(Math.random() * mindfulTips.length)];
 
   // Stats calculations
   const now = new Date();
@@ -112,6 +128,21 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Mindful Tip Card */}
+      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+            <Lightbulb className="w-5 h-5" />
+            💡 Mindful Spending Tip
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-purple-600 dark:text-purple-200 text-lg italic">
+            {randomTip}
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Total Spent Card */}
@@ -472,6 +503,9 @@ const getTriggerEmoji = (trigger: string) => {
     excitement: '🤩',
     peer_pressure: '👥',
     sale: '🏷️',
+    impulse: '⚡',
+    necessities: '🛒',
+    planned: '📋',
     other: '🤔'
   };
   return emojiMap[trigger] || '🤔';

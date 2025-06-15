@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,19 +53,15 @@ export const Wants = () => {
   const extractImageFromUrl = async (url: string): Promise<string> => {
     try {
       // For Amazon URLs, try to extract product image
-      if (url.includes('amazon.com')) {
-        const asinMatch = url.match(/\/dp\/([A-Z0-9]{10})/);
+      if (url.includes('amazon.com') || url.includes('amazon.')) {
+        const asinMatch = url.match(/\/dp\/([A-Z0-9]{10})|\/gp\/product\/([A-Z0-9]{10})/);
         if (asinMatch) {
-          return `https://images-na.ssl-images-amazon.com/images/P/${asinMatch[1]}.01.L.jpg`;
+          const asin = asinMatch[1] || asinMatch[2];
+          return `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.L.jpg`;
         }
       }
       
-      // For other e-commerce sites, try common patterns
-      if (url.includes('ebay.com')) {
-        // eBay often has item images in a specific pattern
-        return '';
-      }
-      
+      // For other e-commerce sites, return empty string for now
       return '';
     } catch (error) {
       console.error('Error extracting image:', error);
@@ -80,8 +75,9 @@ export const Wants = () => {
     
     if (url) {
       const extractedImage = await extractImageFromUrl(url);
-      console.log('Extracted image URL:', extractedImage);
-      setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
+      if (extractedImage) {
+        setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
+      }
     }
   };
 
@@ -98,7 +94,7 @@ export const Wants = () => {
           product_name: newWant.product_name,
           category: newWant.category,
           product_url: newWant.product_url,
-          product_image_url: extractedImage || null,
+          product_image_url: extractedImage || newWant.product_image_url || null,
           notes: newWant.notes || null,
           user_id: (await supabase.auth.getUser()).data.user?.id
         })
@@ -173,7 +169,7 @@ export const Wants = () => {
           <Sparkles className="w-6 h-6" />
         </div>
         <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          Keep track of items you want to buy. Take time to think before making impulse purchases!
+          Keep track of items you want to buy. Take time to think before making impulse purchases! 🤔💭
         </p>
       </div>
 
@@ -184,7 +180,7 @@ export const Wants = () => {
           className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg transform transition-all hover:scale-105"
         >
           <Plus className="w-5 h-5 mr-2" />
-          Add to Wishlist
+          ➕ Add to Wishlist
         </Button>
       </div>
 
@@ -194,7 +190,7 @@ export const Wants = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
               <ShoppingBag className="w-5 h-5" />
-              Add New Item
+              ➕ Add New Item
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -202,7 +198,7 @@ export const Wants = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Product Name *
+                    🛍️ Product Name *
                   </label>
                   <input
                     type="text"
@@ -215,7 +211,7 @@ export const Wants = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Category *
+                    📂 Category *
                   </label>
                   <select
                     value={newWant.category}
@@ -238,19 +234,19 @@ export const Wants = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Product URL
+                  🔗 Product URL
                 </label>
                 <input
                   type="url"
                   value={newWant.product_url}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="https://... (image will be auto-detected)"
+                  placeholder="https://... (image will be auto-detected for Amazon)"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Notes
+                  📝 Notes
                 </label>
                 <textarea
                   value={newWant.notes}
@@ -265,7 +261,7 @@ export const Wants = () => {
                   type="submit"
                   className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                 >
-                  Add to Wishlist
+                  ➕ Add to Wishlist
                 </Button>
                 <Button
                   type="button"
@@ -283,11 +279,13 @@ export const Wants = () => {
 
       {/* Product Detail Modal */}
       {selectedWant && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedWant(null)}>
+          <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800" onClick={(e) => e.stopPropagation()}>
             <CardHeader>
               <div className="flex justify-between items-start">
-                <CardTitle className="text-xl font-bold">{selectedWant.product_name}</CardTitle>
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
+                  {getCategoryEmoji(selectedWant.category)} {selectedWant.product_name}
+                </CardTitle>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -306,22 +304,26 @@ export const Wants = () => {
                     alt={selectedWant.product_name}
                     className="w-full h-full object-contain"
                     onError={(e) => {
-                      e.currentTarget.parentElement!.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">Image not available</div>';
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">📷 Image not available</div>';
+                      }
                     }}
                   />
                 </div>
               )}
               <div className="space-y-2">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Category:</span> {getCategoryEmoji(selectedWant.category)} {selectedWant.category}
+                  <span className="font-medium">📂 Category:</span> {getCategoryEmoji(selectedWant.category)} {selectedWant.category}
                 </p>
                 {selectedWant.notes && (
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Notes:</span> {selectedWant.notes}
+                    <span className="font-medium">📝 Notes:</span> {selectedWant.notes}
                   </p>
                 )}
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Added:</span> {new Date(selectedWant.created_at).toLocaleDateString()}
+                  <span className="font-medium">📅 Added:</span> {new Date(selectedWant.created_at).toLocaleDateString()}
                 </p>
               </div>
               <div className="flex gap-3">
@@ -331,7 +333,7 @@ export const Wants = () => {
                     className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    View Product
+                    🔗 View Product
                   </Button>
                 )}
                 <Button
@@ -343,7 +345,7 @@ export const Wants = () => {
                   className="px-6"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  🗑️ Delete
                 </Button>
               </div>
             </CardContent>
@@ -357,7 +359,7 @@ export const Wants = () => {
           <CardContent className="text-center py-12">
             <div className="text-6xl mb-4">🎯</div>
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">Your wishlist is empty</h3>
-            <p className="text-gray-500 dark:text-gray-400">Start adding items you'd like to buy in the future!</p>
+            <p className="text-gray-500 dark:text-gray-400">Start adding items you'd like to buy in the future! ✨</p>
           </CardContent>
         </Card>
       ) : (
@@ -391,11 +393,12 @@ export const Wants = () => {
                             alt={want.product_name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                             onError={(e) => {
-                              console.log('Image failed to load:', want.product_image_url);
-                              e.currentTarget.parentElement!.style.display = 'none';
-                            }}
-                            onLoad={() => {
-                              console.log('Image loaded successfully:', want.product_image_url);
+                              const target = e.currentTarget;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 text-4xl">📷</div>';
+                              }
                             }}
                           />
                         </div>
@@ -426,22 +429,21 @@ export const Wants = () => {
                     </div>
                     
                     <CardContent className="p-6">
-                      <h4 className="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2 line-clamp-2">
-                        {want.product_name}
+                      <h4 className="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2 line-clamp-2 flex items-center gap-2">
+                        {getCategoryEmoji(want.category)} {want.product_name}
                       </h4>
                       {want.notes && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
-                          {want.notes}
+                          📝 {want.notes}
                         </p>
                       )}
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Added {new Date(want.created_at).toLocaleDateString()}
+                          📅 Added {new Date(want.created_at).toLocaleDateString()}
                         </span>
                         <div className="flex items-center gap-1">
-                          <span className="text-sm">{getCategoryEmoji(category)}</span>
                           <span className="text-xs text-purple-600 dark:text-purple-400 capitalize font-medium">
-                            {category}
+                            {getCategoryEmoji(want.category)} {category}
                           </span>
                         </div>
                       </div>
