@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,24 @@ interface PurchaseViewProps {
   purchases: Purchase[];
   onDeletePurchase: (id: string) => void;
 }
+
+const getTriggerEmoji = (trigger: string) => {
+  const emojiMap: { [key: string]: string } = {
+    stress: '😰',
+    boredom: '😴',
+    happiness: '😊',
+    sadness: '😢',
+    anxiety: '😟',
+    excitement: '🤩',
+    peer_pressure: '👥',
+    sale: '🏷️',
+    impulse: '⚡',
+    necessities: '🛒',
+    planned: '📋',
+    other: '🤔'
+  };
+  return emojiMap[trigger] || '🤔';
+};
 
 export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,7 +79,6 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
     };
     return colors[trigger] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
   };
-
 
   const getStoreEmoji = (store: string) => {
     const storeEmojis: { [key: string]: string } = {
