@@ -132,7 +132,7 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
       <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
-            <Lightbulb className="w-5 h-5" />
+            <Lightbulb />
             💡 Mindful Spending Tip
           </CardTitle>
         </CardHeader>
