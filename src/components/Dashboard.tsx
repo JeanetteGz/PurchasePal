@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Purchase } from '@/pages/Index';
 import { SpendingChart } from './SpendingChart';
@@ -126,28 +127,22 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
   const avgPurchase = purchases.length > 0 ? totalSpent / purchases.length : 0;
   const recentPurchases = purchases.slice(0, 3);
 
-return (
-  <div className="space-y-6">
-    {tips.map((tip, index) => (
-      <Card
-        key={index}
-        className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0 shadow-lg"
-      >
+  return (
+    <div className="space-y-6">
+      {/* Mindful Tip Card */}
+      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
             <Lightbulb className="w-5 h-5" />
-            💡 Mindful Spending Tip #{index + 1}
+            💡 Mindful Spending Tip
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-purple-600 dark:text-purple-200 text-lg italic">
-            {tip}
+            {randomTip}
           </p>
         </CardContent>
       </Card>
-    ))}
-  </div>
-);
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
