@@ -1,5 +1,7 @@
 
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -41,76 +43,105 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-10">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <span>👤</span> Profile
-      </h2>
-      <form onSubmit={handleSave} className="space-y-6">
-        <div className="flex flex-col items-center gap-3">
-          <div className="relative">
-            <Avatar className="h-20 w-20 cursor-pointer ring-2 ring-accent" onClick={handleAvatarClick}>
-              <AvatarImage src={avatarUrl} />
-              <AvatarFallback>{getInitials()}</AvatarFallback>
-            </Avatar>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInput}
-              onChange={handleFileChange}
-            />
-            <span className="absolute bottom-0 right-0 bg-primary text-xs rounded-full px-2 py-1 font-semibold cursor-pointer text-primary-foreground" onClick={handleAvatarClick}>
-              Change
-            </span>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Header with back button */}
+      <div className="bg-white/70 backdrop-blur-sm border-b border-white/20">
+        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
+          <Link 
+            to="/" 
+            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft size={20} />
+            Back
+          </Link>
+          <h1 className="flex-1 text-xl font-bold text-center">Profile Settings</h1>
+          <div className="w-12"></div> {/* Spacer for centering */}
         </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">First Name</label>
-            <Input
-              value={firstName}
-              onChange={e => setFirstName(e.target.value)}
-              maxLength={30}
-              placeholder="First name"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Last Name</label>
-            <Input
-              value={lastName}
-              onChange={e => setLastName(e.target.value)}
-              maxLength={30}
-              placeholder="Last name"
-            />
-          </div>
-        </div>
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <Input
-            value={email}
-            readOnly
-            className="bg-muted cursor-not-allowed"
-            type="email"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Email cannot be changed
-          </p>
-        </div>
+      <div className="max-w-md mx-auto py-10 px-4">
+        <form onSubmit={handleSave} className="space-y-6">
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative">
+              <Avatar className="h-20 w-20 cursor-pointer ring-2 ring-accent hover:ring-4 transition-all" onClick={handleAvatarClick}>
+                <AvatarImage src={avatarUrl} />
+                <AvatarFallback>{getInitials()}</AvatarFallback>
+              </Avatar>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInput}
+                onChange={handleFileChange}
+              />
+              <span className="absolute bottom-0 right-0 bg-primary text-xs rounded-full px-2 py-1 font-semibold cursor-pointer text-primary-foreground hover:bg-primary/90 transition-colors" onClick={handleAvatarClick}>
+                Change
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              Click to upload a new profile picture
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">First Name</label>
+              <Input
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
+                maxLength={30}
+                placeholder="First name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Last Name</label>
+              <Input
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+                maxLength={30}
+                placeholder="Last name"
+              />
+            </div>
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Bio</label>
-          <Input
-            value={bio}
-            onChange={e => setBio(e.target.value)}
-            maxLength={80}
-            placeholder="Tell us about yourself"
-          />
-        </div>
-        
-        <Button type="submit" className="w-full mt-4">Save Changes</Button>
-      </form>
+          <div>
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <Input
+              value={email}
+              readOnly
+              className="bg-muted cursor-not-allowed"
+              type="email"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Email cannot be changed
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Bio</label>
+            <Input
+              value={bio}
+              onChange={e => setBio(e.target.value)}
+              maxLength={80}
+              placeholder="Tell us about yourself"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              {bio.length}/80 characters
+            </p>
+          </div>
+          
+          <div className="flex gap-3">
+            <Button type="submit" className="flex-1">
+              Save Changes
+            </Button>
+            <Link to="/">
+              <Button type="button" variant="outline">
+                Cancel
+              </Button>
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
