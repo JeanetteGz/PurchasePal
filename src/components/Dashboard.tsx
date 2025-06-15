@@ -140,12 +140,7 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
           <p className="text-purple-600 dark:text-purple-200 text-lg italic">
             {randomTip}
           </p>
-          <p className="text-purple-600 dark:text-purple-200 text-lg italic">
-            {randomTip}
-          </p>
-          <p className="text-purple-600 dark:text-purple-200 text-lg italic">
-            {randomTip}
-          </p>        </CardContent>
+     </CardContent>
       </Card>
 
       {/* Stats Cards */}
