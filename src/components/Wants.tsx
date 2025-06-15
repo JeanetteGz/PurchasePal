@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,23 @@ const CATEGORIES = [
   '✈️ Travel',
   '🔮 Other'
 ];
+
+const getCategoryGradient = (category: string) => {
+  const gradients = {
+    '💇‍♀️ Hair Care': 'from-pink-400 via-pink-500 to-pink-600',
+    '🪑 Furniture': 'from-amber-400 via-orange-500 to-red-500',
+    '📱 Electronics': 'from-blue-400 via-blue-500 to-blue-600',
+    '👗 Clothing': 'from-purple-400 via-purple-500 to-purple-600',
+    '📚 Books': 'from-green-400 via-green-500 to-green-600',
+    '🏡 Home & Garden': 'from-emerald-400 via-emerald-500 to-emerald-600',
+    '🏃‍♂️ Sports & Fitness': 'from-red-400 via-red-500 to-red-600',
+    '💄 Beauty & Skincare': 'from-pink-400 via-rose-500 to-rose-600',
+    '🍽️ Kitchen & Dining': 'from-yellow-400 via-orange-500 to-orange-600',
+    '✈️ Travel': 'from-cyan-400 via-sky-500 to-blue-600',
+    '🔮 Other': 'from-indigo-400 via-purple-500 to-purple-600'
+  };
+  return gradients[category] || 'from-gray-400 via-gray-500 to-gray-600';
+};
 
 export const Wants = () => {
   const [wants, setWants] = useState<Want[]>([]);
@@ -73,8 +91,6 @@ export const Wants = () => {
 
   const extractImageFromUrl = async (url: string) => {
     try {
-      // Simple image extraction - try to get og:image from meta tags
-      // This is a basic implementation - in a real app you might use a service
       const response = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
       const data = await response.json();
       return data?.data?.image?.url || null;
@@ -97,7 +113,6 @@ export const Wants = () => {
 
     setLoading(true);
     try {
-      // Extract image from URL
       const imageUrl = await extractImageFromUrl(formData.product_url);
 
       const { data, error } = await supabase
@@ -170,7 +185,7 @@ export const Wants = () => {
 
   if (loading && wants.length === 0) {
     return (
-      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
+      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
         <CardContent className="p-4 md:p-6">
           <div className="flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 dark:border-blue-400"></div>
@@ -180,12 +195,12 @@ export const Wants = () => {
     );
   }
 
-  // If a category is selected, show items in that category
+  // Category view - show items in selected category
   if (selectedCategory) {
     const categoryItems = groupedWants[selectedCategory] || [];
     
     return (
-      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
+      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
         <CardHeader className="p-4 md:p-6">
           <div className="flex items-center gap-3">
             <Button
@@ -195,7 +210,7 @@ export const Wants = () => {
             >
               <ArrowLeft size={20} />
             </Button>
-            <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-blue-400 text-lg md:text-xl">
+            <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-100 text-lg md:text-xl">
               <Heart className="text-pink-500" size={24} />
               {selectedCategory}
             </CardTitle>
@@ -210,7 +225,7 @@ export const Wants = () => {
           ) : (
             <div className="space-y-3 md:space-y-4">
               {categoryItems.map((want) => (
-                <div key={want.id} className="border dark:border-gray-600 rounded-xl p-3 md:p-4 bg-white dark:bg-gray-700 shadow-sm">
+                <div key={want.id} className="border dark:border-gray-600/50 rounded-xl p-3 md:p-4 bg-white/70 dark:bg-gray-700/70 shadow-sm backdrop-blur-sm">
                   <div className="flex gap-3 md:gap-4">
                     {want.product_image_url ? (
                       <img 
@@ -223,7 +238,7 @@ export const Wants = () => {
                         }}
                       />
                     ) : (
-                      <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-blue-900 dark:to-purple-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-blue-900/50 dark:to-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Heart className="text-purple-400 dark:text-blue-400" size={20} />
                       </div>
                     )}
@@ -238,7 +253,7 @@ export const Wants = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => window.open(want.product_url, '_blank')}
-                          className="rounded-full text-xs h-7 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200 dark:hover:bg-gray-500"
+                          className="rounded-full text-xs h-7 bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500/70"
                         >
                           <ExternalLink size={12} />
                           <span className="hidden sm:inline ml-1">View Product</span>
@@ -248,7 +263,7 @@ export const Wants = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => deleteWant(want.id)}
-                          className="rounded-full text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 h-7"
+                          className="rounded-full text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 h-7 bg-white/70 dark:bg-gray-600/70 border-red-300 dark:border-red-500"
                         >
                           <Trash2 size={12} />
                           <span className="hidden sm:inline ml-1">Remove</span>
@@ -266,9 +281,9 @@ export const Wants = () => {
   }
 
   return (
-    <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm">
+    <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
       <CardHeader className="p-4 md:p-6">
-        <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-blue-400 text-lg md:text-xl">
+        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-100 text-lg md:text-xl">
           <Heart className="text-pink-500" size={24} />
           💜 My Wishlist
         </CardTitle>
@@ -277,47 +292,47 @@ export const Wants = () => {
         {!showAddForm ? (
           <Button 
             onClick={() => setShowAddForm(true)}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 dark:from-blue-600 dark:to-purple-600 hover:from-purple-600 hover:to-pink-600 dark:hover:from-blue-700 dark:hover:to-purple-700 text-sm md:text-base"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 dark:from-blue-600 dark:to-purple-600 hover:from-purple-600 hover:to-pink-600 dark:hover:from-blue-700 dark:hover:to-purple-700 text-sm md:text-base shadow-lg"
           >
             <Plus size={20} />
             Add Future Purchase
           </Button>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 p-3 md:p-4 bg-purple-50 dark:bg-gray-700 rounded-lg">
+          <form onSubmit={handleSubmit} className="space-y-4 p-3 md:p-4 bg-purple-50/70 dark:bg-gray-700/70 rounded-lg backdrop-blur-sm">
             <div>
-              <Label htmlFor="product_name" className="text-sm dark:text-gray-200">Product Name *</Label>
+              <Label htmlFor="product_name" className="text-sm text-gray-700 dark:text-gray-200">Product Name *</Label>
               <Input
                 id="product_name"
                 value={formData.product_name}
                 onChange={(e) => setFormData(prev => ({ ...prev, product_name: e.target.value }))}
                 placeholder="What do you want to buy?"
-                className="rounded-xl text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"
+                className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100"
                 required
               />
             </div>
             
             <div>
-              <Label htmlFor="product_url" className="text-sm dark:text-gray-200">Product Link *</Label>
+              <Label htmlFor="product_url" className="text-sm text-gray-700 dark:text-gray-200">Product Link *</Label>
               <Input
                 id="product_url"
                 type="url"
                 value={formData.product_url}
                 onChange={(e) => setFormData(prev => ({ ...prev, product_url: e.target.value }))}
                 placeholder="https://example.com/product"
-                className="rounded-xl text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"
+                className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100"
                 required
               />
             </div>
             
             <div>
-              <Label htmlFor="category" className="text-sm dark:text-gray-200">Category *</Label>
+              <Label htmlFor="category" className="text-sm text-gray-700 dark:text-gray-200">Category *</Label>
               <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                <SelectTrigger className="rounded-xl text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100">
+                <SelectTrigger className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-700 z-50">
                   {CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category} className="text-sm dark:text-gray-200">
+                    <SelectItem key={category} value={category} className="text-sm text-gray-900 dark:text-gray-200">
                       {category}
                     </SelectItem>
                   ))}
@@ -326,26 +341,26 @@ export const Wants = () => {
             </div>
             
             <div>
-              <Label htmlFor="notes" className="text-sm dark:text-gray-200">Notes (Optional)</Label>
+              <Label htmlFor="notes" className="text-sm text-gray-700 dark:text-gray-200">Notes (Optional)</Label>
               <Textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                 placeholder="Why do you want this? When might you buy it?"
-                className="rounded-xl text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"
+                className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100"
                 rows={3}
               />
             </div>
             
             <div className="flex flex-col sm:flex-row gap-2">
-              <Button type="submit" disabled={loading} className="flex-1 rounded-xl text-sm dark:bg-blue-600 dark:hover:bg-blue-700">
+              <Button type="submit" disabled={loading} className="flex-1 rounded-xl text-sm bg-gradient-to-r from-purple-500 to-pink-500 dark:from-blue-600 dark:to-purple-600 hover:from-purple-600 hover:to-pink-600 dark:hover:from-blue-700 dark:hover:to-purple-700">
                 {loading ? "Adding..." : "💜 Add to Wishlist"}
               </Button>
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => setShowAddForm(false)}
-                className="rounded-xl text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-200 dark:hover:bg-gray-500"
+                className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500/70"
               >
                 Cancel
               </Button>
@@ -362,24 +377,38 @@ export const Wants = () => {
         ) : (
           <div className="space-y-3 md:space-y-4">
             {Object.entries(groupedWants).map(([category, items]) => (
-              <Card 
+              <div 
                 key={category}
-                className="cursor-pointer hover:shadow-lg transition-all bg-gradient-to-r from-purple-50 to-pink-50 dark:from-blue-900/20 dark:to-purple-900/20 border-purple-200 dark:border-blue-700"
+                className={`relative overflow-hidden rounded-2xl cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-gradient-to-br ${getCategoryGradient(category)} p-[1px]`}
                 onClick={() => setSelectedCategory(category)}
               >
-                <CardContent className="p-4">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 h-full">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="text-2xl">{category.split(' ')[0]}</div>
+                      <div className="text-3xl">{category.split(' ')[0]}</div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{category}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{items.length} item{items.length !== 1 ? 's' : ''}</p>
+                        <h3 className="font-bold text-gray-900 dark:text-gray-100 text-lg">{category.split(' ').slice(1).join(' ')}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{items.length} item{items.length !== 1 ? 's' : ''}</p>
                       </div>
                     </div>
-                    <div className="text-purple-600 dark:text-blue-400">→</div>
+                    <div className="text-gray-400 dark:text-gray-500 text-xl">→</div>
                   </div>
-                </CardContent>
-              </Card>
+                  
+                  {/* Show preview of first few items */}
+                  <div className="mt-3 flex gap-2 overflow-hidden">
+                    {items.slice(0, 3).map((item, index) => (
+                      <div key={item.id} className="flex-shrink-0 w-8 h-8 bg-white/50 dark:bg-gray-700/50 rounded-lg flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-200/50 dark:border-gray-600/50">
+                        {item.product_name.charAt(0).toUpperCase()}
+                      </div>
+                    ))}
+                    {items.length > 3 && (
+                      <div className="flex-shrink-0 w-8 h-8 bg-gray-100/50 dark:bg-gray-600/50 rounded-lg flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400 border border-gray-200/50 dark:border-gray-600/50">
+                        +{items.length - 3}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
