@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
@@ -6,7 +7,7 @@ import { Wants } from '@/components/Wants';
 import { Link } from "react-router-dom";
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, LogOut, BarChart3, Plus, Heart, PieChart } from 'lucide-react';
+import { Lightbulb, LogOut } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -173,7 +174,7 @@ const Index = () => {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
         <div className="container mx-auto px-4 py-8">
           <header className="flex flex-col md:flex-row items-center justify-between mb-8">
             <div className="text-center md:text-left">
@@ -245,11 +246,11 @@ const Index = () => {
           </div>
 
           {/* Mindful Tips Card */}
-          <Card className="mt-8 bg-gradient-to-r from-purple-500 to-purple-600 dark:from-gray-800 dark:to-gray-900 border-0 text-white shadow-lg">
+          <Card className="mt-8 bg-gradient-to-r from-purple-500 to-purple-600 dark:from-gray-700 dark:to-gray-800 border-0 text-white shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Lightbulb className="text-yellow-300 dark:text-yellow-400" size={24} />
-                <h3 className="text-xl font-bold">💜 Mindful Tips</h3>
+                <h3 className="text-xl font-bold">Mindful Tips</h3>
               </div>
               <div className="space-y-3 mb-4">
                 {currentTips.map((tip, index) => (

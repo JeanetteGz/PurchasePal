@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,17 @@ const getCategoryGradient = (category: string) => {
     '🔮 Other': 'from-indigo-400 via-purple-500 to-purple-600'
   };
   return gradients[category] || 'from-gray-400 via-gray-500 to-gray-600';
+};
+
+const getClothingCardStyle = () => {
+  return {
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    borderRadius: '20px',
+    padding: '20px',
+    color: 'white',
+    position: 'relative' as const,
+    overflow: 'hidden' as const,
+  };
 };
 
 export const Wants = () => {
@@ -377,30 +389,63 @@ export const Wants = () => {
             {Object.entries(groupedWants).map(([category, items]) => (
               <div 
                 key={category}
-                className={`relative overflow-hidden rounded-2xl cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] bg-gradient-to-br ${getCategoryGradient(category)} p-[1px]`}
+                className={`relative overflow-hidden rounded-2xl cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] ${
+                  category === '👗 Clothing' 
+                    ? 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600' 
+                    : `bg-gradient-to-br ${getCategoryGradient(category)}`
+                } p-[1px]`}
                 onClick={() => setSelectedCategory(category)}
+                style={category === '👗 Clothing' ? getClothingCardStyle() : undefined}
               >
-                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-4 h-full">
+                <div className={`${category === '👗 Clothing' ? 'bg-transparent' : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm'} rounded-2xl p-4 h-full`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="text-3xl">{category.split(' ')[0]}</div>
+                      <div className={`text-3xl ${category === '👗 Clothing' ? 'filter drop-shadow-sm' : ''}`}>
+                        {category.split(' ')[0]}
+                      </div>
                       <div>
-                        <h3 className="font-bold text-gray-900 dark:text-gray-100 text-lg">{category.substring(category.indexOf(' ') + 1)}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{items.length} item{items.length !== 1 ? 's' : ''}</p>
+                        <h3 className={`font-bold text-lg ${
+                          category === '👗 Clothing' 
+                            ? 'text-white drop-shadow-sm' 
+                            : 'text-gray-900 dark:text-gray-100'
+                        }`}>
+                          {category.substring(category.indexOf(' ') + 1)}
+                        </h3>
+                        <p className={`text-sm font-medium ${
+                          category === '👗 Clothing' 
+                            ? 'text-white/80 drop-shadow-sm' 
+                            : 'text-gray-600 dark:text-gray-400'
+                        }`}>
+                          {items.length} item{items.length !== 1 ? 's' : ''}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-gray-400 dark:text-gray-500 text-xl">→</div>
+                    <div className={`text-xl ${
+                      category === '👗 Clothing' 
+                        ? 'text-white/60 drop-shadow-sm' 
+                        : 'text-gray-400 dark:text-gray-500'
+                    }`}>
+                      →
+                    </div>
                   </div>
                   
                   {/* Show preview of first few items */}
                   <div className="mt-3 flex gap-2 overflow-hidden">
                     {items.slice(0, 3).map((item, index) => (
-                      <div key={item.id} className="flex-shrink-0 w-8 h-8 bg-white/50 dark:bg-gray-700/50 rounded-lg flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-200/50 dark:border-gray-600/50">
+                      <div key={item.id} className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium border ${
+                        category === '👗 Clothing'
+                          ? 'bg-white/20 text-white border-white/30 backdrop-blur-sm'
+                          : 'bg-white/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 border-gray-200/50 dark:border-gray-600/50'
+                      }`}>
                         {item.product_name.charAt(0).toUpperCase()}
                       </div>
                     ))}
                     {items.length > 3 && (
-                      <div className="flex-shrink-0 w-8 h-8 bg-gray-100/50 dark:bg-gray-600/50 rounded-lg flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400 border border-gray-200/50 dark:border-gray-600/50">
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium border ${
+                        category === '👗 Clothing'
+                          ? 'bg-white/10 text-white/70 border-white/20 backdrop-blur-sm'
+                          : 'bg-gray-100/50 dark:bg-gray-600/50 text-gray-500 dark:text-gray-400 border-gray-200/50 dark:border-gray-600/50'
+                      }`}>
                         +{items.length - 3}
                       </div>
                     )}
