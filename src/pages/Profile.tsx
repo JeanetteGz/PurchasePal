@@ -11,7 +11,9 @@ const Profile = () => {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [avatarUrl, setAvatarUrl] = useState(placeholderImage);
-  const [name, setName] = useState("Jesse");
+  const [firstName, setFirstName] = useState("Jesse");
+  const [lastName, setLastName] = useState("Smith");
+  const [email] = useState("jesse.smith@example.com"); // Read-only email
   const [bio, setBio] = useState("Mindful spender 🧘‍♂️");
   const [tempFile, setTempFile] = useState<File | null>(null);
 
@@ -31,6 +33,11 @@ const Profile = () => {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, upload avatar and save info here.
+    console.log("Saving profile:", { firstName, lastName, bio, tempFile });
+  };
+
+  const getInitials = () => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
   return (
@@ -43,7 +50,7 @@ const Profile = () => {
           <div className="relative">
             <Avatar className="h-20 w-20 cursor-pointer ring-2 ring-accent" onClick={handleAvatarClick}>
               <AvatarImage src={avatarUrl} />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>{getInitials()}</AvatarFallback>
             </Avatar>
             <input
               type="file"
@@ -52,27 +59,56 @@ const Profile = () => {
               ref={fileInput}
               onChange={handleFileChange}
             />
-            <span className="absolute bottom-0 right-0 bg-primary text-xs rounded-full px-2 py-1 font-semibold cursor-pointer" onClick={handleAvatarClick}>
+            <span className="absolute bottom-0 right-0 bg-primary text-xs rounded-full px-2 py-1 font-semibold cursor-pointer text-primary-foreground" onClick={handleAvatarClick}>
               Change
             </span>
           </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Name</label>
-          <Input
-            value={name}
-            onChange={e => setName(e.target.value)}
-            maxLength={30}
-          />
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">First Name</label>
+            <Input
+              value={firstName}
+              onChange={e => setFirstName(e.target.value)}
+              maxLength={30}
+              placeholder="First name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Last Name</label>
+            <Input
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+              maxLength={30}
+              placeholder="Last name"
+            />
+          </div>
         </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Email</label>
+          <Input
+            value={email}
+            readOnly
+            className="bg-muted cursor-not-allowed"
+            type="email"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Email cannot be changed
+          </p>
+        </div>
+
         <div>
           <label className="block text-sm font-medium mb-1">Bio</label>
           <Input
             value={bio}
             onChange={e => setBio(e.target.value)}
             maxLength={80}
+            placeholder="Tell us about yourself"
           />
         </div>
+        
         <Button type="submit" className="w-full mt-4">Save Changes</Button>
       </form>
     </div>
