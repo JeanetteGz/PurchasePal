@@ -7,7 +7,7 @@ interface LogoProps {
   showText?: boolean;
 }
 
-const Logo = ({ size = 'md', showText = true }: LogoProps) => {
+export const Logo = ({ size = 'md', showText = true }: LogoProps) => {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
@@ -57,5 +57,3 @@ const Logo = ({ size = 'md', showText = true }: LogoProps) => {
     </div>
   );
 };
-
-export default Logo;
