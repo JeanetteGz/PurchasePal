@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,17 +13,45 @@ interface AddPurchaseProps {
   onSuccess?: () => void;
 }
 
-const triggers = [
-  { id: 'stress', label: 'Stress', emoji: '😰' },
-  { id: 'boredom', label: 'Boredom', emoji: '😴' },
-  { id: 'happiness', label: 'Happiness', emoji: '😊' },
-  { id: 'sadness', label: 'Sadness', emoji: '😢' },
-  { id: 'anxiety', label: 'Anxiety', emoji: '😟' },
-  { id: 'excitement', label: 'Excitement', emoji: '🤩' },
-  { id: 'peer_pressure', label: 'Peer Pressure', emoji: '👥' },
-  { id: 'sale', label: 'Sale/Deal', emoji: '🏷️' },
-  { id: 'other', label: 'Other', emoji: '🤔' }
-];
+const triggers = {
+  // Practical Reasons
+  groceries: { label: 'Groceries', emoji: '🛒', category: 'practical' },
+  necessities: { label: 'Necessities', emoji: '🏠', category: 'practical' },
+  replacement: { label: 'Replacement', emoji: '🔄', category: 'practical' },
+  gift: { label: 'Gift for Someone', emoji: '🎁', category: 'practical' },
+  planned: { label: 'Planned Purchase', emoji: '📋', category: 'practical' },
+  emergency: { label: 'Emergency', emoji: '🚨', category: 'practical' },
+  convenience: { label: 'Convenience', emoji: '⚡', category: 'practical' },
+  
+  // Emotional Triggers
+  boredom: { label: 'Boredom', emoji: '😴', category: 'emotional' },
+  stress: { label: 'Stress', emoji: '😰', category: 'emotional' },
+  anxiety: { label: 'Anxiety', emoji: '😟', category: 'emotional' },
+  depression: { label: 'Depression', emoji: '😢', category: 'emotional' },
+  celebration: { label: 'Celebration', emoji: '🎉', category: 'emotional' },
+  retail_therapy: { label: 'Retail Therapy', emoji: '🛍️', category: 'emotional' },
+  
+  // Influence-based
+  sale: { label: 'Sale/Discount', emoji: '🏷️', category: 'external' },
+  advertisement: { label: 'Saw an Ad', emoji: '📱', category: 'external' },
+  influencer: { label: 'Influencer Rec', emoji: '⭐', category: 'external' },
+  fomo: { label: 'FOMO', emoji: '😱', category: 'external' },
+  peer_pressure: { label: 'Peer Pressure', emoji: '👥', category: 'external' },
+  impulse: { label: 'Pure Impulse', emoji: '💭', category: 'external' },
+  
+  // Others
+  treat_yourself: { label: 'Treat Yourself', emoji: '✨', category: 'other' },
+  curiosity: { label: 'Curiosity', emoji: '🤔', category: 'other' },
+  hobby: { label: 'Hobby/Collection', emoji: '🎨', category: 'other' },
+  other: { label: 'Other', emoji: '📝', category: 'other' }
+};
+
+const triggerCategories = {
+  practical: 'Practical Reasons',
+  emotional: 'Emotional Triggers',
+  external: 'External Influences',
+  other: 'Other Reasons'
+};
 
 const stores = [
   { id: 'amazon', name: 'Amazon', emoji: '📦' },
@@ -106,14 +133,18 @@ export const AddPurchase = ({ onAddPurchase, onSuccess }: AddPurchaseProps) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const getTriggersByCategory = (category: string) => {
+    return Object.entries(triggers).filter(([_, trigger]) => trigger.category === category);
+  };
+
   return (
     <div className="max-w-2xl mx-auto">
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg rounded-3xl">
+      <Card className="bg-white/60 dark:bg-card/80 backdrop-blur-sm border-0 shadow-lg rounded-3xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             🛒 Add New Purchase
           </CardTitle>
-          <p className="text-gray-600">Track what you bought and why to understand your spending patterns</p>
+          <p className="text-muted-foreground">Track what you bought and why to understand your spending patterns</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -125,21 +156,21 @@ export const AddPurchase = ({ onAddPurchase, onSuccess }: AddPurchaseProps) => {
                   placeholder="e.g., Designer sneakers"
                   value={formData.item}
                   onChange={(e) => handleInputChange('item', e.target.value)}
-                  className="bg-white/50 rounded-xl"
+                  className="bg-white/50 dark:bg-input/50 rounded-xl"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="store">Where did you buy it? *</Label>
                 <Select value={formData.store} onValueChange={(value) => handleInputChange('store', value)}>
-                  <SelectTrigger className="bg-white/50 rounded-xl">
+                  <SelectTrigger className="bg-white/50 dark:bg-input/50 rounded-xl">
                     <SelectValue placeholder="Select a store" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white rounded-xl border shadow-lg max-h-60">
+                  <SelectContent className="bg-white dark:bg-popover rounded-xl border shadow-lg max-h-60">
                     {stores.map((store) => (
                       <SelectItem 
                         key={store.id} 
                         value={store.name}
-                        className="cursor-pointer hover:bg-purple-50 rounded-lg"
+                        className="cursor-pointer hover:bg-purple-50 dark:hover:bg-accent rounded-lg"
                       >
                         <div className="flex items-center gap-2">
                           <span>{store.emoji}</span>
@@ -162,7 +193,7 @@ export const AddPurchase = ({ onAddPurchase, onSuccess }: AddPurchaseProps) => {
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={(e) => handleInputChange('amount', e.target.value)}
-                  className="bg-white/50 rounded-xl"
+                  className="bg-white/50 dark:bg-input/50 rounded-xl"
                 />
               </div>
               <div className="space-y-2">
@@ -172,30 +203,37 @@ export const AddPurchase = ({ onAddPurchase, onSuccess }: AddPurchaseProps) => {
                   type="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
-                  className="bg-white/50 rounded-xl"
+                  className="bg-white/50 dark:bg-input/50 rounded-xl"
                 />
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Label>What triggered this purchase? *</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {triggers.map((trigger) => (
-                  <button
-                    key={trigger.id}
-                    type="button"
-                    onClick={() => handleInputChange('trigger', trigger.id)}
-                    className={`p-3 rounded-2xl border-2 transition-all text-left ${
-                      formData.trigger === trigger.id
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 bg-white/50 hover:border-purple-300'
-                    }`}
-                  >
-                    <div className="text-lg mb-1">{trigger.emoji}</div>
-                    <div className="text-sm font-medium">{trigger.label}</div>
-                  </button>
-                ))}
-              </div>
+              {Object.entries(triggerCategories).map(([categoryKey, categoryName]) => (
+                <div key={categoryKey} className="space-y-3">
+                  <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    {categoryName}
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {getTriggersByCategory(categoryKey).map(([triggerKey, trigger]) => (
+                      <button
+                        key={triggerKey}
+                        type="button"
+                        onClick={() => handleInputChange('trigger', triggerKey)}
+                        className={`p-3 rounded-2xl border-2 transition-all text-left ${
+                          formData.trigger === triggerKey
+                            ? 'border-primary bg-primary/10 text-primary dark:border-primary dark:bg-primary/20'
+                            : 'border-border bg-white/50 dark:bg-card/50 hover:border-primary/50 dark:hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="text-lg mb-1">{trigger.emoji}</div>
+                        <div className="text-sm font-medium">{trigger.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="space-y-2">
@@ -205,13 +243,13 @@ export const AddPurchase = ({ onAddPurchase, onSuccess }: AddPurchaseProps) => {
                 placeholder="What were you feeling? What led to this purchase?"
                 value={formData.notes}
                 onChange={(e) => handleInputChange('notes', e.target.value)}
-                className="bg-white/50 min-h-20 rounded-xl"
+                className="bg-white/50 dark:bg-input/50 min-h-20 rounded-xl"
               />
             </div>
 
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-3 rounded-2xl"
+              className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-medium py-3 rounded-2xl"
             >
               💾 Save Purchase
             </Button>
