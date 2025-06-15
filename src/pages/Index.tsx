@@ -21,7 +21,7 @@ const Index = () => {
     {
       id: '1',
       item: 'Designer sneakers',
-      store: 'Nike Store',
+      store: 'Nike',
       amount: 180,
       trigger: 'stress',
       date: '2024-06-10',
@@ -47,6 +47,8 @@ const Index = () => {
     }
   ]);
 
+  const [activeTab, setActiveTab] = useState("dashboard");
+
   const addPurchase = (purchase: Omit<Purchase, 'id'>) => {
     const newPurchase: Purchase = {
       ...purchase,
@@ -57,6 +59,10 @@ const Index = () => {
 
   const deletePurchase = (id: string) => {
     setPurchases(prev => prev.filter(p => p.id !== id));
+  };
+
+  const handlePurchaseSuccess = () => {
+    setActiveTab("dashboard");
   };
 
   return (
@@ -81,15 +87,15 @@ const Index = () => {
           </nav>
         </header>
 
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-white/50 backdrop-blur-sm">
-            <TabsTrigger value="dashboard" className="text-sm font-medium">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-8 bg-white/50 backdrop-blur-sm rounded-2xl">
+            <TabsTrigger value="dashboard" className="text-sm font-medium rounded-xl">
               📊 Dashboard
             </TabsTrigger>
-            <TabsTrigger value="add" className="text-sm font-medium">
+            <TabsTrigger value="add" className="text-sm font-medium rounded-xl">
               ➕ Add Purchase
             </TabsTrigger>
-            <TabsTrigger value="insights" className="text-sm font-medium">
+            <TabsTrigger value="insights" className="text-sm font-medium rounded-xl">
               🧠 Insights
             </TabsTrigger>
           </TabsList>
@@ -99,7 +105,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="add">
-            <AddPurchase onAddPurchase={addPurchase} />
+            <AddPurchase onAddPurchase={addPurchase} onSuccess={handlePurchaseSuccess} />
           </TabsContent>
 
           <TabsContent value="insights">

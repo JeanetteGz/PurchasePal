@@ -15,7 +15,7 @@ const Profile = () => {
   const [avatarUrl, setAvatarUrl] = useState(placeholderImage);
   const [firstName, setFirstName] = useState("Jesse");
   const [lastName, setLastName] = useState("Smith");
-  const [email] = useState("jesse.smith@example.com"); // Read-only email
+  const [email] = useState("jesse.smith@example.com");
   const [bio, setBio] = useState("Mindful spender 🧘‍♂️");
   const [tempFile, setTempFile] = useState<File | null>(null);
 
@@ -34,7 +34,6 @@ const Profile = () => {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, upload avatar and save info here.
     console.log("Saving profile:", { firstName, lastName, bio, tempFile });
   };
 
@@ -44,18 +43,17 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Header with back button */}
       <div className="bg-white/70 backdrop-blur-sm border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
           <Link 
             to="/" 
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors hover:bg-white/50 px-3 py-2 rounded-full"
           >
             <ArrowLeft size={20} />
             Back
           </Link>
-          <h1 className="flex-1 text-xl font-bold text-center">Profile Settings</h1>
-          <div className="w-12"></div> {/* Spacer for centering */}
+          <h1 className="flex-1 text-xl font-bold text-center">Profile Settings ⚙️</h1>
+          <div className="w-16"></div>
         </div>
       </div>
 
@@ -75,55 +73,58 @@ const Profile = () => {
                 onChange={handleFileChange}
               />
               <span className="absolute bottom-0 right-0 bg-primary text-xs rounded-full px-2 py-1 font-semibold cursor-pointer text-primary-foreground hover:bg-primary/90 transition-colors" onClick={handleAvatarClick}>
-                Change
+                📷
               </span>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Click to upload a new profile picture
+              Click to upload a new profile picture 📸
             </p>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">First Name</label>
+              <label className="block text-sm font-medium mb-1">First Name ✨</label>
               <Input
                 value={firstName}
                 onChange={e => setFirstName(e.target.value)}
                 maxLength={30}
                 placeholder="First name"
+                className="rounded-xl"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Last Name</label>
+              <label className="block text-sm font-medium mb-1">Last Name ✨</label>
               <Input
                 value={lastName}
                 onChange={e => setLastName(e.target.value)}
                 maxLength={30}
                 placeholder="Last name"
+                className="rounded-xl"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium mb-1">Email 📧</label>
             <Input
               value={email}
               readOnly
-              className="bg-muted cursor-not-allowed"
+              className="bg-muted cursor-not-allowed rounded-xl"
               type="email"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Email cannot be changed
+              Email cannot be changed 🔒
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Bio</label>
+            <label className="block text-sm font-medium mb-1">Bio 💭</label>
             <Input
               value={bio}
               onChange={e => setBio(e.target.value)}
               maxLength={80}
               placeholder="Tell us about yourself"
+              className="rounded-xl"
             />
             <p className="text-xs text-muted-foreground mt-1">
               {bio.length}/80 characters
@@ -131,12 +132,12 @@ const Profile = () => {
           </div>
           
           <div className="flex gap-3">
-            <Button type="submit" className="flex-1">
-              Save Changes
+            <Button type="submit" className="flex-1 rounded-xl">
+              💾 Save Changes
             </Button>
             <Link to="/">
-              <Button type="button" variant="outline">
-                Cancel
+              <Button type="button" variant="outline" className="rounded-xl">
+                ❌ Cancel
               </Button>
             </Link>
           </div>
