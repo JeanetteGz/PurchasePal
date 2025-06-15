@@ -181,16 +181,16 @@ const Index = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/50 backdrop-blur-sm rounded-2xl">
-            <TabsTrigger value="dashboard" className="text-sm font-medium rounded-xl">
+            <TabsTrigger value="dashboard" className="text-xs md:text-sm font-medium rounded-xl">
               📊 Dashboard
             </TabsTrigger>
-            <TabsTrigger value="add" className="text-sm font-medium rounded-xl">
+            <TabsTrigger value="add" className="text-xs md:text-sm font-medium rounded-xl">
               ➕ Add Purchase
             </TabsTrigger>
-            <TabsTrigger value="wants" className="text-sm font-medium rounded-xl">
-              💜 Wants
+            <TabsTrigger value="wants" className="text-xs md:text-sm font-medium rounded-xl">
+              💜 Wishlist
             </TabsTrigger>
-            <TabsTrigger value="insights" className="text-sm font-medium rounded-xl">
+            <TabsTrigger value="insights" className="text-xs md:text-sm font-medium rounded-xl">
               🧠 Insights
             </TabsTrigger>
           </TabsList>

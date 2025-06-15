@@ -21,17 +21,17 @@ interface Want {
 }
 
 const CATEGORIES = [
-  'Hair Care',
-  'Furniture',
-  'Electronics',
-  'Clothing',
-  'Books',
-  'Home & Garden',
-  'Sports & Fitness',
-  'Beauty & Skincare',
-  'Kitchen & Dining',
-  'Travel',
-  'Other'
+  '💇‍♀️ Hair Care',
+  '🪑 Furniture',
+  '📱 Electronics',
+  '👗 Clothing',
+  '📚 Books',
+  '🏡 Home & Garden',
+  '🏃‍♂️ Sports & Fitness',
+  '💄 Beauty & Skincare',
+  '🍽️ Kitchen & Dining',
+  '✈️ Travel',
+  '🔮 Other'
 ];
 
 export const Wants = () => {
@@ -162,7 +162,7 @@ export const Wants = () => {
   if (loading && wants.length === 0) {
     return (
       <Card className="bg-white/70 backdrop-blur-sm">
-        <CardContent className="p-6">
+        <CardContent className="p-4 md:p-6">
           <div className="flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
           </div>
@@ -173,57 +173,57 @@ export const Wants = () => {
 
   return (
     <Card className="bg-white/70 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-purple-700">
+      <CardHeader className="p-4 md:p-6">
+        <CardTitle className="flex items-center gap-2 text-purple-700 text-lg md:text-xl">
           <Heart className="text-pink-500" size={24} />
           💜 My Wishlist
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-4 md:p-6 pt-0">
         {!showAddForm ? (
           <Button 
             onClick={() => setShowAddForm(true)}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-sm md:text-base"
           >
             <Plus size={20} />
             Add Future Purchase
           </Button>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-purple-50 rounded-lg">
+          <form onSubmit={handleSubmit} className="space-y-4 p-3 md:p-4 bg-purple-50 rounded-lg">
             <div>
-              <Label htmlFor="product_name">Product Name *</Label>
+              <Label htmlFor="product_name" className="text-sm">Product Name *</Label>
               <Input
                 id="product_name"
                 value={formData.product_name}
                 onChange={(e) => setFormData(prev => ({ ...prev, product_name: e.target.value }))}
                 placeholder="What do you want to buy?"
-                className="rounded-xl"
+                className="rounded-xl text-sm"
                 required
               />
             </div>
             
             <div>
-              <Label htmlFor="product_url">Product Link *</Label>
+              <Label htmlFor="product_url" className="text-sm">Product Link *</Label>
               <Input
                 id="product_url"
                 type="url"
                 value={formData.product_url}
                 onChange={(e) => setFormData(prev => ({ ...prev, product_url: e.target.value }))}
                 placeholder="https://example.com/product"
-                className="rounded-xl"
+                className="rounded-xl text-sm"
                 required
               />
             </div>
             
             <div>
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category" className="text-sm">Category *</Label>
               <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                <SelectTrigger className="rounded-xl">
+                <SelectTrigger className="rounded-xl text-sm">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white z-50">
                   {CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
+                    <SelectItem key={category} value={category} className="text-sm">
                       {category}
                     </SelectItem>
                   ))}
@@ -232,26 +232,26 @@ export const Wants = () => {
             </div>
             
             <div>
-              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Label htmlFor="notes" className="text-sm">Notes (Optional)</Label>
               <Textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                 placeholder="Why do you want this? When might you buy it?"
-                className="rounded-xl"
+                className="rounded-xl text-sm"
                 rows={3}
               />
             </div>
             
-            <div className="flex gap-2">
-              <Button type="submit" disabled={loading} className="flex-1 rounded-xl">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button type="submit" disabled={loading} className="flex-1 rounded-xl text-sm">
                 {loading ? "Adding..." : "💜 Add to Wishlist"}
               </Button>
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => setShowAddForm(false)}
-                className="rounded-xl"
+                className="rounded-xl text-sm"
               >
                 Cancel
               </Button>
@@ -260,56 +260,57 @@ export const Wants = () => {
         )}
 
         {wants.length === 0 && !showAddForm ? (
-          <div className="text-center py-8 text-gray-500">
-            <Heart size={48} className="mx-auto mb-4 text-gray-300" />
-            <p>Your wishlist is empty</p>
-            <p className="text-sm">Add your future purchases to keep track of what you want! 💜</p>
+          <div className="text-center py-6 md:py-8 text-gray-500">
+            <Heart size={40} className="mx-auto mb-4 text-gray-300 md:w-12 md:h-12" />
+            <p className="text-sm md:text-base">Your wishlist is empty</p>
+            <p className="text-xs md:text-sm">Add your future purchases to keep track of what you want! 💜</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {wants.map((want) => (
-              <div key={want.id} className="border rounded-xl p-4 bg-white shadow-sm">
-                <div className="flex gap-4">
+              <div key={want.id} className="border rounded-xl p-3 md:p-4 bg-white shadow-sm">
+                <div className="flex gap-3 md:gap-4">
                   {want.product_image_url ? (
                     <img 
                       src={want.product_image_url} 
                       alt={want.product_name}
-                      className="w-20 h-20 object-cover rounded-lg"
+                      className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg flex-shrink-0"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
                       }}
                     />
                   ) : (
-                    <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
-                      <Heart className="text-purple-400" size={24} />
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Heart className="text-purple-400" size={20} />
                     </div>
                   )}
                   
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{want.product_name}</h3>
-                    <p className="text-sm text-purple-600 font-medium">{want.category}</p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 text-sm md:text-base truncate">{want.product_name}</h3>
+                    <p className="text-xs md:text-sm text-purple-600 font-medium">{want.category}</p>
                     {want.notes && (
-                      <p className="text-sm text-gray-600 mt-1">{want.notes}</p>
+                      <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{want.notes}</p>
                     )}
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex flex-wrap gap-2 mt-2">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => window.open(want.product_url, '_blank')}
-                        className="rounded-full text-xs"
+                        className="rounded-full text-xs h-7"
                       >
-                        <ExternalLink size={14} />
-                        View Product
+                        <ExternalLink size={12} />
+                        <span className="hidden sm:inline ml-1">View Product</span>
+                        <span className="sm:hidden ml-1">View</span>
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => deleteWant(want.id)}
-                        className="rounded-full text-xs text-red-600 hover:text-red-700"
+                        className="rounded-full text-xs text-red-600 hover:text-red-700 h-7"
                       >
-                        <Trash2 size={14} />
-                        Remove
+                        <Trash2 size={12} />
+                        <span className="hidden sm:inline ml-1">Remove</span>
                       </Button>
                     </div>
                   </div>
