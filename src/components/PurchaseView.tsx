@@ -222,7 +222,7 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4" />
                         <span className="font-semibold text-lg text-gray-900 dark:text-gray-100">
-                          💵 ${purchase.amount.toFixed(2)}
+                          💵 {purchase.amount.toFixed(2)}
                         </span>
                       </div>
                     </div>
