@@ -34,79 +34,56 @@ const handler = async (req: Request): Promise<Response> => {
       to: [email],
       subject: "Welcome to PausePal! Verify your email ⏸️",
       html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Welcome to PausePal - Verify Your Email</title>
-        </head>
-        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #BFDBFE 100%); min-height: 100vh;">
-          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-            <!-- Header -->
-            <div style="text-align: center; margin-bottom: 40px;">
-              <div style="display: inline-flex; align-items: center; gap: 12px; background: white; padding: 16px 24px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-                <span style="font-size: 32px;">⏸️</span>
-                <span style="font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #3B82F6, #1D4ED8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">PausePal</span>
-              </div>
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fafafa;">
+          <!-- Cute Header with Gradient -->
+          <div style="background: linear-gradient(135deg, #8B5CF6, #EC4899); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
+            <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to PausePal! 🌟</h1>
+            <p style="color: white; opacity: 0.9; margin: 10px 0 0 0;">Your journey to mindful spending starts here!</p>
+          </div>
+
+          <!-- Main Content -->
+          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <!-- Welcome Message -->
+            <div style="text-align: center; margin-bottom: 30px;">
+              <p style="font-size: 18px; color: #4B5563; margin: 0;">Hey ${firstName}! 👋</p>
+              <p style="font-size: 16px; color: #6B7280; margin: 10px 0;">We're so excited to have you join our community of mindful spenders!</p>
             </div>
 
-            <!-- Main Content -->
-            <div style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 40px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.2);">
-              <h1 style="font-size: 28px; font-weight: bold; color: #1E40AF; margin: 0 0 16px 0; text-align: center;">Welcome to PausePal! 🎉</h1>
-              
-              <p style="font-size: 18px; color: #6B7280; margin: 0 0 24px 0; text-align: center;">
-                Hi ${firstName}, 👋
-              </p>
-              
-              <p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
-                Welcome to PausePal - your companion for mindful spending! 💰✨ We're excited to help you develop healthier spending habits and take control of your financial wellness.
-              </p>
-              
-              <p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
-                To get started, please verify your email address by clicking the button below:
-              </p>
-              
-              <!-- CTA Button -->
-              <div style="text-align: center; margin: 32px 0;">
-                <a href="${verificationUrl}" style="display: inline-block; background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: white; text-decoration: none; font-weight: 600; font-size: 16px; padding: 16px 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(59,130,246,0.3); transition: all 0.3s ease;">
-                  Verify Email Address ✅
-                </a>
-              </div>
-              
-              <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 20px; margin: 24px 0;">
-                <p style="font-size: 16px; color: #1E40AF; font-weight: 600; margin: 0 0 12px 0;">
-                  🚀 What's next?
-                </p>
-                <p style="font-size: 14px; color: #1E3A8A; margin: 0; line-height: 1.5;">
-                  Once verified, you'll be able to:
-                  <br>• Track your purchases and spending patterns 📊
-                  <br>• Identify your spending triggers 🎯
-                  <br>• Set mindful spending goals 🎯
-                  <br>• Build healthier financial habits 💪
-                </p>
-              </div>
-              
-              <p style="font-size: 14px; color: #6B7280; line-height: 1.5; margin: 24px 0 0 0; text-align: center;">
-                If you didn't create an account with PausePal, you can safely ignore this email. 🛡️
-              </p>
-              
-              <p style="font-size: 12px; color: #9CA3AF; line-height: 1.5; margin: 16px 0 0 0; text-align: center;">
-                If the button doesn't work, copy and paste this link into your browser:<br>
-                <a href="${verificationUrl}" style="color: #3B82F6; word-break: break-all;">${verificationUrl}</a>
-              </p>
+            <!-- Confirmation Button -->
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${verificationUrl}" style="background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+                ✨ Confirm Your Email ✨
+              </a>
+            </div>
+
+            <!-- Features List -->
+            <div style="margin: 30px 0; padding: 20px; background: #F8FAFC; border-radius: 10px;">
+              <p style="font-weight: bold; color: #4B5563; margin-bottom: 15px;">What's waiting for you: 🎁</p>
+              <ul style="color: #6B7280; margin: 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">Track your impulse purchases 📝</li>
+                <li style="margin-bottom: 8px;">Set and manage your budget 💰</li>
+                <li style="margin-bottom: 8px;">Understand your spending patterns 📊</li>
+                <li style="margin-bottom: 8px;">Make smarter financial decisions 🎯</li>
+              </ul>
             </div>
 
             <!-- Footer -->
-            <div style="text-align: center; margin-top: 32px; padding: 0 20px;">
-              <p style="font-size: 14px; color: #9CA3AF; margin: 0;">
-                Ready to pause before you purchase? Let's build mindful spending habits together! 🌟<br>
-                PausePal - Your companion for intentional spending
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
+              <p style="color: #6B7280; margin: 0; font-size: 14px;">
+                With love and excitement,<br>
+                <span style="color: #8B5CF6; font-weight: bold;">The PausePal Team 💜</span>
               </p>
             </div>
           </div>
-        </body>
-        </html>
+
+          <!-- Bottom Note -->
+          <div style="text-align: center; margin-top: 20px; padding: 15px; background: #F8FAFC; border-radius: 10px;">
+            <p style="color: #6B7280; margin: 0; font-size: 12px;">
+              This email was sent to ${email}<br>
+              If you didn't create this account, you can safely ignore this email.
+            </p>
+          </div>
+        </div>
       `,
     });
 

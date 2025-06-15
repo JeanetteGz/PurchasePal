@@ -34,79 +34,70 @@ const handler = async (req: Request): Promise<Response> => {
       to: [email],
       subject: "Confirm Account Deletion - PausePal 🗑️",
       html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Confirm Account Deletion - PausePal</title>
-        </head>
-        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 50%, #FECACA 100%); min-height: 100vh;">
-          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-            <!-- Header -->
-            <div style="text-align: center; margin-bottom: 40px;">
-              <div style="display: inline-flex; align-items: center; gap: 12px; background: white; padding: 16px 24px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-                <span style="font-size: 32px;">⏸️</span>
-                <span style="font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #EF4444, #DC2626); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">PausePal</span>
-              </div>
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fafafa;">
+          <!-- Header with Red Gradient for Deletion -->
+          <div style="background: linear-gradient(135deg, #EF4444, #DC2626); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
+            <h1 style="color: white; margin: 0; font-size: 28px;">Account Deletion Request 🗑️</h1>
+            <p style="color: white; opacity: 0.9; margin: 10px 0 0 0;">We're sad to see you go, but we understand!</p>
+          </div>
+
+          <!-- Main Content -->
+          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <!-- Welcome Message -->
+            <div style="text-align: center; margin-bottom: 30px;">
+              <p style="font-size: 18px; color: #4B5563; margin: 0;">Hi ${firstName}! 👋</p>
+              <p style="font-size: 16px; color: #6B7280; margin: 10px 0;">We received a request to permanently delete your PausePal account.</p>
             </div>
 
-            <!-- Main Content -->
-            <div style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 40px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.2);">
-              <h1 style="font-size: 28px; font-weight: bold; color: #DC2626; margin: 0 0 16px 0; text-align: center;">Account Deletion Request 🗑️</h1>
-              
-              <p style="font-size: 18px; color: #6B7280; margin: 0 0 24px 0; text-align: center;">
-                Hi ${firstName}, 👋
+            <!-- Warning Box -->
+            <div style="margin: 30px 0; padding: 20px; background: #FEF2F2; border-radius: 10px; border-left: 4px solid #EF4444;">
+              <p style="font-weight: bold; color: #DC2626; margin-bottom: 15px;">⚠️ Important: This action cannot be undone</p>
+              <p style="color: #7F1D1D; margin: 0; font-size: 14px;">
+                Deleting your account will permanently remove:
               </p>
-              
-              <p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
-                We received a request to permanently delete your PausePal account. We're sad to see you go! 😢
-              </p>
-              
-              <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px; padding: 20px; margin: 24px 0;">
-                <p style="font-size: 16px; color: #DC2626; font-weight: 600; margin: 0 0 12px 0;">
-                  ⚠️ Important: This action cannot be undone
-                </p>
-                <p style="font-size: 14px; color: #7F1D1D; margin: 0; line-height: 1.5;">
-                  Deleting your account will permanently remove:
-                  <br>• All your purchase data and insights 📊
-                  <br>• Your profile information 👤
-                  <br>• Your spending habits and triggers 🎯
-                  <br>• All account settings and preferences ⚙️
-                </p>
-              </div>
-              
-              <p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 24px 0;">
-                If you're sure you want to proceed, click the button below to confirm the deletion:
-              </p>
-              
-              <!-- CTA Button -->
-              <div style="text-align: center; margin: 32px 0;">
-                <a href="${deletionUrl}" style="display: inline-block; background: linear-gradient(135deg, #DC2626, #B91C1C); color: white; text-decoration: none; font-weight: 600; font-size: 16px; padding: 16px 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(220,38,38,0.3); transition: all 0.3s ease;">
-                  Confirm Account Deletion 🗑️
-                </a>
-              </div>
-              
-              <p style="font-size: 14px; color: #6B7280; line-height: 1.5; margin: 24px 0 0 0; text-align: center;">
-                If you didn't request this deletion or want to keep your account, simply ignore this email. Your account will remain active. 🛡️
-              </p>
-              
-              <p style="font-size: 12px; color: #9CA3AF; line-height: 1.5; margin: 16px 0 0 0; text-align: center;">
-                If the button doesn't work, copy and paste this link into your browser:<br>
-                <a href="${deletionUrl}" style="color: #DC2626; word-break: break-all;">${deletionUrl}</a>
+              <ul style="color: #7F1D1D; margin: 10px 0 0 0; padding-left: 20px;">
+                <li style="margin-bottom: 8px;">All your purchase data and insights 📊</li>
+                <li style="margin-bottom: 8px;">Your profile information 👤</li>
+                <li style="margin-bottom: 8px;">Your spending habits and triggers 🎯</li>
+                <li style="margin-bottom: 8px;">All account settings and preferences ⚙️</li>
+              </ul>
+            </div>
+
+            <!-- Confirmation Button -->
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${deletionUrl}" style="background: linear-gradient(135deg, #DC2626, #B91C1C); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);">
+                🗑️ Confirm Account Deletion 🗑️
+              </a>
+            </div>
+
+            <!-- Alternative Message -->
+            <div style="margin: 30px 0; padding: 20px; background: #F0FDF4; border-radius: 10px;">
+              <p style="font-weight: bold; color: #15803D; margin-bottom: 15px;">Changed your mind? 💚</p>
+              <p style="color: #166534; margin: 0; font-size: 14px;">
+                If you didn't request this deletion or want to keep your account, simply ignore this email. Your account will remain active and secure! 🛡️
               </p>
             </div>
 
             <!-- Footer -->
-            <div style="text-align: center; margin-top: 32px; padding: 0 20px;">
-              <p style="font-size: 14px; color: #9CA3AF; margin: 0;">
-                We hope you'll consider coming back to mindful spending! 💙<br>
-                PausePal - Your companion for intentional spending
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
+              <p style="color: #6B7280; margin: 0; font-size: 14px;">
+                We hope you'll consider coming back to mindful spending!<br>
+                <span style="color: #8B5CF6; font-weight: bold;">The PausePal Team 💙</span>
               </p>
             </div>
           </div>
-        </body>
-        </html>
+
+          <!-- Bottom Note -->
+          <div style="text-align: center; margin-top: 20px; padding: 15px; background: #F8FAFC; border-radius: 10px;">
+            <p style="color: #6B7280; margin: 0; font-size: 12px;">
+              This email was sent to ${email}<br>
+              If you didn't request this deletion, you can safely ignore this email.<br>
+              <br>
+              If the button doesn't work, copy and paste this link:<br>
+              <a href="${deletionUrl}" style="color: #DC2626; word-break: break-all; font-size: 11px;">${deletionUrl}</a>
+            </p>
+          </div>
+        </div>
       `,
     });
 
