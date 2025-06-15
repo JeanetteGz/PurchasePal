@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -46,6 +45,54 @@ export const Wants = () => {
       console.error('Error fetching wants:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to extract image from URL
+  const extractImageFromUrl = async (url: string): Promise<string> => {
+    try {
+      // For Amazon URLs, try to extract product image
+      if (url.includes('amazon.com')) {
+        const asinMatch = url.match(/\/dp\/([A-Z0-9]{10})/);
+        if (asinMatch) {
+          // Amazon image URL pattern (this is a simplified approach)
+          return `https://images-na.ssl-images-amazon.com/images/P/${asinMatch[1]}.01.L.jpg`;
+        }
+      }
+      
+      // For other URLs, try to fetch and parse for Open Graph image
+      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+      const data = await response.json();
+      const html = data.contents;
+      
+      // Look for Open Graph image
+      const ogImageMatch = html.match(/<meta property="og:image" content="([^"]+)"/);
+      if (ogImageMatch) {
+        return ogImageMatch[1];
+      }
+      
+      // Look for Twitter card image
+      const twitterImageMatch = html.match(/<meta name="twitter:image" content="([^"]+)"/);
+      if (twitterImageMatch) {
+        return twitterImageMatch[1];
+      }
+      
+      return '';
+    } catch (error) {
+      console.error('Error extracting image:', error);
+      return '';
+    }
+  };
+
+  // Handle URL change and auto-fetch image
+  const handleUrlChange = async (url: string) => {
+    setNewWant(prev => ({ ...prev, product_url: url }));
+    
+    if (url && !newWant.product_image_url) {
+      const extractedImage = await extractImageFromUrl(url);
+      if (extractedImage) {
+        setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
+      }
     }
   };
 
@@ -205,9 +252,9 @@ export const Wants = () => {
                 <input
                   type="url"
                   value={newWant.product_url}
-                  onChange={(e) => setNewWant(prev => ({ ...prev, product_url: e.target.value }))}
+                  onChange={(e) => handleUrlChange(e.target.value)}
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="https://..."
+                  placeholder="https://... (image will be auto-detected)"
                 />
               </div>
               <div>
@@ -219,7 +266,7 @@ export const Wants = () => {
                   value={newWant.product_image_url}
                   onChange={(e) => setNewWant(prev => ({ ...prev, product_image_url: e.target.value }))}
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="https://..."
+                  placeholder="https://... (or leave empty for auto-detection)"
                 />
               </div>
               <div>
@@ -300,11 +347,11 @@ export const Wants = () => {
                         {want.product_url && (
                           <Button
                             size="icon"
-                            variant="secondary"
-                            className="bg-white/90 hover:bg-white shadow-lg"
+                            className="bg-purple-500 hover:bg-purple-600 text-white shadow-lg"
                             onClick={() => window.open(want.product_url, '_blank')}
                           >
-                            <ExternalLink className="w-4 h-4" />
+                            <span className="mr-1">➜</span>
+                            <ExternalLink className="w-3 h-3" />
                           </Button>
                         )}
                         <Button

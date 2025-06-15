@@ -1,467 +1,314 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Purchase } from '@/pages/Index';
-import { format, subMonths, getMonth, getYear, parseISO, startOfWeek, endOfWeek, isWithinInterval, getHours, getDayOfWeek } from 'date-fns';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { getDay, format, startOfMonth, endOfMonth, eachDayOfInterval, isWithinInterval, subMonths } from 'date-fns';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { Calendar, TrendingUp, ShoppingBag, Clock, Download, DollarSign, Target, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Download, TrendingUp, TrendingDown, Clock, Calendar, Target, Zap } from 'lucide-react';
+import type { Purchase } from '@/pages/Index';
 
 interface InsightsProps {
   purchases: Purchase[];
 }
 
-const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1'];
+interface CategorySpending {
+  category: string;
+  amount: number;
+}
+
+interface MonthlySpending {
+  month: string;
+  amount: number;
+}
+
+interface DayOfWeekSpending {
+  day: string;
+  amount: number;
+  count: number;
+}
 
 export const Insights = ({ purchases }: InsightsProps) => {
-  // Data processing and calculations
-  const now = new Date();
-  const sixMonthsAgo = subMonths(now, 6);
-
-  // Filter purchases within the last 6 months
-  const recentPurchases = purchases.filter(p => {
-    const purchaseDate = parseISO(p.date);
-    return isWithinInterval(purchaseDate, { start: sixMonthsAgo, end: now });
+  const [categorySpending, setCategorySpending] = useState<CategorySpending[]>([]);
+  const [monthlySpending, setMonthlySpending] = useState<MonthlySpending[]>([]);
+  const [dayOfWeekSpending, setDayOfWeekSpending] = useState<DayOfWeekSpending[]>([]);
+  const [totalSpending, setTotalSpending] = useState<number>(0);
+  const [averageSpending, setAverageSpending] = useState<number>(0);
+  const [highestSpending, setHighestSpending] = useState<{ item: string; amount: number }>({ item: '', amount: 0 });
+  const [spendingTriggers, setSpendingTriggers] = useState<{ trigger: string; count: number }[]>([]);
+  const [monthlyTrend, setMonthlyTrend] = useState<MonthlySpending[]>([]);
+  const [recentPurchases, setRecentPurchases] = useState<Purchase[]>([]);
+  const [dateRange, setDateRange] = useState<{ start: Date; end: Date }>({
+    start: subMonths(new Date(), 1),
+    end: new Date(),
   });
 
-  const totalSpent = recentPurchases.reduce((sum, purchase) => sum + purchase.amount, 0);
-  const avgPurchase = recentPurchases.length > 0 ? totalSpent / recentPurchases.length : 0;
+  useEffect(() => {
+    calculateInsights();
+  }, [purchases, dateRange]);
 
-  // Monthly spending data
-  const monthlyData = [];
-  for (let i = 0; i < 6; i++) {
-    const monthDate = subMonths(now, i);
-    const monthStart = startOfWeek(subMonths(now, i), { weekStartsOn: 1 });
-    const monthEnd = endOfWeek(subMonths(now, i), { weekStartsOn: 1 });
-    const monthPurchases = recentPurchases.filter(p => {
-      const purchaseDate = parseISO(p.date);
-      return isWithinInterval(purchaseDate, { start: subMonths(now, i), end: subMonths(now, i) });
-    });
-    const monthSpending = monthPurchases.reduce((sum, p) => sum + p.amount, 0);
-    monthlyData.push({
-      month: format(monthDate, 'MMM'),
-      amount: monthSpending,
-      count: monthPurchases.length
-    });
-  }
-  monthlyData.reverse();
+  const calculateInsights = () => {
+    const filteredPurchases = purchases.filter(purchase =>
+      isWithinInterval(new Date(purchase.date), { start: dateRange.start, end: dateRange.end })
+    );
 
-  // Spending by trigger
-  const triggerSpending: { [key: string]: number } = {};
-  recentPurchases.forEach(p => {
-    triggerSpending[p.trigger] = (triggerSpending[p.trigger] || 0) + p.amount;
-  });
-  const triggerData = Object.entries(triggerSpending)
-    .map(([trigger, amount]) => ({ name: trigger, value: amount }))
-    .sort((a, b) => b.value - a.value);
-  const topTrigger = triggerData[0]?.name || 'N/A';
+    const categoryData = calculateCategorySpending(filteredPurchases);
+    setCategorySpending(categoryData);
 
-  // Spending by store
-  const storeSpending: { [key: string]: number } = {};
-  const storeStats: { [key: string]: { count: number; total: number; avg: number } } = {};
-  recentPurchases.forEach(p => {
-    storeSpending[p.store] = (storeSpending[p.store] || 0) + p.amount;
-    if (!storeStats[p.store]) {
-      storeStats[p.store] = { count: 0, total: 0, avg: 0 };
-    }
-    storeStats[p.store].count++;
-    storeStats[p.store].total += p.amount;
-    storeStats[p.store].avg = storeStats[p.store].total / storeStats[p.store].count;
-  });
-  const storeData = Object.entries(storeSpending)
-    .map(([store, amount]) => ({ name: store, value: amount }))
-    .sort((a, b) => b.value - a.value);
+    const monthlyData = calculateMonthlySpending(filteredPurchases);
+    setMonthlySpending(monthlyData);
 
-  // Spending by day of week
-  const daySpending: { [key: string]: number } = {};
-  recentPurchases.forEach(p => {
-    const day = format(parseISO(p.date), 'EEE');
-    daySpending[day] = (daySpending[day] || 0) + p.amount;
-  });
-  const dayData = Object.entries(daySpending)
-    .map(([day, amount]) => ({ name: day, value: amount }))
-    .sort((a, b) => {
-      const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      return daysOfWeek.indexOf(a.name) - daysOfWeek.indexOf(b.name);
+    const dayOfWeekData = getDayOfWeekData();
+    setDayOfWeekSpending(dayOfWeekData);
+
+    const total = calculateTotalSpending(filteredPurchases);
+    setTotalSpending(total);
+
+    const average = calculateAverageSpending(filteredPurchases);
+    setAverageSpending(average);
+
+    const highest = findHighestSpending(filteredPurchases);
+    setHighestSpending(highest);
+
+    const triggers = identifySpendingTriggers(filteredPurchases);
+    setSpendingTriggers(triggers);
+
+    const trend = calculateMonthlyTrend(purchases);
+    setMonthlyTrend(trend);
+
+    const recent = getRecentPurchases(filteredPurchases);
+    setRecentPurchases(recent);
+  };
+
+  const calculateCategorySpending = (purchases: Purchase[]) => {
+    const categoryMap: { [key: string]: number } = {};
+    purchases.forEach(purchase => {
+      categoryMap[purchase.item] = (categoryMap[purchase.item] || 0) + purchase.amount;
     });
 
-  // Spending by hour of day
-  const hourSpending: { [key: string]: number } = {};
-  recentPurchases.forEach(p => {
-    const hour = getHours(parseISO(p.date));
-    hourSpending[hour] = (hourSpending[hour] || 0) + p.amount;
-  });
-  const hourData = Object.entries(hourSpending)
-    .map(([hour, amount]) => ({ name: hour, value: amount }))
-    .sort((a, b) => Number(a.name) - Number(b.name));
+    return Object.entries(categoryMap)
+      .map(([category, amount]) => ({ category, amount }))
+      .sort((a, b) => b.amount - a.amount);
+  };
 
-  // Trigger analysis for radar chart
-  const triggerRadarData = triggerData.map(t => ({
-    trigger: t.name,
-    amount: t.value
-  }));
+  const calculateMonthlySpending = (purchases: Purchase[]) => {
+    const monthlyMap: { [key: string]: number } = {};
+    purchases.forEach(purchase => {
+      const month = format(new Date(purchase.date), 'MMM');
+      monthlyMap[month] = (monthlyMap[month] || 0) + purchase.amount;
+    });
 
-  // Recommendations (simplified for demonstration)
-  const recommendations = [
-    `Consider setting a monthly budget for ${topTrigger} purchases.`,
-    `Try to reduce spending at ${storeData[0]?.name}, your top store.`,
-    `Limit purchases during your peak spending hours (${hourData[0]?.name}:00).`
-  ];
+    return Object.entries(monthlyMap)
+      .map(([month, amount]) => ({ month, amount }))
+      .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+  };
 
-  // Download comprehensive report
-  const downloadReport = async () => {
-    try {
-      const reportData = [
-        `COMPREHENSIVE SPENDING REPORT`,
-        `Generated: ${new Date().toLocaleDateString()}`,
-        `Report Period: Last 6 Months`,
-        `\n${'='.repeat(60)}`,
-        `\nOVERVIEW`,
-        `${'='.repeat(60)}`,
-        `Total Purchases: ${recentPurchases.length}`,
-        `Total Amount: $${totalSpent.toFixed(2)}`,
-        `Average Purchase: $${avgPurchase.toFixed(2)}`,
-        `\nMONTHLY BREAKDOWN`,
-        `${'='.repeat(60)}`,
-        ...monthlyData.map(m => `${m.month}: $${m.amount.toFixed(2)} (${m.count} purchases)`),
-        `\nTOP SPENDING CATEGORIES`,
-        `${'='.repeat(60)}`,
-        ...triggerData.slice(0, 5).map((t, i) => `${i + 1}. ${t.name}: $${t.value.toFixed(2)}`),
-        `\nTOP STORES`,
-        `${'='.repeat(60)}`,
-        ...storeData.slice(0, 5).map((s, i) => `${i + 1}. ${s.name}: $${s.value.toFixed(2)}`),
-        `\nSPENDING PATTERNS`,
-        `${'='.repeat(60)}`,
-        `Most Active Day: ${dayData.sort((a, b) => b.value - a.value)[0]?.name || 'N/A'}`,
-        `Peak Spending Hour: ${hourData.sort((a, b) => b.value - a.value)[0]?.name || 'N/A'}:00`,
-        `\nRECOMMENDations`,
-        `${'='.repeat(60)}`,
-        ...recommendations,
-        `\nDETAILED PURCHASE HISTORY`,
-        `${'='.repeat(60)}`,
-        `DATE | ITEM | STORE | AMOUNT | TRIGGER`,
-        `${'='.repeat(60)}`,
-        ...recentPurchases.map(p => `${p.date} | ${p.item} | ${p.store} | $${p.amount.toFixed(2)} | ${p.trigger}`)
-      ].join('\n');
-      
-      const blob = new Blob([reportData], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `comprehensive-spending-report-${new Date().toISOString().split('T')[0]}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error generating report:', error);
-    }
+  const calculateTotalSpending = (purchases: Purchase[]) => {
+    return purchases.reduce((sum, purchase) => sum + purchase.amount, 0);
+  };
+
+  const calculateAverageSpending = (purchases: Purchase[]) => {
+    return purchases.length > 0 ? calculateTotalSpending(purchases) / purchases.length : 0;
+  };
+
+  const findHighestSpending = (purchases: Purchase[]) => {
+    let highest = { item: '', amount: 0 };
+    purchases.forEach(purchase => {
+      if (purchase.amount > highest.amount) {
+        highest = { item: purchase.item, amount: purchase.amount };
+      }
+    });
+    return highest;
+  };
+
+  const identifySpendingTriggers = (purchases: Purchase[]) => {
+    const triggerMap: { [key: string]: number } = {};
+    purchases.forEach(purchase => {
+      triggerMap[purchase.trigger] = (triggerMap[purchase.trigger] || 0) + 1;
+    });
+
+    return Object.entries(triggerMap)
+      .map(([trigger, count]) => ({ trigger, count }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const calculateMonthlyTrend = (purchases: Purchase[]) => {
+    const today = new Date();
+    const lastSixMonths = Array.from({ length: 6 }, (_, i) => subMonths(today, i));
+    const monthlyData: { [key: string]: number } = {};
+
+    lastSixMonths.forEach(date => {
+      const monthYear = format(date, 'MMM YYYY');
+      monthlyData[monthYear] = 0;
+    });
+
+    purchases.forEach(purchase => {
+      const purchaseDate = new Date(purchase.date);
+      if (isWithinInterval(purchaseDate, { start: subMonths(today, 5), end: today })) {
+        const monthYear = format(purchaseDate, 'MMM YYYY');
+        monthlyData[monthYear] = (monthlyData[monthYear] || 0) + purchase.amount;
+      }
+    });
+
+    return Object.entries(monthlyData)
+      .map(([month, amount]) => ({ month, amount }))
+      .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+  };
+
+  const getRecentPurchases = (purchases: Purchase[]) => {
+    return purchases.slice(0, 5);
+  };
+
+  const getDayOfWeekData = () => {
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayData = Array(7).fill(0).map((_, i) => ({ day: dayNames[i], amount: 0, count: 0 }));
+    
+    purchases.forEach(purchase => {
+      const dayOfWeek = getDay(new Date(purchase.date));
+      dayData[dayOfWeek].amount += purchase.amount;
+      dayData[dayOfWeek].count += 1;
+    });
+    
+    return dayData;
   };
 
   return (
     <div className="space-y-6">
-      {/* Header with Download Button */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">📊 Spending Insights</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Deep dive into your spending patterns and trends</p>
-        </div>
-        <Button
-          onClick={downloadReport}
-          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-lg"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          Download Full Report
-        </Button>
-      </div>
-
-      {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm">Total Spent</p>
-                <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-purple-200" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm">Avg Purchase</p>
-                <p className="text-2xl font-bold">${avgPurchase.toFixed(2)}</p>
-              </div>
-              <Target className="w-8 h-8 text-blue-200" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm">This Month</p>
-                <p className="text-2xl font-bold">${monthlyData[monthlyData.length - 1].amount.toFixed(2)}</p>
-              </div>
-              <Calendar className="w-8 h-8 text-green-200" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-orange-100 text-sm">Top Trigger</p>
-                <p className="text-lg font-bold capitalize">{topTrigger || 'N/A'}</p>
-              </div>
-              <Zap className="w-8 h-8 text-orange-200" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* 6-Month Spending Trend */}
-      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 dark:text-gray-100">
-            📈 6-Month Spending Trend
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer>
-              <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
-                <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
-                <YAxis yAxisId="left" stroke="#6b7280" fontSize={12} tickFormatter={(value) => `$${value}`} />
-                <YAxis yAxisId="right" orientation="right" stroke="#6b7280" fontSize={12} />
-                <Tooltip 
-                  formatter={(value, name) => name === 'amount' ? [`$${value}`, 'Amount Spent'] : [value, 'Purchases']}
-                  labelFormatter={(label) => `Month: ${label}`}
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px'
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="amount" 
-                  stroke="#8b5cf6" 
-                  strokeWidth={3}
-                  dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 6 }}
-                  name="Amount Spent"
-                  yAxisId="left"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="count" 
-                  stroke="#3b82f6" 
-                  strokeWidth={2}
-                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                  name="Number of Purchases"
-                  yAxisId="right"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Spending by Category */}
-        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="dark:text-gray-100">🎯 Spending by Trigger</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div style={{ width: '100%', height: 300 }}>
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie
-                    data={triggerData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {triggerData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Amount']} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Top Stores */}
-        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="dark:text-gray-100">🏪 Top Stores</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div style={{ width: '100%', height: 300 }}>
-              <ResponsiveContainer>
-                <BarChart data={storeData.slice(0, 6)} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    fontSize={12} 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={60}
-                  />
-                  <YAxis fontSize={12} tickFormatter={(value) => `$${value}`} />
-                  <Tooltip formatter={(value) => [`$${value}`, 'Total Spent']} />
-                  <Bar dataKey="value" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Time-based Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Spending by Day of Week */}
-        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 dark:text-gray-100">
-              📅 Spending by Day of Week
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div style={{ width: '100%', height: 250 }}>
-              <ResponsiveContainer>
-                <BarChart data={dayData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" fontSize={12} />
-                  <YAxis fontSize={12} tickFormatter={(value) => `$${value}`} />
-                  <Tooltip formatter={(value) => [`$${value}`, 'Total Spent']} />
-                  <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Spending by Hour */}
-        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 dark:text-gray-100">
-              <Clock className="w-5 h-5" />
-              Spending by Hour of Day
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div style={{ width: '100%', height: 250 }}>
-              <ResponsiveContainer>
-                <BarChart data={hourData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" fontSize={12} tickFormatter={(hour) => `${hour}:00`} />
-                  <YAxis fontSize={12} tickFormatter={(value) => `$${value}`} />
-                  <Tooltip 
-                    formatter={(value) => [`$${value}`, 'Total Spent']}
-                    labelFormatter={(hour) => `${hour}:00`}
-                  />
-                  <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Advanced Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Trigger Analysis Over Time */}
-        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="dark:text-gray-100">🎭 Trigger Analysis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div style={{ width: '100%', height: 300 }}>
-              <ResponsiveContainer>
-                <RadarChart data={triggerRadarData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="trigger" fontSize={12} />
-                  <PolarRadiusAxis 
-                    fontSize={10} 
-                    tickFormatter={(value) => `$${value}`}
-                    domain={[0, 'dataMax']}
-                  />
-                  <Radar
-                    name="Amount Spent"
-                    dataKey="amount"
-                    stroke="#8b5cf6"
-                    fill="#8b5cf6"
-                    fillOpacity={0.3}
-                    strokeWidth={2}
-                  />
-                  <Tooltip formatter={(value) => [`$${value}`, 'Amount Spent']} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Store Performance */}
-        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="dark:text-gray-100">🏆 Store Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {storeData.slice(0, 5).map((store, index) => (
-                <div key={store.name} className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                      {index + 1}
-                    </div>
-                    <div>
-                      <div className="font-medium dark:text-gray-100">{store.name}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {storeStats[store.name]?.count || 0} purchases
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-lg dark:text-gray-100">${store.value.toFixed(2)}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      ${storeStats[store.name]?.avg.toFixed(2) || 0} avg
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Personalized Recommendations */}
-      <Card className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white border-0 shadow-lg">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            💡 Personalized Money-Saving Tips
+            <TrendingUp className="w-5 h-5" />
+            Spending Overview
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {recommendations.map((tip, index) => (
-              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-white/90 leading-relaxed">{tip}</p>
-              </div>
-            ))}
+            <div>
+              <h3 className="text-lg font-semibold">Total Spending</h3>
+              <p className="text-2xl">${totalSpending.toFixed(2)}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Average Purchase</h3>
+              <p className="text-2xl">${averageSpending.toFixed(2)}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Highest Spending Item</h3>
+              <p className="text-xl">
+                {highestSpending.item} - ${highestSpending.amount.toFixed(2)}
+              </p>
+            </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            Date Range
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Button onClick={() => setDateRange({ start: subMonths(new Date(), 1), end: new Date() })} variant="outline">Last Month</Button>
+            <Button onClick={() => setDateRange({ start: subMonths(new Date(), 3), end: new Date() })} variant="outline">Last 3 Months</Button>
+            <Button onClick={() => setDateRange({ start: subMonths(new Date(), 6), end: new Date() })} variant="outline">Last 6 Months</Button>
+            <Button onClick={() => setDateRange({ start: subMonths(new Date(), 12), end: new Date() })} variant="outline">Last Year</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5" />
+            Top Categories
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={categorySpending}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="amount" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-5 h-5" />
+            Spending by Day of the Week
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dayOfWeekSpending}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="amount" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="w-5 h-5" />
+            Monthly Spending
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={monthlySpending}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="amount" stroke="#8884d8" activeDot={{ r: 8 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="w-5 h-5" />
+            Spending Triggers
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul>
+            {spendingTriggers.map(trigger => (
+              <li key={trigger.trigger} className="py-2">
+                {trigger.trigger} - {trigger.count} times
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5" />
+            Recent Purchases
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul>
+            {recentPurchases.map(purchase => (
+              <li key={purchase.id} className="py-2">
+                {purchase.item} - ${purchase.amount.toFixed(2)} on {format(new Date(purchase.date), 'MMM dd, yyyy')}
+              </li>
+            ))}
+          </ul>
         </CardContent>
       </Card>
     </div>
