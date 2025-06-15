@@ -1,16 +1,16 @@
+
 import { useState, useEffect } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
 import { Insights } from '@/components/Insights';
 import { Wants } from '@/components/Wants';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from "react-router-dom";
 import { Card, CardContent } from '@/components/ui/card';
-import { Lightbulb, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Lightbulb, LogOut, BarChart3, Plus, Heart, PieChart } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
 import { ThemeProvider } from 'next-themes';
 
 export interface Purchase {
@@ -45,7 +45,7 @@ const mindfulTips = [
 const Index = () => {
   const { profile, signOut } = useAuth();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeView, setActiveView] = useState("dashboard");
   const [currentTips, setCurrentTips] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -134,7 +134,7 @@ const Index = () => {
   };
 
   const handlePurchaseSuccess = () => {
-    setActiveTab("dashboard");
+    setActiveView("dashboard");
   };
 
   const getRandomTips = () => {
@@ -157,6 +157,21 @@ const Index = () => {
     );
   }
 
+  const renderContent = () => {
+    switch (activeView) {
+      case "dashboard":
+        return <Dashboard purchases={purchases} onDeletePurchase={deletePurchase} />;
+      case "add":
+        return <AddPurchase onAddPurchase={addPurchase} onSuccess={handlePurchaseSuccess} />;
+      case "wishlist":
+        return <Wants />;
+      case "insights":
+        return <Insights purchases={purchases} />;
+      default:
+        return <Dashboard purchases={purchases} onDeletePurchase={deletePurchase} />;
+    }
+  };
+
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
@@ -169,10 +184,10 @@ const Index = () => {
               </p>
             </div>
             <nav className="flex gap-3 mt-4 md:mt-0">
-              <Link to="/profile" className="rounded-full bg-white/70 dark:bg-gray-800/70 px-4 py-2 shadow hover:bg-blue-50 dark:hover:bg-gray-700 transition flex items-center gap-2 text-sm font-semibold">
+              <Link to="/profile" className="rounded-full bg-white/70 dark:bg-gray-800/70 px-4 py-2 shadow hover:bg-blue-50 dark:hover:bg-gray-700 transition flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                 <span role="img" aria-label="profile">👤</span> Profile
               </Link>
-              <Link to="/settings" className="rounded-full bg-white/70 dark:bg-gray-800/70 px-4 py-2 shadow hover:bg-blue-50 dark:hover:bg-gray-700 transition flex items-center gap-2 text-sm font-semibold">
+              <Link to="/settings" className="rounded-full bg-white/70 dark:bg-gray-800/70 px-4 py-2 shadow hover:bg-blue-50 dark:hover:bg-gray-700 transition flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                 <span role="img" aria-label="settings">⚙️</span> Settings
               </Link>
               <Button 
@@ -186,38 +201,49 @@ const Index = () => {
             </nav>
           </header>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl">
-              <TabsTrigger value="dashboard" className="text-xs md:text-sm font-medium rounded-xl">
-                📊 Dashboard
-              </TabsTrigger>
-              <TabsTrigger value="add" className="text-xs md:text-sm font-medium rounded-xl">
-                ➕ Add Purchase
-              </TabsTrigger>
-              <TabsTrigger value="wants" className="text-xs md:text-sm font-medium rounded-xl">
-                💜 Wishlist
-              </TabsTrigger>
-              <TabsTrigger value="insights" className="text-xs md:text-sm font-medium rounded-xl">
-                🧠 Insights
-              </TabsTrigger>
-            </TabsList>
+          {/* Navigation Buttons */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <Button
+              onClick={() => setActiveView("dashboard")}
+              variant={activeView === "dashboard" ? "default" : "outline"}
+              className="p-6 h-auto flex flex-col items-center gap-2 bg-white/70 dark:bg-gray-800/70 hover:bg-blue-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+            >
+              <BarChart3 size={24} />
+              <span className="font-medium">Dashboard</span>
+            </Button>
+            
+            <Button
+              onClick={() => setActiveView("add")}
+              variant={activeView === "add" ? "default" : "outline"}
+              className="p-6 h-auto flex flex-col items-center gap-2 bg-white/70 dark:bg-gray-800/70 hover:bg-green-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+            >
+              <Plus size={24} />
+              <span className="font-medium">Add Purchase</span>
+            </Button>
+            
+            <Button
+              onClick={() => setActiveView("wishlist")}
+              variant={activeView === "wishlist" ? "default" : "outline"}
+              className="p-6 h-auto flex flex-col items-center gap-2 bg-white/70 dark:bg-gray-800/70 hover:bg-purple-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+            >
+              <Heart size={24} />
+              <span className="font-medium">Wishlist</span>
+            </Button>
+            
+            <Button
+              onClick={() => setActiveView("insights")}
+              variant={activeView === "insights" ? "default" : "outline"}
+              className="p-6 h-auto flex flex-col items-center gap-2 bg-white/70 dark:bg-gray-800/70 hover:bg-orange-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+            >
+              <PieChart size={24} />
+              <span className="font-medium">Insights</span>
+            </Button>
+          </div>
 
-            <TabsContent value="dashboard">
-              <Dashboard purchases={purchases} onDeletePurchase={deletePurchase} />
-            </TabsContent>
-
-            <TabsContent value="add">
-              <AddPurchase onAddPurchase={addPurchase} onSuccess={handlePurchaseSuccess} />
-            </TabsContent>
-
-            <TabsContent value="wants">
-              <Wants />
-            </TabsContent>
-
-            <TabsContent value="insights">
-              <Insights purchases={purchases} />
-            </TabsContent>
-          </Tabs>
+          {/* Content Area */}
+          <div className="mb-8">
+            {renderContent()}
+          </div>
 
           {/* Mindful Tips Card - Now showing 3 tips */}
           <Card className="mt-8 bg-gradient-to-r from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 border-0 text-white shadow-lg">
