@@ -1,23 +1,42 @@
-import { useRef, useState } from "react";
+
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Logo } from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const placeholderImage =
   "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=facearea&w=256&q=80&facepad=2";
 
 const Profile = () => {
+  const { profile, user } = useAuth();
+  const { toast } = useToast();
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [avatarUrl, setAvatarUrl] = useState(placeholderImage);
-  const [firstName, setFirstName] = useState("Jesse");
-  const [lastName, setLastName] = useState("Smith");
-  const [email] = useState("jesse.smith@example.com");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [bio, setBio] = useState("Mindful spender 🧘‍♂️");
   const [tempFile, setTempFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Update form fields when profile data is loaded
+  useEffect(() => {
+    if (profile) {
+      setFirstName(profile.first_name || "");
+      setLastName(profile.last_name || "");
+      setEmail(profile.email || "");
+    }
+    if (user) {
+      setEmail(user.email || "");
+    }
+  }, [profile, user]);
 
   const handleAvatarClick = () => {
     if (fileInput.current) fileInput.current.click();
@@ -32,12 +51,39 @@ const Profile = () => {
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Saving profile:", { firstName, lastName, bio, tempFile });
+    setLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile updated! ✨",
+        description: "Your changes have been saved successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error updating profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getInitials = () => {
+    if (!firstName && !lastName) return "PP";
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
@@ -134,8 +180,8 @@ const Profile = () => {
           </div>
           
           <div className="flex gap-3">
-            <Button type="submit" className="flex-1 rounded-xl">
-              💾 Save Changes
+            <Button type="submit" className="flex-1 rounded-xl" disabled={loading}>
+              {loading ? "💾 Saving..." : "💾 Save Changes"}
             </Button>
             <Link to="/">
               <Button type="button" variant="outline" className="rounded-xl">
