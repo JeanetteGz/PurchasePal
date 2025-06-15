@@ -52,7 +52,7 @@ const Profile = () => {
             <ArrowLeft size={20} />
             Back
           </Link>
-          <h1 className="flex-1 text-xl font-bold text-center">Profile Settings ⚙️</h1>
+          <h1 className="flex-1 text-xl font-bold text-center">Profile Settings 👤</h1>
           <div className="w-16"></div>
         </div>
       </div>

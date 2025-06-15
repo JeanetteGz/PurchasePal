@@ -5,6 +5,8 @@ import { AddPurchase } from '@/components/AddPurchase';
 import { Insights } from '@/components/Insights';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from "react-router-dom";
+import { Card, CardContent } from '@/components/ui/card';
+import { Lightbulb } from 'lucide-react';
 
 export interface Purchase {
   id: string;
@@ -15,6 +17,19 @@ export interface Purchase {
   date: string;
   notes?: string;
 }
+
+const mindfulTips = [
+  "💡 Wait 24 hours before making any non-essential purchase",
+  "🛒 Make a shopping list and stick to it - avoid browsing",
+  "💳 Leave your credit cards at home when going out for fun",
+  "🤔 Ask yourself: 'Do I need this or do I just want it?'",
+  "💰 Set a monthly spending limit for non-essentials",
+  "📱 Delete shopping apps from your phone",
+  "🧘‍♀️ Practice mindfulness - notice your emotions before buying",
+  "👥 Shop with a budget-conscious friend who can keep you accountable",
+  "🎯 Focus on experiences rather than material things",
+  "📊 Review your purchases weekly to identify patterns"
+];
 
 const Index = () => {
   const [purchases, setPurchases] = useState<Purchase[]>([
@@ -48,6 +63,7 @@ const Index = () => {
   ]);
 
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
   const addPurchase = (purchase: Omit<Purchase, 'id'>) => {
     const newPurchase: Purchase = {
@@ -65,16 +81,21 @@ const Index = () => {
     setActiveTab("dashboard");
   };
 
+  const getRandomTip = () => {
+    const randomIndex = Math.floor(Math.random() * mindfulTips.length);
+    setCurrentTipIndex(randomIndex);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
         <header className="flex flex-col md:flex-row items-center justify-between mb-8">
           <div className="text-center md:text-left">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
-              💸 Mindful Spending 🧘‍♀️
+              ⏸️ PausePal 🧘‍♀️
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto md:mx-0">
-              Take control of your impulsive shopping habits and discover what triggers your spending
+              Your companion for mindful spending - pause before you purchase
             </p>
           </div>
           <nav className="flex gap-3 mt-4 md:mt-0">
@@ -112,6 +133,25 @@ const Index = () => {
             <Insights purchases={purchases} />
           </TabsContent>
         </Tabs>
+
+        {/* Mindful Tips Card */}
+        <Card className="mt-8 bg-gradient-to-r from-purple-500 to-purple-600 border-0 text-white shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Lightbulb className="text-yellow-300" size={24} />
+              <h3 className="text-xl font-bold">💜 Mindful Tips</h3>
+            </div>
+            <p className="text-purple-100 mb-4 leading-relaxed">
+              {mindfulTips[currentTipIndex]}
+            </p>
+            <button
+              onClick={getRandomTip}
+              className="bg-white/20 hover:bg-white/30 transition-colors rounded-full px-4 py-2 text-sm font-medium backdrop-blur-sm"
+            >
+              ✨ Get Another Tip
+            </button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

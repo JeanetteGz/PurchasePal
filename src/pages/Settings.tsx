@@ -159,7 +159,7 @@ const Settings = () => {
 
         {/* App Info */}
         <div className="text-center text-sm text-gray-500 pt-4">
-          <p>Mindful Spending v1.0.0 💸</p>
+          <p>PausePal v1.0.0 ⏸️</p>
           <p>Made with ❤️ for mindful shoppers</p>
         </div>
       </div>
