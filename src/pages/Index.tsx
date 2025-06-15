@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
@@ -208,10 +207,7 @@ const Index = () => {
               variant={activeView === "dashboard" ? "default" : "outline"}
               className="p-6 h-auto flex flex-col items-center gap-2 bg-white/80 dark:bg-gray-800/80 hover:bg-blue-50 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-xl">📊</span>
-                <BarChart3 size={24} />
-              </div>
+              <span className="text-2xl">📊</span>
               <span className="font-medium">Dashboard</span>
             </Button>
             
@@ -220,10 +216,7 @@ const Index = () => {
               variant={activeView === "add" ? "default" : "outline"}
               className="p-6 h-auto flex flex-col items-center gap-2 bg-white/80 dark:bg-gray-800/80 hover:bg-green-50 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-xl">➕</span>
-                <Plus size={24} />
-              </div>
+              <span className="text-2xl">➕</span>
               <span className="font-medium">Add Purchase</span>
             </Button>
             
@@ -232,10 +225,7 @@ const Index = () => {
               variant={activeView === "wishlist" ? "default" : "outline"}
               className="p-6 h-auto flex flex-col items-center gap-2 bg-white/80 dark:bg-gray-800/80 hover:bg-purple-50 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-xl">💝</span>
-                <Heart size={24} />
-              </div>
+              <span className="text-2xl">💝</span>
               <span className="font-medium">Wishlist</span>
             </Button>
             
@@ -244,10 +234,7 @@ const Index = () => {
               variant={activeView === "insights" ? "default" : "outline"}
               className="p-6 h-auto flex flex-col items-center gap-2 bg-white/80 dark:bg-gray-800/80 hover:bg-orange-50 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-xl">📈</span>
-                <PieChart size={24} />
-              </div>
+              <span className="text-2xl">📈</span>
               <span className="font-medium">Insights</span>
             </Button>
           </div>
@@ -258,7 +245,7 @@ const Index = () => {
           </div>
 
           {/* Mindful Tips Card */}
-          <Card className="mt-8 bg-gradient-to-r from-purple-500 to-purple-600 dark:from-blue-800 dark:to-indigo-800 border-0 text-white shadow-lg">
+          <Card className="mt-8 bg-gradient-to-r from-purple-500 to-purple-600 dark:from-gray-800 dark:to-gray-900 border-0 text-white shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Lightbulb className="text-yellow-300 dark:text-yellow-400" size={24} />
@@ -266,7 +253,7 @@ const Index = () => {
               </div>
               <div className="space-y-3 mb-4">
                 {currentTips.map((tip, index) => (
-                  <p key={index} className="text-purple-100 dark:text-blue-100 leading-relaxed p-3 bg-white/10 dark:bg-white/5 rounded-lg backdrop-blur-sm">
+                  <p key={index} className="text-purple-100 dark:text-gray-200 leading-relaxed p-3 bg-white/10 dark:bg-white/5 rounded-lg backdrop-blur-sm">
                     {tip}
                   </p>
                 ))}

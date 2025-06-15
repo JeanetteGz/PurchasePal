@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -284,8 +283,7 @@ export const Wants = () => {
     <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
       <CardHeader className="p-4 md:p-6">
         <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-100 text-lg md:text-xl">
-          <Heart className="text-pink-500" size={24} />
-          💜 My Wishlist
+          💝 My Wishlist
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 p-4 md:p-6 pt-0">
@@ -387,7 +385,7 @@ export const Wants = () => {
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{category.split(' ')[0]}</div>
                       <div>
-                        <h3 className="font-bold text-gray-900 dark:text-gray-100 text-lg">{category.split(' ').slice(1).join(' ')}</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-gray-100 text-lg">{category.substring(category.indexOf(' ') + 1)}</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{items.length} item{items.length !== 1 ? 's' : ''}</p>
                       </div>
                     </div>
