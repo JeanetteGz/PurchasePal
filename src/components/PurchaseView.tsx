@@ -202,7 +202,7 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
                   <div className="flex-1 space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                        🛒 {purchase.item}
+                        {purchase.item}
                       </h3>
                       <Badge className={getTriggerColor(purchase.trigger)}>
                         <Tag className="w-3 h-3 mr-1" />
