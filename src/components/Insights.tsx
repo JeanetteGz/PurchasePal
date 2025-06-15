@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDay, format, startOfMonth, endOfMonth, eachDayOfInterval, isWithinInterval, subMonths, startOfWeek, endOfWeek, differenceInDays } from 'date-fns';
@@ -284,7 +285,7 @@ export const Insights = ({ purchases }: InsightsProps) => {
     window.URL.revokeObjectURL(url);
   };
 
-  // Custom tooltip component for dark mode
+  // Custom tooltip component for dark mode with proper type checking
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -292,7 +293,7 @@ export const Insights = ({ purchases }: InsightsProps) => {
           <p className="text-gray-900 dark:text-gray-100 font-medium">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: ${entry.value?.toFixed(2)}
+              {entry.name}: ${typeof entry.value === 'number' ? entry.value.toFixed(2) : entry.value}
             </p>
           ))}
         </div>
@@ -630,11 +631,12 @@ export const Insights = ({ purchases }: InsightsProps) => {
                   <Tooltip 
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
+                        const value = payload[0].value;
                         return (
                           <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
                             <p className="text-gray-900 dark:text-gray-100 font-medium capitalize">{payload[0].payload.trigger}</p>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              Amount: ${payload[0].value?.toFixed(2)}
+                              Amount: ${typeof value === 'number' ? value.toFixed(2) : value}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                               Count: {payload[0].payload.count}
