@@ -2,78 +2,32 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Trash2, ExternalLink, Plus, Heart, ArrowLeft } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Plus, ExternalLink, Trash2, Heart, ShoppingBag, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface Want {
+interface WantItem {
   id: string;
   product_name: string;
+  category: string;
   product_url: string;
   product_image_url?: string;
-  category: string;
   notes?: string;
   created_at: string;
 }
 
-const CATEGORIES = [
-  '💇‍♀️ Hair Care',
-  '🪑 Furniture',
-  '📱 Electronics',
-  '👗 Clothing',
-  '📚 Books',
-  '🏡 Home & Garden',
-  '🏃‍♂️ Sports & Fitness',
-  '💄 Beauty & Skincare',
-  '🍽️ Kitchen & Dining',
-  '✈️ Travel',
-  '🔮 Other'
-];
-
-const getCategoryGradient = (category: string) => {
-  const gradients = {
-    '💇‍♀️ Hair Care': 'from-pink-400 via-pink-500 to-pink-600',
-    '🪑 Furniture': 'from-amber-400 via-orange-500 to-red-500',
-    '📱 Electronics': 'from-blue-400 via-blue-500 to-blue-600',
-    '👗 Clothing': 'from-purple-400 via-purple-500 to-purple-600',
-    '📚 Books': 'from-green-400 via-green-500 to-green-600',
-    '🏡 Home & Garden': 'from-emerald-400 via-emerald-500 to-emerald-600',
-    '🏃‍♂️ Sports & Fitness': 'from-red-400 via-red-500 to-red-600',
-    '💄 Beauty & Skincare': 'from-pink-400 via-rose-500 to-rose-600',
-    '🍽️ Kitchen & Dining': 'from-yellow-400 via-orange-500 to-orange-600',
-    '✈️ Travel': 'from-cyan-400 via-sky-500 to-blue-600',
-    '🔮 Other': 'from-indigo-400 via-purple-500 to-purple-600'
-  };
-  return gradients[category] || 'from-gray-400 via-gray-500 to-gray-600';
-};
-
-const getClothingCardStyle = () => {
-  return {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    borderRadius: '20px',
-    padding: '20px',
-    color: 'white',
-    position: 'relative' as const,
-    overflow: 'hidden' as const,
-  };
-};
-
 export const Wants = () => {
-  const [wants, setWants] = useState<Want[]>([]);
+  const { profile } = useAuth();
+  const [wants, setWants] = useState<WantItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [newWant, setNewWant] = useState({
     product_name: '',
-    product_url: '',
     category: '',
+    product_url: '',
+    product_image_url: '',
     notes: ''
   });
-  const { toast } = useToast();
 
   useEffect(() => {
     fetchWants();
@@ -90,74 +44,36 @@ export const Wants = () => {
       setWants(data || []);
     } catch (error) {
       console.error('Error fetching wants:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load your wishlist",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
   };
 
-  const extractImageFromUrl = async (url: string) => {
-    try {
-      const response = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
-      const data = await response.json();
-      return data?.data?.image?.url || null;
-    } catch (error) {
-      console.log('Could not extract image from URL:', error);
-      return null;
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const addWant = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.product_name || !formData.product_url || !formData.category) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!newWant.product_name || !newWant.category) return;
 
-    setLoading(true);
     try {
-      const imageUrl = await extractImageFromUrl(formData.product_url);
-
       const { data, error } = await supabase
         .from('user_wants')
         .insert({
-          product_name: formData.product_name,
-          product_url: formData.product_url,
-          product_image_url: imageUrl,
-          category: formData.category,
-          notes: formData.notes || null,
+          product_name: newWant.product_name,
+          category: newWant.category,
+          product_url: newWant.product_url,
+          product_image_url: newWant.product_image_url || null,
+          notes: newWant.notes || null,
           user_id: (await supabase.auth.getUser()).data.user?.id
         })
         .select()
         .single();
 
       if (error) throw error;
-
-      setWants(prev => [data, ...prev]);
-      setFormData({ product_name: '', product_url: '', category: '', notes: '' });
-      setShowAddForm(false);
       
-      toast({
-        title: "Added to wishlist! 🌟",
-        description: "Your future purchase has been saved",
-      });
+      setWants(prev => [data, ...prev]);
+      setNewWant({ product_name: '', category: '', product_url: '', product_image_url: '', notes: '' });
+      setShowAddForm(false);
     } catch (error) {
       console.error('Error adding want:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add item to wishlist",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -169,293 +85,267 @@ export const Wants = () => {
         .eq('id', id);
 
       if (error) throw error;
-      
       setWants(prev => prev.filter(want => want.id !== id));
-      toast({
-        title: "Removed from wishlist",
-        description: "Item has been deleted",
-      });
     } catch (error) {
       console.error('Error deleting want:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete item",
-        variant: "destructive",
-      });
     }
   };
 
-  const groupedWants = wants.reduce((groups, want) => {
-    const category = want.category;
-    if (!groups[category]) {
-      groups[category] = [];
+  const getCategoryEmoji = (category: string) => {
+    const emojiMap: { [key: string]: string } = {
+      clothing: '👕',
+      electronics: '📱',
+      books: '📚',
+      home: '🏠',
+      beauty: '💄',
+      sports: '⚽',
+      food: '🍔',
+      travel: '✈️',
+      other: '🛍️'
+    };
+    return emojiMap[category.toLowerCase()] || '🛍️';
+  };
+
+  // Group wants by category
+  const wantsByCategory = wants.reduce((acc, want) => {
+    const category = want.category.toLowerCase();
+    if (!acc[category]) {
+      acc[category] = [];
     }
-    groups[category].push(want);
-    return groups;
-  }, {} as Record<string, Want[]>);
+    acc[category].push(want);
+    return acc;
+  }, {} as Record<string, WantItem[]>);
 
-  if (loading && wants.length === 0) {
+  if (loading) {
     return (
-      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
-        <CardContent className="p-4 md:p-6">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 dark:border-blue-400"></div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Category view - show items in selected category
-  if (selectedCategory) {
-    const categoryItems = groupedWants[selectedCategory] || [];
-    
-    return (
-      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
-        <CardHeader className="p-4 md:p-6">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              onClick={() => setSelectedCategory(null)}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <ArrowLeft size={20} />
-            </Button>
-            <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-100 text-lg md:text-xl">
-              <Heart className="text-pink-500" size={24} />
-              {selectedCategory}
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4 p-4 md:p-6 pt-0">
-          {categoryItems.length === 0 ? (
-            <div className="text-center py-6 md:py-8 text-gray-500 dark:text-gray-400">
-              <Heart size={40} className="mx-auto mb-4 text-gray-300 dark:text-gray-600 md:w-12 md:h-12" />
-              <p className="text-sm md:text-base">No items in this category yet</p>
-            </div>
-          ) : (
-            <div className="space-y-3 md:space-y-4">
-              {categoryItems.map((want) => (
-                <div key={want.id} className="border dark:border-gray-600/50 rounded-xl p-3 md:p-4 bg-white/70 dark:bg-gray-700/70 shadow-sm backdrop-blur-sm">
-                  <div className="flex gap-3 md:gap-4">
-                    {want.product_image_url ? (
-                      <img 
-                        src={want.product_image_url} 
-                        alt={want.product_name}
-                        className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg flex-shrink-0"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-blue-900/50 dark:to-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Heart className="text-purple-400 dark:text-blue-400" size={20} />
-                      </div>
-                    )}
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm md:text-base truncate">{want.product_name}</h3>
-                      {want.notes && (
-                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{want.notes}</p>
-                      )}
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => window.open(want.product_url, '_blank')}
-                          className="rounded-full text-xs h-7 bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500/70"
-                        >
-                          <ExternalLink size={12} />
-                          <span className="hidden sm:inline ml-1">View Product</span>
-                          <span className="sm:hidden ml-1">View</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => deleteWant(want.id)}
-                          className="rounded-full text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 h-7 bg-white/70 dark:bg-gray-600/70 border-red-300 dark:border-red-500"
-                        >
-                          <Trash2 size={12} />
-                          <span className="hidden sm:inline ml-1">Remove</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-300">Loading your wishlist...</p>
+      </div>
     );
   }
 
   return (
-    <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
-      <CardHeader className="p-4 md:p-6">
-        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-100 text-lg md:text-xl">
-          💝 My Wishlist
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 p-4 md:p-6 pt-0">
-        {!showAddForm ? (
-          <Button 
-            onClick={() => setShowAddForm(true)}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 dark:from-blue-600 dark:to-purple-600 hover:from-purple-600 hover:to-pink-600 dark:hover:from-blue-700 dark:hover:to-purple-700 text-sm md:text-base shadow-lg"
-          >
-            <Plus size={20} />
-            Add Future Purchase
-          </Button>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 p-3 md:p-4 bg-purple-50/70 dark:bg-gray-700/70 rounded-lg backdrop-blur-sm">
-            <div>
-              <Label htmlFor="product_name" className="text-sm text-gray-700 dark:text-gray-200">Product Name *</Label>
-              <Input
-                id="product_name"
-                value={formData.product_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, product_name: e.target.value }))}
-                placeholder="What do you want to buy?"
-                className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100"
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="product_url" className="text-sm text-gray-700 dark:text-gray-200">Product Link *</Label>
-              <Input
-                id="product_url"
-                type="url"
-                value={formData.product_url}
-                onChange={(e) => setFormData(prev => ({ ...prev, product_url: e.target.value }))}
-                placeholder="https://example.com/product"
-                className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100"
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="category" className="text-sm text-gray-700 dark:text-gray-200">Category *</Label>
-              <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                <SelectTrigger className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-700 z-50">
-                  {CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category} className="text-sm text-gray-900 dark:text-gray-200">
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="notes" className="text-sm text-gray-700 dark:text-gray-200">Notes (Optional)</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="Why do you want this? When might you buy it?"
-                className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-900 dark:text-gray-100"
-                rows={3}
-              />
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button type="submit" disabled={loading} className="flex-1 rounded-xl text-sm bg-gradient-to-r from-purple-500 to-pink-500 dark:from-blue-600 dark:to-purple-600 hover:from-purple-600 hover:to-pink-600 dark:hover:from-blue-700 dark:hover:to-purple-700">
-                {loading ? "Adding..." : "💜 Add to Wishlist"}
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setShowAddForm(false)}
-                className="rounded-xl text-sm bg-white/70 dark:bg-gray-600/70 border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500/70"
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        )}
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full shadow-lg mb-4">
+          <Heart className="w-6 h-6" />
+          <h2 className="text-2xl font-bold">Your Wishlist</h2>
+          <Sparkles className="w-6 h-6" />
+        </div>
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Keep track of items you want to buy. Take time to think before making impulse purchases!
+        </p>
+      </div>
 
-        {Object.keys(groupedWants).length === 0 && !showAddForm ? (
-          <div className="text-center py-6 md:py-8 text-gray-500 dark:text-gray-400">
-            <Heart size={40} className="mx-auto mb-4 text-gray-300 dark:text-gray-600 md:w-12 md:h-12" />
-            <p className="text-sm md:text-base">Your wishlist is empty</p>
-            <p className="text-xs md:text-sm">Add your future purchases to keep track of what you want! 💜</p>
-          </div>
-        ) : (
-          <div className="space-y-3 md:space-y-4">
-            {Object.entries(groupedWants).map(([category, items]) => (
-              <div 
-                key={category}
-                className={`relative overflow-hidden rounded-2xl cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] ${
-                  category === '👗 Clothing' 
-                    ? 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600' 
-                    : `bg-gradient-to-br ${getCategoryGradient(category)}`
-                } p-[1px]`}
-                onClick={() => setSelectedCategory(category)}
-                style={category === '👗 Clothing' ? getClothingCardStyle() : undefined}
-              >
-                <div className={`${category === '👗 Clothing' ? 'bg-transparent' : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm'} rounded-2xl p-4 h-full`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`text-3xl ${category === '👗 Clothing' ? 'filter drop-shadow-sm' : ''}`}>
-                        {category.split(' ')[0]}
-                      </div>
-                      <div>
-                        <h3 className={`font-bold text-lg ${
-                          category === '👗 Clothing' 
-                            ? 'text-white drop-shadow-sm' 
-                            : 'text-gray-900 dark:text-gray-100'
-                        }`}>
-                          {category.substring(category.indexOf(' ') + 1)}
-                        </h3>
-                        <p className={`text-sm font-medium ${
-                          category === '👗 Clothing' 
-                            ? 'text-white/80 drop-shadow-sm' 
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}>
-                          {items.length} item{items.length !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                    </div>
-                    <div className={`text-xl ${
-                      category === '👗 Clothing' 
-                        ? 'text-white/60 drop-shadow-sm' 
-                        : 'text-gray-400 dark:text-gray-500'
-                    }`}>
-                      →
-                    </div>
-                  </div>
-                  
-                  {/* Show preview of first few items */}
-                  <div className="mt-3 flex gap-2 overflow-hidden">
-                    {items.slice(0, 3).map((item, index) => (
-                      <div key={item.id} className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium border ${
-                        category === '👗 Clothing'
-                          ? 'bg-white/20 text-white border-white/30 backdrop-blur-sm'
-                          : 'bg-white/50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 border-gray-200/50 dark:border-gray-600/50'
-                      }`}>
-                        {item.product_name.charAt(0).toUpperCase()}
-                      </div>
-                    ))}
-                    {items.length > 3 && (
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium border ${
-                        category === '👗 Clothing'
-                          ? 'bg-white/10 text-white/70 border-white/20 backdrop-blur-sm'
-                          : 'bg-gray-100/50 dark:bg-gray-600/50 text-gray-500 dark:text-gray-400 border-gray-200/50 dark:border-gray-600/50'
-                      }`}>
-                        +{items.length - 3}
-                      </div>
-                    )}
-                  </div>
+      {/* Add Item Button */}
+      <div className="flex justify-center">
+        <Button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg transform transition-all hover:scale-105"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Add to Wishlist
+        </Button>
+      </div>
+
+      {/* Add Form */}
+      {showAddForm && (
+        <Card className="max-w-2xl mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
+              <ShoppingBag className="w-5 h-5" />
+              Add New Item
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={addWant} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Product Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newWant.product_name}
+                    onChange={(e) => setNewWant(prev => ({ ...prev, product_name: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                    placeholder="What do you want?"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Category *
+                  </label>
+                  <select
+                    value={newWant.category}
+                    onChange={(e) => setNewWant(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                    required
+                  >
+                    <option value="">Select category</option>
+                    <option value="clothing">👕 Clothing</option>
+                    <option value="electronics">📱 Electronics</option>
+                    <option value="books">📚 Books</option>
+                    <option value="home">🏠 Home</option>
+                    <option value="beauty">💄 Beauty</option>
+                    <option value="sports">⚽ Sports</option>
+                    <option value="food">🍔 Food</option>
+                    <option value="travel">✈️ Travel</option>
+                    <option value="other">🛍️ Other</option>
+                  </select>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Product URL
+                </label>
+                <input
+                  type="url"
+                  value={newWant.product_url}
+                  onChange={(e) => setNewWant(prev => ({ ...prev, product_url: e.target.value }))}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  value={newWant.product_image_url}
+                  onChange={(e) => setNewWant(prev => ({ ...prev, product_image_url: e.target.value }))}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Notes
+                </label>
+                <textarea
+                  value={newWant.notes}
+                  onChange={(e) => setNewWant(prev => ({ ...prev, notes: e.target.value }))}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  rows={3}
+                  placeholder="Why do you want this? Any specific details?"
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  type="submit"
+                  className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                >
+                  Add to Wishlist
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddForm(false)}
+                  className="px-6"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Wishlist Items by Category */}
+      {Object.keys(wantsByCategory).length === 0 ? (
+        <Card className="max-w-2xl mx-auto bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-800 border-0 shadow-xl">
+          <CardContent className="text-center py-12">
+            <div className="text-6xl mb-4">🎯</div>
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">Your wishlist is empty</h3>
+            <p className="text-gray-500 dark:text-gray-400">Start adding items you'd like to buy in the future!</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-8">
+          {Object.entries(wantsByCategory).map(([category, items]) => (
+            <div key={category} className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">{getCategoryEmoji(category)}</span>
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 capitalize">
+                  {category}
+                </h3>
+                <div className="bg-purple-100 dark:bg-purple-900/50 px-3 py-1 rounded-full">
+                  <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                    {items.length} item{items.length !== 1 ? 's' : ''}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {items.map((want) => (
+                  <Card key={want.id} className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden">
+                    <div className="relative">
+                      {want.product_image_url && (
+                        <div className="h-48 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-purple-900/30 flex items-center justify-center overflow-hidden">
+                          <img
+                            src={want.product_image_url}
+                            alt={want.product_name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div className="absolute top-3 right-3 flex gap-2">
+                        {want.product_url && (
+                          <Button
+                            size="icon"
+                            variant="secondary"
+                            className="bg-white/90 hover:bg-white shadow-lg"
+                            onClick={() => window.open(want.product_url, '_blank')}
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          className="bg-red-500/90 hover:bg-red-600 shadow-lg"
+                          onClick={() => deleteWant(want.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <CardContent className="p-6">
+                      <h4 className="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2 line-clamp-2">
+                        {want.product_name}
+                      </h4>
+                      {want.notes && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+                          {want.notes}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          Added {new Date(want.created_at).toLocaleDateString()}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm">{getCategoryEmoji(category)}</span>
+                          <span className="text-xs text-purple-600 dark:text-purple-400 capitalize font-medium">
+                            {category}
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
