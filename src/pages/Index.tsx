@@ -1,12 +1,16 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
 import { Insights } from '@/components/Insights';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from "react-router-dom";
 import { Card, CardContent } from '@/components/ui/card';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, LogOut } from 'lucide-react';
 import { Logo } from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 export interface Purchase {
   id: string;
@@ -16,6 +20,7 @@ export interface Purchase {
   trigger: string;
   date: string;
   notes?: string;
+  user_id?: string;
 }
 
 const mindfulTips = [
@@ -32,49 +37,93 @@ const mindfulTips = [
 ];
 
 const Index = () => {
-  const [purchases, setPurchases] = useState<Purchase[]>([
-    {
-      id: '1',
-      item: 'Designer sneakers',
-      store: 'Nike',
-      amount: 180,
-      trigger: 'stress',
-      date: '2024-06-10',
-      notes: 'Had a tough day at work'
-    },
-    {
-      id: '2',
-      item: 'Coffee maker',
-      store: 'Target',
-      amount: 85,
-      trigger: 'boredom',
-      date: '2024-06-08',
-      notes: 'Saw it on sale and thought why not'
-    },
-    {
-      id: '3',
-      item: 'Books',
-      store: 'Amazon',
-      amount: 45,
-      trigger: 'happiness',
-      date: '2024-06-05',
-      notes: 'Celebrating a small win'
-    }
-  ]);
-
+  const { profile, signOut } = useAuth();
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const addPurchase = (purchase: Omit<Purchase, 'id'>) => {
-    const newPurchase: Purchase = {
-      ...purchase,
-      id: Date.now().toString(),
-    };
-    setPurchases(prev => [newPurchase, ...prev]);
+  useEffect(() => {
+    fetchPurchases();
+  }, []);
+
+  const fetchPurchases = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_purchases')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      // Transform the data to match the Purchase interface
+      const transformedPurchases = data.map(purchase => ({
+        id: purchase.id,
+        item: purchase.item,
+        store: purchase.store,
+        amount: Number(purchase.amount),
+        trigger: purchase.trigger,
+        date: purchase.date,
+        notes: purchase.notes || '',
+        user_id: purchase.user_id
+      }));
+      
+      setPurchases(transformedPurchases);
+    } catch (error) {
+      console.error('Error fetching purchases:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deletePurchase = (id: string) => {
-    setPurchases(prev => prev.filter(p => p.id !== id));
+  const addPurchase = async (purchase: Omit<Purchase, 'id'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_purchases')
+        .insert({
+          item: purchase.item,
+          store: purchase.store,
+          amount: purchase.amount,
+          trigger: purchase.trigger,
+          date: purchase.date,
+          notes: purchase.notes || null,
+          user_id: (await supabase.auth.getUser()).data.user?.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newPurchase: Purchase = {
+        id: data.id,
+        item: data.item,
+        store: data.store,
+        amount: Number(data.amount),
+        trigger: data.trigger,
+        date: data.date,
+        notes: data.notes || '',
+        user_id: data.user_id
+      };
+      
+      setPurchases(prev => [newPurchase, ...prev]);
+    } catch (error) {
+      console.error('Error adding purchase:', error);
+    }
+  };
+
+  const deletePurchase = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('user_purchases')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setPurchases(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      console.error('Error deleting purchase:', error);
+    }
   };
 
   const handlePurchaseSuccess = () => {
@@ -86,6 +135,21 @@ const Index = () => {
     setCurrentTipIndex(randomIndex);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
@@ -93,7 +157,7 @@ const Index = () => {
           <div className="text-center md:text-left">
             <Logo size="lg" />
             <p className="text-lg text-gray-600 max-w-2xl mx-auto md:mx-0 mt-4">
-              Your companion for mindful spending - pause before you purchase
+              Welcome back, {profile?.first_name || 'there'}! 👋 Ready for some mindful spending?
             </p>
           </div>
           <nav className="flex gap-3 mt-4 md:mt-0">
@@ -103,6 +167,14 @@ const Index = () => {
             <Link to="/settings" className="rounded-full bg-white/70 px-4 py-2 shadow hover:bg-blue-50 transition flex items-center gap-2 text-sm font-semibold">
               <span role="img" aria-label="settings">⚙️</span> Settings
             </Link>
+            <Button 
+              onClick={handleSignOut}
+              variant="outline" 
+              className="rounded-full bg-white/70 px-4 py-2 shadow hover:bg-red-50 transition flex items-center gap-2 text-sm font-semibold border-red-200 text-red-600"
+            >
+              <LogOut size={16} />
+              Sign Out
+            </Button>
           </nav>
         </header>
 
