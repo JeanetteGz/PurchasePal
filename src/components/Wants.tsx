@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, ExternalLink, Trash2, Heart, ShoppingBag, Sparkles } from 'lucide-react';
+import { Plus, ExternalLink, Trash2, Heart, ShoppingBag, Sparkles, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -20,6 +21,7 @@ export const Wants = () => {
   const [wants, setWants] = useState<WantItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedWant, setSelectedWant] = useState<WantItem | null>(null);
   const [newWant, setNewWant] = useState({
     product_name: '',
     category: '',
@@ -79,6 +81,7 @@ export const Wants = () => {
     if (url) {
       const extractedImage = await extractImageFromUrl(url);
       console.log('Extracted image URL:', extractedImage);
+      setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
     }
   };
 
@@ -105,7 +108,7 @@ export const Wants = () => {
       if (error) throw error;
       
       setWants(prev => [data, ...prev]);
-      setNewWant({ product_name: '', category: '', product_url: '', notes: '' });
+      setNewWant({ product_name: '', category: '', product_url: '', product_image_url: '', notes: '' });
       setShowAddForm(false);
     } catch (error) {
       console.error('Error adding want:', error);
@@ -278,6 +281,76 @@ export const Wants = () => {
         </Card>
       )}
 
+      {/* Product Detail Modal */}
+      {selectedWant && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-xl font-bold">{selectedWant.product_name}</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSelectedWant(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {selectedWant.product_image_url && (
+                <div className="w-full h-64 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                  <img
+                    src={selectedWant.product_image_url}
+                    alt={selectedWant.product_name}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.parentElement!.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">Image not available</div>';
+                    }}
+                  />
+                </div>
+              )}
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-medium">Category:</span> {getCategoryEmoji(selectedWant.category)} {selectedWant.category}
+                </p>
+                {selectedWant.notes && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="font-medium">Notes:</span> {selectedWant.notes}
+                  </p>
+                )}
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-medium">Added:</span> {new Date(selectedWant.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                {selectedWant.product_url && (
+                  <Button
+                    onClick={() => window.open(selectedWant.product_url, '_blank')}
+                    className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    View Product
+                  </Button>
+                )}
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    deleteWant(selectedWant.id);
+                    setSelectedWant(null);
+                  }}
+                  className="px-6"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Wishlist Items by Category */}
       {Object.keys(wantsByCategory).length === 0 ? (
         <Card className="max-w-2xl mx-auto bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-800 border-0 shadow-xl">
@@ -305,7 +378,11 @@ export const Wants = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {items.map((want) => (
-                  <Card key={want.id} className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden">
+                  <Card 
+                    key={want.id} 
+                    className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedWant(want)}
+                  >
                     <div className="relative">
                       {want.product_image_url && (
                         <div className="h-48 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-purple-900/30 flex items-center justify-center overflow-hidden">
@@ -324,20 +401,24 @@ export const Wants = () => {
                         </div>
                       )}
                       <div className="absolute top-3 right-3 flex gap-2">
-                        {want.product_url && (
-                          <Button
-                            size="icon"
-                            className="bg-purple-500 hover:bg-purple-600 text-white shadow-lg rounded-full h-8 w-8"
-                            onClick={() => window.open(want.product_url, '_blank')}
-                          >
-                            <span className="text-xs">➜</span>
-                          </Button>
-                        )}
+                        <Button
+                          size="icon"
+                          className="bg-purple-500/90 hover:bg-purple-600 text-white shadow-lg rounded-full h-8 w-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedWant(want);
+                          }}
+                        >
+                          <Eye className="w-3 h-3" />
+                        </Button>
                         <Button
                           size="icon"
                           variant="destructive"
                           className="bg-red-500/90 hover:bg-red-600 shadow-lg rounded-full h-8 w-8"
-                          onClick={() => deleteWant(want.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteWant(want.id);
+                          }}
                         >
                           <Trash2 className="w-3 h-3" />
                         </Button>
