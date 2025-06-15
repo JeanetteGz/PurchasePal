@@ -63,23 +63,6 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
     return colors[trigger] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
   };
 
-  const getTriggerEmoji = (trigger: string) => {
-    const emojiMap: { [key: string]: string } = {
-      stress: '😰',
-      boredom: '😴',
-      happiness: '😊',
-      sadness: '😢',
-      anxiety: '😟',
-      excitement: '🤩',
-      peer_pressure: '👥',
-      sale: '🏷️',
-      impulse: '⚡',
-      necessities: '🛒',
-      planned: '📋',
-      other: '🤔'
-    };
-    return emojiMap[trigger] || '🤔';
-  };
 
   const getStoreEmoji = (store: string) => {
     const storeEmojis: { [key: string]: string } = {
