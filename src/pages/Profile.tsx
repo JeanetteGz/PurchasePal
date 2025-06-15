@@ -85,12 +85,12 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="bg-white/70 backdrop-blur-sm border-b border-white/20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
+      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-b border-white/20 dark:border-gray-700/20">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
           <Link 
             to="/" 
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors hover:bg-white/50 px-3 py-2 rounded-full"
+            className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors hover:bg-white/50 dark:hover:bg-gray-700/50 px-3 py-2 rounded-full"
           >
             <ArrowLeft size={20} />
             Back
@@ -106,15 +106,15 @@ const Profile = () => {
         <form onSubmit={handleSave} className="space-y-6">
           <div className="flex flex-col items-center gap-3">
             <div className="relative">
-              <Avatar className="h-20 w-20 cursor-pointer ring-2 ring-accent hover:ring-4 transition-all" onClick={handleAvatarClick}>
+              <Avatar className="h-20 w-20 cursor-pointer ring-2 ring-accent dark:ring-blue-400 hover:ring-4 transition-all" onClick={handleAvatarClick}>
                 {avatarUrl ? (
                   <AvatarImage src={avatarUrl} />
                 ) : null}
-                <AvatarFallback className="bg-gradient-to-br from-purple-100 to-pink-100">
+                <AvatarFallback className="bg-gradient-to-br from-purple-100 to-pink-100 dark:from-blue-900 dark:to-purple-900">
                   {getInitials() ? (
-                    <span className="text-purple-600 font-semibold">{getInitials()}</span>
+                    <span className="text-purple-600 dark:text-blue-300 font-semibold">{getInitials()}</span>
                   ) : (
-                    <User className="text-purple-400" size={32} />
+                    <User className="text-purple-400 dark:text-blue-400" size={32} />
                   )}
                 </AvatarFallback>
               </Avatar>
@@ -125,71 +125,71 @@ const Profile = () => {
                 ref={fileInput}
                 onChange={handleFileChange}
               />
-              <span className="absolute bottom-0 right-0 bg-primary text-xs rounded-full px-2 py-1 font-semibold cursor-pointer text-primary-foreground hover:bg-primary/90 transition-colors" onClick={handleAvatarClick}>
+              <span className="absolute bottom-0 right-0 bg-primary dark:bg-blue-600 text-xs rounded-full px-2 py-1 font-semibold cursor-pointer text-primary-foreground hover:bg-primary/90 dark:hover:bg-blue-700 transition-colors" onClick={handleAvatarClick}>
                 📷
               </span>
             </div>
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-xs text-muted-foreground dark:text-gray-400 text-center">
               Click to upload a new profile picture 📸
             </p>
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">First Name ✨</label>
+              <label className="block text-sm font-medium mb-1 dark:text-gray-200">First Name ✨</label>
               <Input
                 value={firstName}
                 onChange={e => setFirstName(e.target.value)}
                 maxLength={30}
                 placeholder="First name"
-                className="rounded-xl"
+                className="rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Last Name ✨</label>
+              <label className="block text-sm font-medium mb-1 dark:text-gray-200">Last Name ✨</label>
               <Input
                 value={lastName}
                 onChange={e => setLastName(e.target.value)}
                 maxLength={30}
                 placeholder="Last name"
-                className="rounded-xl"
+                className="rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Email 📧</label>
+            <label className="block text-sm font-medium mb-1 dark:text-gray-200">Email 📧</label>
             <Input
               value={email}
               readOnly
-              className="bg-muted cursor-not-allowed rounded-xl"
+              className="bg-muted dark:bg-gray-700 cursor-not-allowed rounded-xl dark:border-gray-600 dark:text-gray-300"
               type="email"
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
               Email cannot be changed 🔒
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Bio 💭</label>
+            <label className="block text-sm font-medium mb-1 dark:text-gray-200">Bio 💭</label>
             <Input
               value={bio}
               onChange={e => setBio(e.target.value)}
               maxLength={80}
               placeholder="Tell us about yourself"
-              className="rounded-xl"
+              className="rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
               {bio.length}/80 characters
             </p>
           </div>
           
           <div className="flex gap-3">
-            <Button type="submit" className="flex-1 rounded-xl" disabled={loading}>
+            <Button type="submit" className="flex-1 rounded-xl dark:bg-blue-600 dark:hover:bg-blue-700" disabled={loading}>
               {loading ? "💾 Saving..." : "💾 Save Changes"}
             </Button>
             <Link to="/">
-              <Button type="button" variant="outline" className="rounded-xl">
+              <Button type="button" variant="outline" className="rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600">
                 ❌ Cancel
               </Button>
             </Link>

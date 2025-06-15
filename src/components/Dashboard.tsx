@@ -84,40 +84,40 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
         <AlertDialog open={statsOpen} onOpenChange={setStatsOpen}>
           <AlertDialogTrigger asChild>
             <Card
-              className="bg-white/60 backdrop-blur-sm border-0 shadow-lg cursor-pointer hover:scale-105 hover:ring-2 hover:ring-purple-400 transition-all"
+              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg cursor-pointer hover:scale-105 hover:ring-2 hover:ring-purple-400 dark:hover:ring-blue-400 transition-all"
               onClick={() => setStatsOpen(true)}
               tabIndex={0}
               aria-label="Show spending stats"
               role="button"
             >
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">💰 Total Spent</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">💰 Total Spent</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-purple-600">${totalSpent.toFixed(2)}</div>
-                <p className="text-xs text-gray-500 mt-1">All time spending</p>
+                <div className="text-3xl font-bold text-purple-600 dark:text-blue-400">${totalSpent.toFixed(2)}</div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">All time spending</p>
               </CardContent>
             </Card>
           </AlertDialogTrigger>
-          <AlertDialogContent className="max-w-lg p-0 overflow-hidden">
+          <AlertDialogContent className="max-w-lg p-0 overflow-hidden dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6">
               <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2">
+                <AlertDialogTitle className="flex items-center gap-2 dark:text-gray-100">
                   <span className="text-2xl">💰</span>
                   Spending Breakdown
                 </AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogDescription className="dark:text-gray-300">
                   <div className="text-base mt-3">
                     <span className="font-bold text-lg">This Month:</span>{" "}
-                    <span className="text-blue-700 font-semibold">${thisMonthSpent.toFixed(2)}</span>
+                    <span className="text-blue-700 dark:text-blue-400 font-semibold">${thisMonthSpent.toFixed(2)}</span>
                   </div>
                   <div className="text-base">
                     <span className="font-bold">Last Month:</span>{" "}
-                    <span className="text-slate-600">${prevMonthSpent.toFixed(2)}</span>
+                    <span className="text-slate-600 dark:text-gray-400">${prevMonthSpent.toFixed(2)}</span>
                   </div>
                   <div className="mt-2 font-medium">
                     <span className="mr-2">Change:</span>
-                    <span className={percentChange > 0 ? "text-red-600" : percentChange < 0 ? "text-green-600" : "text-gray-600"}>
+                    <span className={percentChange > 0 ? "text-red-600 dark:text-red-400" : percentChange < 0 ? "text-green-600 dark:text-green-400" : "text-gray-600 dark:text-gray-400"}>
                       {percentChange > 0 ? "▲" : percentChange < 0 ? "▼" : "•"} {Math.abs(percentChange).toFixed(1)}%
                     </span>
                   </div>
@@ -127,13 +127,13 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
                       <span>
                         <span className="text-xl">{getTriggerEmoji(biggestTriggerEntry[0])}</span> <span className="capitalize">{biggestTriggerEntry[0]}</span> (${biggestTriggerEntry[1].toFixed(2)})
                       </span>
-                      : <span className="text-gray-500">N/A</span>
+                      : <span className="text-gray-500 dark:text-gray-400">N/A</span>
                     }
                   </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div className="my-6 bg-purple-50 p-2 rounded-lg">
-                <div className="font-bold text-center text-purple-600 mb-2">Your Spending by Trigger</div>
+              <div className="my-6 bg-purple-50 dark:bg-gray-700 p-2 rounded-lg">
+                <div className="font-bold text-center text-purple-600 dark:text-blue-400 mb-2">Your Spending by Trigger</div>
                 {triggerPieData.length > 0 ? (
                   <div style={{ width: '100%', height: 230 }}>
                     <ResponsiveContainer width="100%" height="100%">
@@ -165,7 +165,7 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
             </div>
             <AlertDialogFooter className="p-4 flex justify-end">
               <AlertDialogAction
-                className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700"
+                className="px-4 py-2 rounded bg-purple-600 dark:bg-blue-600 text-white hover:bg-purple-700 dark:hover:bg-blue-700"
                 onClick={() => setStatsOpen(false)}
               >
                 Close
@@ -175,31 +175,31 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
         </AlertDialog>
 
         {/* This Month */}
-        <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">📅 This Month</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">📅 This Month</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600">${thisMonthSpent.toFixed(2)}</div>
-            <p className="text-xs text-gray-500 mt-1">Current month</p>
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">${thisMonthSpent.toFixed(2)}</div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Current month</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">📈 Average Purchase</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">📈 Average Purchase</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">${avgPurchase.toFixed(2)}</div>
-            <p className="text-xs text-gray-500 mt-1">Per purchase</p>
+            <div className="text-3xl font-bold text-green-600 dark:text-green-400">${avgPurchase.toFixed(2)}</div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Per purchase</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Spending Chart */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 dark:text-gray-100">
             📊 Spending Trends
           </CardTitle>
         </CardHeader>
@@ -209,23 +209,23 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
       </Card>
 
       {/* Recent Purchases */}
-      <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 dark:text-gray-100">
             🛍️ Recent Purchases
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {recentPurchases.map((purchase) => (
-              <div key={purchase.id} className="flex items-center justify-between p-4 bg-white/50 rounded-lg">
+              <div key={purchase.id} className="flex items-center justify-between p-4 bg-white/50 dark:bg-gray-700/50 rounded-lg">
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">{purchase.item}</div>
-                  <div className="text-sm text-gray-500">{purchase.store} • {format(new Date(purchase.date), 'MMM d, yyyy')}</div>
-                  <div className="text-xs text-purple-600 mt-1">Trigger: {getTriggerEmoji(purchase.trigger)} {purchase.trigger}</div>
+                  <div className="font-medium text-gray-900 dark:text-gray-100">{purchase.item}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{purchase.store} • {format(new Date(purchase.date), 'MMM d, yyyy')}</div>
+                  <div className="text-xs text-purple-600 dark:text-blue-400 mt-1">Trigger: {getTriggerEmoji(purchase.trigger)} {purchase.trigger}</div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="text-lg font-bold text-gray-900">${purchase.amount}</div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-gray-100">${purchase.amount}</div>
                   {onDeletePurchase && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -234,15 +234,15 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
                         </Button>
                       </AlertDialogTrigger>
                       {deleteId === purchase.id && (
-                        <AlertDialogContent>
+                        <AlertDialogContent className="dark:bg-gray-800 dark:border-gray-700">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete purchase?</AlertDialogTitle>
-                            <AlertDialogDescription>
+                            <AlertDialogTitle className="dark:text-gray-100">Delete purchase?</AlertDialogTitle>
+                            <AlertDialogDescription className="dark:text-gray-300">
                               Are you sure you want to delete <span className="font-medium">{purchase.item}</span> from <span className="font-medium">{purchase.store}</span>? This action cannot be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel onClick={() => setDeleteId(null)} className="dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => {
                                 onDeletePurchase(purchase.id);
@@ -261,7 +261,7 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
               </div>
             ))}
             {purchases.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <div className="text-4xl mb-2">🎯</div>
                 <p>No purchases yet. Start tracking your spending!</p>
               </div>
