@@ -1,7 +1,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,15 +10,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-const placeholderImage =
-  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=facearea&w=256&q=80&facepad=2";
-
 const Profile = () => {
   const { profile, user } = useAuth();
   const { toast } = useToast();
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const [avatarUrl, setAvatarUrl] = useState(placeholderImage);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -83,7 +80,7 @@ const Profile = () => {
   };
 
   const getInitials = () => {
-    if (!firstName && !lastName) return "PP";
+    if (!firstName && !lastName) return null;
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
@@ -110,8 +107,16 @@ const Profile = () => {
           <div className="flex flex-col items-center gap-3">
             <div className="relative">
               <Avatar className="h-20 w-20 cursor-pointer ring-2 ring-accent hover:ring-4 transition-all" onClick={handleAvatarClick}>
-                <AvatarImage src={avatarUrl} />
-                <AvatarFallback>{getInitials()}</AvatarFallback>
+                {avatarUrl ? (
+                  <AvatarImage src={avatarUrl} />
+                ) : null}
+                <AvatarFallback className="bg-gradient-to-br from-purple-100 to-pink-100">
+                  {getInitials() ? (
+                    <span className="text-purple-600 font-semibold">{getInitials()}</span>
+                  ) : (
+                    <User className="text-purple-400" size={32} />
+                  )}
+                </AvatarFallback>
               </Avatar>
               <input
                 type="file"

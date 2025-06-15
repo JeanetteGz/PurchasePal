@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
 import { Insights } from '@/components/Insights';
+import { Wants } from '@/components/Wants';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from "react-router-dom";
 import { Card, CardContent } from '@/components/ui/card';
@@ -179,12 +180,15 @@ const Index = () => {
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-white/50 backdrop-blur-sm rounded-2xl">
+          <TabsList className="grid w-full grid-cols-4 mb-8 bg-white/50 backdrop-blur-sm rounded-2xl">
             <TabsTrigger value="dashboard" className="text-sm font-medium rounded-xl">
               📊 Dashboard
             </TabsTrigger>
             <TabsTrigger value="add" className="text-sm font-medium rounded-xl">
               ➕ Add Purchase
+            </TabsTrigger>
+            <TabsTrigger value="wants" className="text-sm font-medium rounded-xl">
+              💜 Wants
             </TabsTrigger>
             <TabsTrigger value="insights" className="text-sm font-medium rounded-xl">
               🧠 Insights
@@ -197,6 +201,10 @@ const Index = () => {
 
           <TabsContent value="add">
             <AddPurchase onAddPurchase={addPurchase} onSuccess={handlePurchaseSuccess} />
+          </TabsContent>
+
+          <TabsContent value="wants">
+            <Wants />
           </TabsContent>
 
           <TabsContent value="insights">
