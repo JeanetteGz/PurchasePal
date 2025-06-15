@@ -1,9 +1,9 @@
-
 import { useState } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
 import { Insights } from '@/components/Insights';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Link } from "react-router-dom";
 
 export interface Purchase {
   id: string;
@@ -57,14 +57,24 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
-            💸 Mindful Spending 🧘‍♀️
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Take control of your impulsive shopping habits and discover what triggers your spending
-          </p>
-        </div>
+        <header className="flex flex-col md:flex-row items-center justify-between mb-8">
+          <div className="text-center md:text-left">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+              💸 Mindful Spending 🧘‍♀️
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto md:mx-0">
+              Take control of your impulsive shopping habits and discover what triggers your spending
+            </p>
+          </div>
+          <nav className="flex gap-3 mt-4 md:mt-0">
+            <Link to="/profile" className="rounded-full bg-white/70 px-4 py-2 shadow hover:bg-blue-50 transition flex items-center gap-2 text-sm font-semibold">
+              <span role="img" aria-label="profile">👤</span> Profile
+            </Link>
+            <Link to="/settings" className="rounded-full bg-white/70 px-4 py-2 shadow hover:bg-blue-50 transition flex items-center gap-2 text-sm font-semibold">
+              <span role="img" aria-label="settings">⚙️</span> Settings
+            </Link>
+          </nav>
+        </header>
 
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-8 bg-white/50 backdrop-blur-sm">
