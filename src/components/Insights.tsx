@@ -170,8 +170,51 @@ export const Insights = ({ purchases }: InsightsProps) => {
     return dayData;
   };
 
+  const downloadReceipts = () => {
+    const filteredPurchases = purchases.filter(purchase =>
+      isWithinInterval(new Date(purchase.date), { start: dateRange.start, end: dateRange.end })
+    );
+
+    const csvContent = [
+      ['Date', 'Item', 'Store', 'Amount', 'Trigger', 'Notes'],
+      ...filteredPurchases.map(purchase => [
+        purchase.date,
+        purchase.item,
+        purchase.store,
+        purchase.amount.toString(),
+        purchase.trigger,
+        purchase.notes || ''
+      ])
+    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `purchases-${format(dateRange.start, 'yyyy-MM-dd')}-to-${format(dateRange.end, 'yyyy-MM-dd')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header with Download Button */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Spending Insights</h2>
+          <p className="text-gray-600 dark:text-gray-400">Analyze your spending patterns and habits</p>
+        </div>
+        <Button
+          onClick={downloadReceipts}
+          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Download Receipts
+        </Button>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
