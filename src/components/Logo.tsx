@@ -5,9 +5,10 @@ import { Pause, Wallet } from 'lucide-react';
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   showText?: boolean;
+  className?: string;
 }
 
-export const Logo = ({ size = 'md', showText = true }: LogoProps) => {
+export const Logo = ({ size = 'md', showText = true, className = '' }: LogoProps) => {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
@@ -27,7 +28,7 @@ export const Logo = ({ size = 'md', showText = true }: LogoProps) => {
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className={`flex items-center gap-3 ${className}`}>
       {/* Logo Icon */}
       <div className={`${sizeClasses[size]} relative flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl shadow-lg`}>
         {/* Main pause symbol */}

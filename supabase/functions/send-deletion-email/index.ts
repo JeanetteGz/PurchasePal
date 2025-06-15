@@ -2,8 +2,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -21,6 +19,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    
+    if (!resendApiKey) {
+      throw new Error("RESEND_API_KEY environment variable is not set");
+    }
+
+    const resend = new Resend(resendApiKey);
+    
     const { email, firstName, deletionUrl }: DeletionEmailRequest = await req.json();
 
     const emailResponse = await resend.emails.send({
