@@ -1,11 +1,10 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Purchase } from '@/pages/Index';
 import { SpendingChart } from './SpendingChart';
 import { format, subMonths, getMonth, getYear, parseISO, isSameMonth } from 'date-fns';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Delete, Download, TrendingUp, TrendingDown, Store, ShoppingCart } from "lucide-react";
+import { Delete, TrendingUp, TrendingDown, Store, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
@@ -111,50 +110,8 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
   const avgPurchase = purchases.length > 0 ? totalSpent / purchases.length : 0;
   const recentPurchases = purchases.slice(0, 3);
 
-  // PDF Download function
-  const downloadPDF = async () => {
-    try {
-      // Create a simple text-based receipt format
-      const receiptData = purchases.map(p => 
-        `${p.date} | ${p.item} | ${p.store} | $${p.amount.toFixed(2)} | ${p.trigger}`
-      ).join('\n');
-      
-      const blob = new Blob([
-        `SPENDING TRACKER RECEIPTS\n`,
-        `Generated: ${new Date().toLocaleDateString()}\n`,
-        `Total Purchases: ${purchases.length}\n`,
-        `Total Amount: $${totalSpent.toFixed(2)}\n\n`,
-        `DATE | ITEM | STORE | AMOUNT | TRIGGER\n`,
-        `${'='.repeat(60)}\n`,
-        receiptData
-      ], { type: 'text/plain' });
-      
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `spending-receipts-${new Date().toISOString().split('T')[0]}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
-  };
-
   return (
     <div className="space-y-6">
-      {/* Download Button */}
-      <div className="flex justify-end">
-        <Button
-          onClick={downloadPDF}
-          className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          Download Receipts
-        </Button>
-      </div>
-
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Total Spent Card */}

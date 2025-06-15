@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,26 +55,14 @@ export const Wants = () => {
       if (url.includes('amazon.com')) {
         const asinMatch = url.match(/\/dp\/([A-Z0-9]{10})/);
         if (asinMatch) {
-          // Amazon image URL pattern (this is a simplified approach)
           return `https://images-na.ssl-images-amazon.com/images/P/${asinMatch[1]}.01.L.jpg`;
         }
       }
       
-      // For other URLs, try to fetch and parse for Open Graph image
-      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-      const data = await response.json();
-      const html = data.contents;
-      
-      // Look for Open Graph image
-      const ogImageMatch = html.match(/<meta property="og:image" content="([^"]+)"/);
-      if (ogImageMatch) {
-        return ogImageMatch[1];
-      }
-      
-      // Look for Twitter card image
-      const twitterImageMatch = html.match(/<meta name="twitter:image" content="([^"]+)"/);
-      if (twitterImageMatch) {
-        return twitterImageMatch[1];
+      // For other e-commerce sites, try common patterns
+      if (url.includes('ebay.com')) {
+        // eBay often has item images in a specific pattern
+        return '';
       }
       
       return '';
@@ -91,9 +78,7 @@ export const Wants = () => {
     
     if (url) {
       const extractedImage = await extractImageFromUrl(url);
-      if (extractedImage) {
-        setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
-      }
+      console.log('Extracted image URL:', extractedImage);
     }
   };
 
@@ -102,13 +87,15 @@ export const Wants = () => {
     if (!newWant.product_name || !newWant.category) return;
 
     try {
+      const extractedImage = newWant.product_url ? await extractImageFromUrl(newWant.product_url) : '';
+      
       const { data, error } = await supabase
         .from('user_wants')
         .insert({
           product_name: newWant.product_name,
           category: newWant.category,
           product_url: newWant.product_url,
-          product_image_url: newWant.product_image_url || null,
+          product_image_url: extractedImage || null,
           notes: newWant.notes || null,
           user_id: (await supabase.auth.getUser()).data.user?.id
         })
@@ -118,7 +105,7 @@ export const Wants = () => {
       if (error) throw error;
       
       setWants(prev => [data, ...prev]);
-      setNewWant({ product_name: '', category: '', product_url: '', product_image_url: '', notes: '' });
+      setNewWant({ product_name: '', category: '', product_url: '', notes: '' });
       setShowAddForm(false);
     } catch (error) {
       console.error('Error adding want:', error);
@@ -327,7 +314,11 @@ export const Wants = () => {
                             alt={want.product_name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                             onError={(e) => {
-                              e.currentTarget.style.display = 'none';
+                              console.log('Image failed to load:', want.product_image_url);
+                              e.currentTarget.parentElement!.style.display = 'none';
+                            }}
+                            onLoad={() => {
+                              console.log('Image loaded successfully:', want.product_image_url);
                             }}
                           />
                         </div>

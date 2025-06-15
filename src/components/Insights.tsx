@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDay, format, startOfMonth, endOfMonth, eachDayOfInterval, isWithinInterval, subMonths } from 'date-fns';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, RadialBarChart, RadialBar, Legend } from 'recharts';
 import { Calendar, TrendingUp, ShoppingBag, Clock, Download, DollarSign, Target, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Purchase } from '@/pages/Index';
@@ -25,6 +25,16 @@ interface DayOfWeekSpending {
   amount: number;
   count: number;
 }
+
+const COLORS = [
+  '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
+  '#ec4899', '#6366f1', '#a21caf', '#f472b6', '#34d399'
+];
+
+const DARK_COLORS = [
+  '#a78bfa', '#60a5fa', '#34d399', '#fbbf24', '#f87171',
+  '#f472b6', '#818cf8', '#c084fc', '#fb7185', '#4ade80'
+];
 
 export const Insights = ({ purchases }: InsightsProps) => {
   const [categorySpending, setCategorySpending] = useState<CategorySpending[]>([]);
@@ -198,6 +208,29 @@ export const Insights = ({ purchases }: InsightsProps) => {
     window.URL.revokeObjectURL(url);
   };
 
+  // Custom tooltip component for dark mode
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+          <p className="text-gray-900 dark:text-gray-100 font-medium">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: ${entry.value?.toFixed(2)}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Prepare data for radial chart
+  const radialData = categorySpending.slice(0, 5).map((item, index) => ({
+    ...item,
+    fill: window.matchMedia('(prefers-color-scheme: dark)').matches ? DARK_COLORS[index] : COLORS[index]
+  }));
+
   return (
     <div className="space-y-6">
       {/* Header with Download Button */}
@@ -215,6 +248,7 @@ export const Insights = ({ purchases }: InsightsProps) => {
         </Button>
       </div>
 
+      {/* Spending Overview */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -242,6 +276,7 @@ export const Insights = ({ purchases }: InsightsProps) => {
         </CardContent>
       </Card>
 
+      {/* Date Range */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -259,84 +294,179 @@ export const Insights = ({ purchases }: InsightsProps) => {
         </CardContent>
       </Card>
 
-      <Card>
+      {/* Top Categories - Radial Bar Chart */}
+      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
             <ShoppingBag className="w-5 h-5" />
             Top Categories
           </CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={categorySpending}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="amount" fill="#8884d8" />
-            </BarChart>
+            <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={radialData}>
+              <RadialBar
+                dataKey="amount"
+                cornerRadius={10}
+                fill="#8884d8"
+                className="dark:opacity-90"
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend 
+                iconType="circle"
+                layout="vertical"
+                verticalAlign="middle"
+                align="right"
+                wrapperStyle={{ paddingLeft: '20px' }}
+                className="text-sm dark:text-gray-300"
+              />
+            </RadialBarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      <Card>
+      {/* Spending by Day of the Week - Area Chart */}
+      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
             <Clock className="w-5 h-5" />
             Spending by Day of the Week
           </CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dayOfWeekSpending}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="amount" fill="#82ca9d" />
-            </BarChart>
+            <AreaChart data={dayOfWeekSpending}>
+              <defs>
+                <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#82ca9d" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" className="dark:opacity-30" />
+              <XAxis 
+                dataKey="day" 
+                className="text-xs dark:text-gray-300"
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                className="text-xs dark:text-gray-300"
+                tick={{ fontSize: 12 }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area 
+                type="monotone" 
+                dataKey="amount" 
+                stroke="#82ca9d" 
+                strokeWidth={2}
+                fillOpacity={1} 
+                fill="url(#colorAmount)" 
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      <Card>
+      {/* Monthly Spending - Enhanced Line Chart */}
+      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
             <DollarSign className="w-5 h-5" />
-            Monthly Spending
+            Monthly Spending Trend
           </CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={monthlySpending}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="amount" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <defs>
+                <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" className="dark:opacity-30" />
+              <XAxis 
+                dataKey="month" 
+                className="text-xs dark:text-gray-300"
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                className="text-xs dark:text-gray-300"
+                tick={{ fontSize: 12 }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Line 
+                type="monotone" 
+                dataKey="amount" 
+                stroke="url(#lineGradient)"
+                strokeWidth={3}
+                dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 6 }}
+                activeDot={{ r: 8, stroke: '#8b5cf6', strokeWidth: 2 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      <Card>
+      {/* Spending Triggers - Enhanced Pie Chart */}
+      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
             <Target className="w-5 h-5" />
             Spending Triggers
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ul>
-            {spendingTriggers.map(trigger => (
-              <li key={trigger.trigger} className="py-2">
-                {trigger.trigger} - {trigger.count} times
-              </li>
-            ))}
-          </ul>
+          {spendingTriggers.length > 0 ? (
+            <ResponsiveContainer width="100%" height={400}>
+              <PieChart>
+                <Pie
+                  data={spendingTriggers.map((trigger, index) => ({
+                    ...trigger,
+                    fill: window.matchMedia('(prefers-color-scheme: dark)').matches ? DARK_COLORS[index % DARK_COLORS.length] : COLORS[index % COLORS.length]
+                  }))}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ trigger, percent }) => `${trigger}: ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={120}
+                  fill="#8884d8"
+                  dataKey="count"
+                  stroke="none"
+                >
+                  {spendingTriggers.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={window.matchMedia('(prefers-color-scheme: dark)').matches ? DARK_COLORS[index % DARK_COLORS.length] : COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+                          <p className="text-gray-900 dark:text-gray-100 font-medium capitalize">{payload[0].payload.trigger}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Count: {payload[0].value}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className="text-4xl mb-2">🎯</div>
+              <p>No spending triggers data available</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
+      {/* Recent Purchases */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
