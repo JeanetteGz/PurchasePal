@@ -4,10 +4,11 @@ import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
 import { Insights } from '@/components/Insights';
 import { Wants } from '@/components/Wants';
+import { PurchaseView } from '@/components/PurchaseView';
 import { Link } from "react-router-dom";
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,34 +25,14 @@ export interface Purchase {
   user_id?: string;
 }
 
-const mindfulTips = [
-  "💡 Wait 24 hours before making any non-essential purchase",
-  "🛒 Make a shopping list and stick to it - avoid browsing",
-  "💳 Leave your credit cards at home when going out for fun",
-  "🤔 Ask yourself: 'Do I need this or do I just want it?'",
-  "💰 Set a monthly spending limit for non-essentials",
-  "📱 Delete shopping apps from your phone",
-  "🧘‍♀️ Practice mindfulness - notice your emotions before buying",
-  "👥 Shop with a budget-conscious friend who can keep you accountable",
-  "🎯 Focus on experiences rather than material things",
-  "📊 Review your purchases weekly to identify patterns",
-  "⏰ Use the 30-day rule for expensive items",
-  "🎨 Find free or low-cost hobbies to reduce retail therapy",
-  "💝 Consider borrowing or buying second-hand first",
-  "🧮 Calculate how many hours you need to work to afford something",
-  "🏦 Pay with cash instead of cards to feel the transaction"
-];
-
 const Index = () => {
   const { profile, signOut } = useAuth();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [activeView, setActiveView] = useState("dashboard");
-  const [currentTips, setCurrentTips] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPurchases();
-    getRandomTips();
   }, []);
 
   const fetchPurchases = async () => {
@@ -137,11 +118,6 @@ const Index = () => {
     setActiveView("dashboard");
   };
 
-  const getRandomTips = () => {
-    const shuffled = [...mindfulTips].sort(() => 0.5 - Math.random());
-    setCurrentTips(shuffled.slice(0, 3));
-  };
-
   const handleSignOut = async () => {
     await signOut();
   };
@@ -155,7 +131,7 @@ const Index = () => {
         </div>
       </div>
     );
-  }
+  };
 
   const renderContent = () => {
     switch (activeView) {
@@ -167,6 +143,8 @@ const Index = () => {
         return <Wants />;
       case "insights":
         return <Insights purchases={purchases} />;
+      case "purchases":
+        return <PurchaseView purchases={purchases} onDeletePurchase={deletePurchase} />;
       default:
         return <Dashboard purchases={purchases} onDeletePurchase={deletePurchase} />;
     }
@@ -202,7 +180,7 @@ const Index = () => {
           </header>
 
           {/* Navigation Buttons */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             <Button
               onClick={() => setActiveView("dashboard")}
               variant={activeView === "dashboard" ? "default" : "outline"}
@@ -219,6 +197,15 @@ const Index = () => {
             >
               <span className="text-2xl">➕</span>
               <span className="font-medium">Add Purchase</span>
+            </Button>
+            
+            <Button
+              onClick={() => setActiveView("purchases")}
+              variant={activeView === "purchases" ? "default" : "outline"}
+              className="p-6 h-auto flex flex-col items-center gap-2 bg-white/80 dark:bg-gray-800/80 hover:bg-yellow-50 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm"
+            >
+              <span className="text-2xl">🛍️</span>
+              <span className="font-medium">Purchases</span>
             </Button>
             
             <Button
@@ -244,29 +231,6 @@ const Index = () => {
           <div className="mb-8">
             {renderContent()}
           </div>
-
-          {/* Mindful Tips Card */}
-          <Card className="mt-8 bg-gradient-to-r from-purple-500 to-purple-600 dark:from-gray-700 dark:to-gray-800 border-0 text-white shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Lightbulb className="text-yellow-300 dark:text-yellow-400" size={24} />
-                <h3 className="text-xl font-bold">Mindful Tips</h3>
-              </div>
-              <div className="space-y-3 mb-4">
-                {currentTips.map((tip, index) => (
-                  <p key={index} className="text-purple-100 dark:text-gray-200 leading-relaxed p-3 bg-white/10 dark:bg-white/5 rounded-lg backdrop-blur-sm">
-                    {tip}
-                  </p>
-                ))}
-              </div>
-              <button
-                onClick={getRandomTips}
-                className="bg-white/20 dark:bg-white/10 hover:bg-white/30 dark:hover:bg-white/20 transition-colors rounded-full px-4 py-2 text-sm font-medium backdrop-blur-sm"
-              >
-                ✨ Get New Tips
-              </button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </ThemeProvider>
