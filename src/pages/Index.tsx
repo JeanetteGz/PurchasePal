@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
@@ -54,6 +55,10 @@ const Index = () => {
     setPurchases(prev => [newPurchase, ...prev]);
   };
 
+  const deletePurchase = (id: string) => {
+    setPurchases(prev => prev.filter(p => p.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
@@ -90,7 +95,7 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <Dashboard purchases={purchases} />
+            <Dashboard purchases={purchases} onDeletePurchase={deletePurchase} />
           </TabsContent>
 
           <TabsContent value="add">

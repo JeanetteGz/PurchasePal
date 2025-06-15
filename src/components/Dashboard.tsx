@@ -3,19 +3,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Purchase } from '@/pages/Index';
 import { SpendingChart } from './SpendingChart';
 import { format } from 'date-fns';
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Delete } from "lucide-react";
+import { useState } from "react";
 
 interface DashboardProps {
   purchases: Purchase[];
+  onDeletePurchase?: (id: string) => void; // optional for backward compatibility
 }
 
-export const Dashboard = ({ purchases }: DashboardProps) => {
+export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
   const totalSpent = purchases.reduce((sum, purchase) => sum + purchase.amount, 0);
   const thisMonthSpent = purchases
     .filter(p => new Date(p.date).getMonth() === new Date().getMonth())
     .reduce((sum, purchase) => sum + purchase.amount, 0);
-  
+
   const avgPurchase = purchases.length > 0 ? totalSpent / purchases.length : 0;
   const recentPurchases = purchases.slice(0, 3);
+
+  // State for tracking which purchase is being confirmed for deletion
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
@@ -80,7 +88,40 @@ export const Dashboard = ({ purchases }: DashboardProps) => {
                   <div className="text-sm text-gray-500">{purchase.store} • {format(new Date(purchase.date), 'MMM d, yyyy')}</div>
                   <div className="text-xs text-purple-600 mt-1">Trigger: {getTriggerEmoji(purchase.trigger)} {purchase.trigger}</div>
                 </div>
-                <div className="text-lg font-bold text-gray-900">${purchase.amount}</div>
+                <div className="flex items-center gap-2">
+                  <div className="text-lg font-bold text-gray-900">${purchase.amount}</div>
+                  {onDeletePurchase && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="icon" variant="ghost" aria-label="Delete Purchase" onClick={() => setDeleteId(purchase.id)}>
+                          <Delete className="w-5 h-5 text-red-500 hover:text-red-700" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      {deleteId === purchase.id && (
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete purchase?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete <span className="font-medium">{purchase.item}</span> from <span className="font-medium">{purchase.store}</span>? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                onDeletePurchase(purchase.id);
+                                setDeleteId(null);
+                              }}
+                              className="bg-red-500 hover:bg-red-600"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      )}
+                    </AlertDialog>
+                  )}
+                </div>
               </div>
             ))}
             {purchases.length === 0 && (
