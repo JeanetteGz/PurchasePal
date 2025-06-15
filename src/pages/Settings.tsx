@@ -1,4 +1,3 @@
-
 import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -8,6 +7,7 @@ import { Moon, Sun, ArrowLeft, LogOut, Bell, Shield, Trash2 } from "lucide-react
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { Logo } from '@/components/Logo';
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
@@ -54,7 +54,9 @@ const Settings = () => {
             <ArrowLeft size={20} />
             Back
           </Link>
-          <h1 className="flex-1 text-xl font-bold text-center">Settings ⚙️</h1>
+          <div className="flex-1 flex justify-center">
+            <Logo size="sm" />
+          </div>
           <div className="w-16"></div>
         </div>
       </div>

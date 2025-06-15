@@ -1,0 +1,61 @@
+
+import React from 'react';
+import { Pause, Wallet } from 'lucide-react';
+
+interface LogoProps {
+  size?: 'sm' | 'md' | 'lg';
+  showText?: boolean;
+}
+
+const Logo = ({ size = 'md', showText = true }: LogoProps) => {
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16'
+  };
+
+  const textSizeClasses = {
+    sm: 'text-lg',
+    md: 'text-2xl',
+    lg: 'text-3xl'
+  };
+
+  const iconSizeClasses = {
+    sm: 16,
+    md: 24,
+    lg: 32
+  };
+
+  return (
+    <div className="flex items-center gap-3">
+      {/* Logo Icon */}
+      <div className={`${sizeClasses[size]} relative flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl shadow-lg`}>
+        {/* Main pause symbol */}
+        <Pause 
+          size={iconSizeClasses[size]} 
+          className="text-white absolute z-10" 
+          fill="currentColor"
+        />
+        {/* Small wallet icon in corner */}
+        <Wallet 
+          size={iconSizeClasses[size] * 0.4} 
+          className="text-white/70 absolute bottom-0.5 right-0.5" 
+        />
+      </div>
+      
+      {/* App Name */}
+      {showText && (
+        <div className="flex flex-col">
+          <h1 className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent leading-tight`}>
+            PausePal
+          </h1>
+          {size !== 'sm' && (
+            <p className="text-xs text-gray-500 -mt-1">Mindful Spending</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Logo;

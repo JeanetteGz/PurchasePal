@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
@@ -7,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from "react-router-dom";
 import { Card, CardContent } from '@/components/ui/card';
 import { Lightbulb } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export interface Purchase {
   id: string;
@@ -91,10 +91,8 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8">
         <header className="flex flex-col md:flex-row items-center justify-between mb-8">
           <div className="text-center md:text-left">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
-              ⏸️ PausePal 🧘‍♀️
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto md:mx-0">
+            <Logo size="lg" />
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto md:mx-0 mt-4">
               Your companion for mindful spending - pause before you purchase
             </p>
           </div>

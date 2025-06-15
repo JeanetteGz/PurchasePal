@@ -1,10 +1,10 @@
-
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Logo } from '@/components/Logo';
 
 const placeholderImage =
   "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=facearea&w=256&q=80&facepad=2";
@@ -52,7 +52,9 @@ const Profile = () => {
             <ArrowLeft size={20} />
             Back
           </Link>
-          <h1 className="flex-1 text-xl font-bold text-center">Profile Settings 👤</h1>
+          <div className="flex-1 flex justify-center">
+            <Logo size="sm" />
+          </div>
           <div className="w-16"></div>
         </div>
       </div>
