@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Pause, Wallet } from 'lucide-react';
+import { Pause } from 'lucide-react';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -29,18 +29,12 @@ export const Logo = ({ size = 'md', showText = true, className = '' }: LogoProps
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {/* Logo Icon */}
+      {/* Logo Icon - Just pause button */}
       <div className={`${sizeClasses[size]} relative flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl shadow-lg`}>
-        {/* Main pause symbol */}
         <Pause 
           size={iconSizeClasses[size]} 
-          className="text-white absolute z-10" 
+          className="text-white" 
           fill="currentColor"
-        />
-        {/* Small wallet icon in corner */}
-        <Wallet 
-          size={iconSizeClasses[size] * 0.4} 
-          className="text-white/70 absolute bottom-0.5 right-0.5" 
         />
       </div>
       
@@ -51,7 +45,7 @@ export const Logo = ({ size = 'md', showText = true, className = '' }: LogoProps
             PausePal
           </h1>
           {size !== 'sm' && (
-            <p className="text-xs text-gray-500 -mt-1">Mindful Spending</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1">Mindful Spending</p>
           )}
         </div>
       )}
