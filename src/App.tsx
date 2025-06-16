@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import { useState, useEffect, lazy, Suspense } from "react";
@@ -32,6 +32,9 @@ const LoadingSpinner = () => (
 );
 
 const AppRoutes = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
   const [showLanding, setShowLanding] = useState(() => {
     // Check if user has visited before or is on auth page
     const hasVisited = localStorage.getItem('hasVisited') === 'true';
@@ -39,10 +42,34 @@ const AppRoutes = () => {
     return !hasVisited && currentPath === '/';
   });
 
+  // Listen for changes to localStorage and location changes
+  useEffect(() => {
+    const checkShowLanding = () => {
+      const hasVisited = localStorage.getItem('hasVisited') === 'true';
+      const isHomePage = location.pathname === '/';
+      setShowLanding(!hasVisited && isHomePage);
+    };
+
+    checkShowLanding();
+
+    // Listen for storage events (when localStorage is modified)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'hasVisited') {
+        checkShowLanding();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [location.pathname]);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
-        window.location.href = '/password-reset';
+        navigate('/password-reset');
       }
       if (event === 'SIGNED_IN' && session) {
         // User signed in, hide landing page
@@ -52,15 +79,15 @@ const AppRoutes = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const handleGetStarted = () => {
     // Instead of hiding landing page, redirect to auth page
     localStorage.setItem('hasVisited', 'true');
-    window.location.href = '/auth';
+    navigate('/auth');
   };
 
-  if (showLanding) {
+  if (showLanding && location.pathname === '/') {
     return (
       <Suspense fallback={<LoadingSpinner />}>
         <LandingPage onGetStarted={handleGetStarted} />
