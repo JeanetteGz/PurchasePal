@@ -12,10 +12,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [timeoutReached, setTimeoutReached] = useState(false);
 
   useEffect(() => {
-    // Set a timeout to prevent infinite loading
+    // Set a timeout to prevent infinite loading - reduced to 5 seconds
     const timeout = setTimeout(() => {
       setTimeoutReached(true);
-    }, 10000); // 10 seconds
+    }, 5000); // 5 seconds
 
     return () => clearTimeout(timeout);
   }, []);
@@ -26,11 +26,6 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
-          {timeoutReached && (
-            <p className="text-sm text-red-500 mt-2">
-              Loading is taking longer than usual. Please refresh the page.
-            </p>
-          )}
         </div>
       </div>
     );

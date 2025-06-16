@@ -40,6 +40,8 @@ export const useAuthState = () => {
     cleanupFirebaseKeys();
 
     const handleSession = async (session: Session | null, event?: string) => {
+      console.log('AuthProvider: Handling session change, event:', event);
+      
       if (isAccountDeleted()) {
         setUser(null);
         setSession(null);
@@ -53,38 +55,62 @@ export const useAuthState = () => {
 
       if (session?.user) {
         const userId = session.user.id;
+        console.log('AuthProvider: User found, loading profile for:', userId);
 
+        // For SIGNED_IN events, be more aggressive about profile loading
         if (event === 'SIGNED_IN') {
           console.log('SIGNED_IN: checking for existing profile...');
-          const { data: existingProfile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .maybeSingle();
+          try {
+            const { data: existingProfile, error } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', userId)
+              .maybeSingle();
 
-          if (error) {
-            console.warn('Profile check error:', error);
-            await loadProfile(userId, true); // fallback to retry
-          } else if (!existingProfile) {
-            console.warn('No profile found, retrying...');
-            await loadProfile(userId, true);
-          } else {
-            setProfile(existingProfile);
+            if (error) {
+              console.warn('Profile check error:', error);
+              // Try retry approach on error
+              setTimeout(() => {
+                loadProfile(userId, true);
+              }, 100);
+            } else if (!existingProfile) {
+              console.warn('No profile found, retrying...');
+              // Try retry approach if no profile found
+              setTimeout(() => {
+                loadProfile(userId, true);
+              }, 100);
+            } else {
+              console.log('Profile found:', existingProfile);
+              setProfile(existingProfile);
+            }
+          } catch (error) {
+            console.error('Error checking profile:', error);
+            // Fallback: try normal profile load
+            setTimeout(() => {
+              loadProfile(userId);
+            }, 100);
           }
         } else {
-          await loadProfile(userId);
+          // For other events, use normal profile loading
+          setTimeout(() => {
+            loadProfile(userId);
+          }, 100);
         }
       } else {
         setProfile(null);
       }
 
-      setLoading(false);
+      // Always set loading to false after handling session
+      setTimeout(() => {
+        setLoading(false);
+      }, 500); // Give profile loading a bit of time
     };
 
     // Handle existing session first
-    supabase.auth.getSession().then(({ data: { session } }) =>
-      handleSession(session)
-    );
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('AuthProvider: Initial session check:', session ? 'found' : 'none');
+      handleSession(session);
+    });
 
     // Subscribe to auth events - fix the subscription handling
     const { data: authListener } = supabase.auth.onAuthStateChange(
