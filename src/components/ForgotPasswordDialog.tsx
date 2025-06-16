@@ -40,13 +40,35 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
     setLoading(true);
     
     try {
+      // Get user's profile to fetch first name for personalized email
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name')
+        .eq('email', email)
+        .single();
+
+      const firstName = profile?.first_name || 'there';
       const redirectUrl = `${window.location.origin}/auth?reset=true`;
       
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      // First, send the default Supabase password reset (this will create the reset token)
+      const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
 
-      if (error) throw error;
+      if (supabaseError) throw supabaseError;
+
+      // Then send our custom styled email via edge function
+      try {
+        await supabase.functions.invoke('send-password-reset', {
+          body: { 
+            email, 
+            firstName,
+            resetUrl: redirectUrl
+          }
+        });
+      } catch (emailError) {
+        console.warn('Custom email failed, but reset link was sent via Supabase:', emailError);
+      }
 
       toast({
         title: "Password reset email sent! 📧",
