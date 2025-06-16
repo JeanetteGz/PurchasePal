@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,14 +21,34 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!resendApiKey) {
       throw new Error("RESEND_API_KEY environment variable is not set");
     }
 
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Supabase environment variables are not set");
+    }
+
     const resend = new Resend(resendApiKey);
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     const { email, firstName, resetUrl }: PasswordResetEmailRequest = await req.json();
+
+    // Generate a secure password reset link using Supabase admin client
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+      options: {
+        redirectTo: resetUrl,
+      }
+    });
+
+    if (error) throw error;
+
+    const resetLink = data.properties?.action_link || resetUrl;
 
     const emailResponse = await resend.emails.send({
       from: "PurchasePal <welcome@resend.dev>",
@@ -52,7 +73,7 @@ const handler = async (req: Request): Promise<Response> => {
 
             <!-- CTA Button -->
             <div style="text-align: center; margin: 40px 0;">
-              <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #EF4444 0%, #F97316 100%); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3); transition: all 0.2s ease;">
+              <a href="${resetLink}" style="display: inline-block; background: linear-gradient(135deg, #EF4444 0%, #F97316 100%); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3); transition: all 0.2s ease;">
                 🔑 Reset Your Password
               </a>
               <p style="color: #9ca3af; margin: 16px 0 0 0; font-size: 14px;">Click the button above to create a new password</p>

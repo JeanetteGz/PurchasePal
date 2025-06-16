@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LandingPage from "@/components/LandingPage";
 import Index from "./pages/Index";
@@ -17,12 +17,25 @@ import Auth from "./pages/Auth";
 import PasswordReset from "./pages/PasswordReset";
 import ConfirmDeletion from "./pages/ConfirmDeletion";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { user } = useAuth();
   const [showLanding, setShowLanding] = useState(!user);
+
+  useEffect(() => {
+    // Handle auth state changes, especially for password reset
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // User clicked on password reset link, redirect to password reset page
+        window.location.href = '/password-reset';
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   if (showLanding && !user) {
     return <LandingPage onGetStarted={() => setShowLanding(false)} />;

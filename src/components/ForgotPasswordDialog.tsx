@@ -48,27 +48,24 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
         .single();
 
       const firstName = profile?.first_name || 'there';
-      const redirectUrl = `${window.location.origin}/password-reset`;
       
-      // First, send the default Supabase password reset (this will create the reset token)
-      const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
+      // Generate a password reset token using Supabase
+      const { error: tokenError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/password-reset`,
       });
 
-      if (supabaseError) throw supabaseError;
+      if (tokenError) throw tokenError;
 
-      // Then send our custom styled email via edge function
-      try {
-        await supabase.functions.invoke('send-password-reset', {
-          body: { 
-            email, 
-            firstName,
-            resetUrl: redirectUrl
-          }
-        });
-      } catch (emailError) {
-        console.warn('Custom email failed, but reset link was sent via Supabase:', emailError);
-      }
+      // Send our custom styled email via edge function
+      const { error: emailError } = await supabase.functions.invoke('send-password-reset', {
+        body: { 
+          email, 
+          firstName,
+          resetUrl: `${window.location.origin}/password-reset`
+        }
+      });
+
+      if (emailError) throw emailError;
 
       toast({
         title: "Password reset email sent! 📧",
