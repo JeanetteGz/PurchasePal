@@ -49,10 +49,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile after successful authentication
-          setTimeout(async () => {
+          // For new signups, wait a bit longer for profile creation, then retry multiple times
+          if (event === 'SIGNED_UP') {
+            await fetchUserProfileWithRetry(session.user.id, 5, 1000);
+          } else {
             await fetchUserProfile(session.user.id);
-          }, 100); // Increased timeout to give more time for profile creation
+          }
         } else {
           setProfile(null);
         }
@@ -94,6 +96,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const fetchUserProfileWithRetry = async (userId: string, maxRetries: number, delay: number) => {
+    for (let i = 0; i < maxRetries; i++) {
+      console.log(`Attempting to fetch profile (attempt ${i + 1}/${maxRetries})`);
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (!error && data) {
+          console.log('Profile data fetched successfully:', data);
+          setProfile(data);
+          return;
+        }
+        
+        if (error) {
+          console.log('Profile fetch attempt failed:', error);
+        }
+      } catch (error) {
+        console.log('Profile fetch attempt error:', error);
+      }
+
+      // Wait before retrying, with increasing delay
+      if (i < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+      }
+    }
+    
+    console.log('Failed to fetch profile after all retries');
+  };
+
   const refreshProfile = async () => {
     if (user?.id) {
       await fetchUserProfile(user.id);
@@ -118,30 +153,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    // If signup was successful and user is created, wait a bit then fetch profile
-    if (!error && data.user) {
-      console.log('User created, waiting for profile creation...');
-      // Wait a bit longer for the trigger to create the profile
-      setTimeout(async () => {
-        await fetchUserProfile(data.user.id);
-      }, 1000);
-      
-      if (!data.user.email_confirmed_at) {
-        try {
-          const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
-            body: {
-              email: email,
-              firstName: firstName,
-              verificationUrl: `${window.location.origin}/auth?token_hash=${data.user.id}&type=signup&redirect_to=${redirectUrl}`
-            }
-          });
-          
-          if (emailError) {
-            console.error('Error sending verification email:', emailError);
+    // If signup was successful and user is created, the auth state change will handle profile fetching
+    if (!error && data.user && !data.user.email_confirmed_at) {
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
+          body: {
+            email: email,
+            firstName: firstName,
+            verificationUrl: `${window.location.origin}/auth?token_hash=${data.user.id}&type=signup&redirect_to=${redirectUrl}`
           }
-        } catch (emailError) {
-          console.error('Failed to send verification email:', emailError);
+        });
+        
+        if (emailError) {
+          console.error('Error sending verification email:', emailError);
         }
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError);
       }
     }
 
