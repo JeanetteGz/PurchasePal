@@ -1,6 +1,5 @@
-
 import { useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Camera } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 const Profile = () => {
   const { profile, user, refreshProfile } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -237,6 +237,14 @@ const Profile = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate("/", { replace: true });
+  };
+
+  const handleBackToDashboard = () => {
+    navigate("/", { replace: true });
+  };
+
   const getInitials = () => {
     if (!firstName && !lastName) return null;
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -246,13 +254,13 @@ const Profile = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-white/30 dark:border-gray-700/30 shadow-sm">
         <div className="max-w-2xl mx-auto px-6 py-4 flex items-center">
-          <Link 
-            to="/" 
+          <button 
+            onClick={handleBackToDashboard}
             className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-200 hover:bg-white/60 dark:hover:bg-gray-700/60 px-4 py-2 rounded-full"
           >
             <ArrowLeft size={20} />
             Back to Dashboard
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -373,15 +381,14 @@ const Profile = () => {
                   )}
                 </Button>
                 
-                <Link to="/" className="flex-1">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 py-3 font-semibold transition-all duration-200"
-                  >
-                    Cancel
-                  </Button>
-                </Link>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleCancel}
+                  className="flex-1 rounded-xl border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 py-3 font-semibold transition-all duration-200"
+                >
+                  Cancel
+                </Button>
               </div>
             </form>
           </CardContent>
