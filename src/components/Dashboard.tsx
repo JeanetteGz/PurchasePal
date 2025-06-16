@@ -46,17 +46,24 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
   const [statsOpen, setStatsOpen] = useState(false);
   const [monthComparisonOpen, setMonthComparisonOpen] = useState(false);
   const [avgPurchaseOpen, setAvgPurchaseOpen] = useState(false);
-  const [currentTipIndex, setCurrentTipIndex] = useState(Math.floor(Math.random() * mindfulTips.length));
+  const [currentTipStartIndex, setCurrentTipStartIndex] = useState(Math.floor(Math.random() * Math.max(0, mindfulTips.length - 2)));
 
-  // Get current tip
-  const currentTip = mindfulTips[currentTipIndex];
+  // Get 3 current tips
+  const getCurrentTips = () => {
+    const tips = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (currentTipStartIndex + i) % mindfulTips.length;
+      tips.push(mindfulTips[index]);
+    }
+    return tips;
+  };
 
-  const refreshTip = () => {
-    let newIndex;
+  const refreshTips = () => {
+    let newStartIndex;
     do {
-      newIndex = Math.floor(Math.random() * mindfulTips.length);
-    } while (newIndex === currentTipIndex && mindfulTips.length > 1);
-    setCurrentTipIndex(newIndex);
+      newStartIndex = Math.floor(Math.random() * Math.max(0, mindfulTips.length - 2));
+    } while (newStartIndex === currentTipStartIndex && mindfulTips.length > 3);
+    setCurrentTipStartIndex(newStartIndex);
   };
 
   // Stats calculations
@@ -147,27 +154,33 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Mindful Tip Card */}
+      {/* Mindful Tips Card */}
       <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-purple-700 dark:text-purple-300">
             <span className="flex items-center gap-2">
-              💡 Mindful Spending Tip
+              💡 Mindful Spending Tips
             </span>
             <Button
-              onClick={refreshTip}
+              onClick={refreshTips}
               variant="ghost"
               size="sm"
               className="text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 hover:bg-purple-100 dark:hover:bg-purple-800/30"
             >
-              <RefreshCw className="w-4 h-4" />
+              🔄 Refresh
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-purple-600 dark:text-purple-200 text-lg italic">
-            {currentTip}
-          </p>
+          <div className="space-y-3">
+            {getCurrentTips().map((tip, index) => (
+              <div key={`${currentTipStartIndex}-${index}`} className="bg-white/50 dark:bg-gray-700/30 p-3 rounded-lg">
+                <p className="text-purple-600 dark:text-purple-200 text-base italic">
+                  {tip}
+                </p>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
