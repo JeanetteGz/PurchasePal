@@ -1,10 +1,9 @@
-
 import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Moon, Sun, ArrowLeft, LogOut, Bell, Shield, Trash2, AlertTriangle } from "lucide-react";
+import { Moon, Sun, ArrowLeft, LogOut, Bell, Shield, Trash2, AlertTriangle, User, Palette } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -154,102 +153,166 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
-      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-b border-white/20 dark:border-gray-700/20">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center">
-          <Link 
-            to="/" 
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors hover:bg-white/50 dark:hover:bg-gray-700/50 px-3 py-2 rounded-full"
-          >
-            <ArrowLeft size={20} />
-            Back
-          </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50">
+        <div className="max-w-2xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <Link 
+              to="/" 
+              className="flex items-center gap-3 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200 group"
+            >
+              <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
+                <ArrowLeft size={18} />
+              </div>
+              <span className="font-medium">Back</span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <User className="text-slate-400" size={20} />
+              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">Settings</h1>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto py-8 px-4 space-y-6">
+      <div className="max-w-2xl mx-auto py-8 px-6 space-y-8">
         {/* Theme Settings */}
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
-            🎨 Appearance
-          </h2>
-          <div className="flex items-center gap-4">
-            <Sun className={!isDark ? "text-yellow-500" : "text-gray-400"} size={20} />
-            <Switch
-              checked={isDark}
-              onCheckedChange={handleThemeChange}
-              id="theme-toggle"
-            />
-            <Moon className={isDark ? "text-purple-400" : "text-gray-400"} size={20} />
-            <Label htmlFor="theme-toggle" className="ml-2 text-gray-700 dark:text-gray-300">
-              {isDark ? "Dark mode" : "Light mode"}
-            </Label>
+        <div className="group">
+          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-sm border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white">
+                <Palette size={24} />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Appearance</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Customize how the app looks</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-700/50 border border-slate-200/50 dark:border-slate-600/50">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg transition-colors ${!isDark ? "bg-yellow-100 text-yellow-600" : "bg-slate-600 text-slate-400"}`}>
+                    <Sun size={18} />
+                  </div>
+                  <Switch
+                    checked={isDark}
+                    onCheckedChange={handleThemeChange}
+                    id="theme-toggle"
+                    className="data-[state=checked]:bg-purple-600"
+                  />
+                  <div className={`p-2 rounded-lg transition-colors ${isDark ? "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400" : "bg-slate-200 text-slate-400"}`}>
+                    <Moon size={18} />
+                  </div>
+                </div>
+              </div>
+              <Label htmlFor="theme-toggle" className="font-medium text-slate-700 dark:text-slate-300">
+                {isDark ? "Dark mode" : "Light mode"}
+              </Label>
+            </div>
           </div>
         </div>
 
         {/* Notification Settings */}
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
-            <Bell size={20} />
-            Notifications
-          </h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="notifications" className="font-medium text-gray-900 dark:text-white">Push Notifications 📱</Label>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Get notified about your spending habits</p>
+        <div className="group">
+          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-sm border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 text-white">
+                <Bell size={24} />
               </div>
-              <Switch
-                id="notifications"
-                checked={notifications}
-                onCheckedChange={setNotifications}
-              />
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Notifications</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Manage your notification preferences</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-700/50 border border-slate-200/50 dark:border-slate-600/50 hover:bg-slate-100/50 dark:hover:bg-slate-600/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="text-2xl">📱</div>
+                  <div>
+                    <Label htmlFor="notifications" className="font-medium text-slate-900 dark:text-white">Push Notifications</Label>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Get notified about your spending habits</p>
+                  </div>
+                </div>
+                <Switch
+                  id="notifications"
+                  checked={notifications}
+                  onCheckedChange={setNotifications}
+                  className="data-[state=checked]:bg-blue-600"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Privacy Settings */}
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
-            <Shield size={20} />
-            Privacy
-          </h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="data-collection" className="font-medium text-gray-900 dark:text-white">Data Collection 📊</Label>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Help improve the app with anonymous usage data</p>
+        <div className="group">
+          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-sm border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 text-white">
+                <Shield size={24} />
               </div>
-              <Switch
-                id="data-collection"
-                checked={dataCollection}
-                onCheckedChange={setDataCollection}
-              />
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Privacy</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Control your data and privacy settings</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-700/50 border border-slate-200/50 dark:border-slate-600/50 hover:bg-slate-100/50 dark:hover:bg-slate-600/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="text-2xl">📊</div>
+                  <div>
+                    <Label htmlFor="data-collection" className="font-medium text-slate-900 dark:text-white">Data Collection</Label>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Help improve the app with anonymous usage data</p>
+                  </div>
+                </div>
+                <Switch
+                  id="data-collection"
+                  checked={dataCollection}
+                  onCheckedChange={setDataCollection}
+                  className="data-[state=checked]:bg-green-600"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Data Management */}
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
-            <Trash2 size={20} />
-            Data Management
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <Label className="font-medium text-gray-900 dark:text-white">Clear All Data 🗑️</Label>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">This will permanently delete all your purchases and wants and cannot be undone</p>
+        <div className="group">
+          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-sm border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 text-white">
+                <Trash2 size={24} />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Data Management</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Manage your stored data</p>
+              </div>
+            </div>
+            
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border border-orange-200/50 dark:border-orange-800/50">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="text-2xl">🗑️</div>
+                <div className="flex-1">
+                  <Label className="font-semibold text-slate-900 dark:text-white text-lg">Clear All Data</Label>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                    This will permanently delete all your purchases and wants and cannot be undone
+                  </p>
+                </div>
+              </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button 
                     variant="destructive" 
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-medium py-3 rounded-2xl shadow-lg"
                   >
-                    <Trash2 size={16} className="mr-2" />
+                    <Trash2 size={18} className="mr-2" />
                     Clear All Data
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="rounded-3xl">
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
                       <Trash2 className="text-red-500" size={20} />
@@ -284,29 +347,40 @@ const Settings = () => {
         </div>
 
         {/* Account Deletion */}
-        <div className="bg-red-50/70 dark:bg-red-900/20 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-red-200 dark:border-red-800">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-red-600 dark:text-red-400">
-            <AlertTriangle size={20} />
-            Danger Zone
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <Label className="font-medium text-red-700 dark:text-red-400">Delete Account ⚠️</Label>
-              <p className="text-sm text-red-600 dark:text-red-400 mb-3">
-                This will permanently delete your account, all your data, and cannot be undone. 
-                You'll receive an email confirmation before deletion.
-              </p>
+        <div className="group">
+          <div className="bg-gradient-to-br from-red-50/80 to-pink-50/80 dark:from-red-950/30 dark:to-pink-950/30 backdrop-blur-sm rounded-3xl p-8 shadow-sm border border-red-200/50 dark:border-red-800/50 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-red-500 to-pink-600 text-white">
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-red-600 dark:text-red-400">Danger Zone</h2>
+                <p className="text-sm text-red-500 dark:text-red-400">Irreversible actions</p>
+              </div>
+            </div>
+            
+            <div className="p-6 rounded-2xl bg-white/50 dark:bg-red-950/20 border border-red-200/50 dark:border-red-800/50">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="text-2xl">⚠️</div>
+                <div className="flex-1">
+                  <Label className="font-semibold text-red-700 dark:text-red-400 text-lg">Delete Account</Label>
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-1 leading-relaxed">
+                    This will permanently delete your account, all your data, and cannot be undone. 
+                    You'll receive an email confirmation before deletion.
+                  </p>
+                </div>
+              </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button 
                     variant="destructive" 
-                    className="w-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+                    className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-medium py-3 rounded-2xl shadow-lg"
                   >
-                    <AlertTriangle size={16} className="mr-2" />
+                    <AlertTriangle size={18} className="mr-2" />
                     Delete My Account
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="rounded-3xl">
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
                       <AlertTriangle className="text-red-500" size={20} />
@@ -342,24 +416,28 @@ const Settings = () => {
           </div>
         </div>
 
-        <Separator className="my-6" />
+        <Separator className="my-8 bg-slate-200 dark:bg-slate-700" />
 
         {/* Account Actions */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Button 
             onClick={signOut}
             variant="outline"
-            className="w-full flex items-center gap-2 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+            className="w-full flex items-center gap-3 border-2 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium py-4 rounded-2xl transition-all duration-200 hover:border-red-300 dark:hover:border-red-700"
           >
             <LogOut size={20} />
-            Logout 👋
+            <span>Logout</span>
+            <span className="text-lg">👋</span>
           </Button>
         </div>
 
         {/* App Info */}
-        <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-4">
-          <p>PurchasePal v1.0.0 🛍️</p>
-          <p>Made with 💜 for mindful shoppers</p>
+        <div className="text-center pt-8 space-y-3">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-400">PurchasePal v1.0.0</span>
+            <span className="text-lg">🛍️</span>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Made with 💜 for mindful shoppers</p>
         </div>
       </div>
     </div>
