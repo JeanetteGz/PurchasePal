@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -18,23 +19,21 @@ const ConfirmDeletion = () => {
   const email = searchParams.get('email');
 
   const clearAllAuthData = () => {
-    // Clear all possible auth-related storage
     try {
-      // Clear localStorage
+      // Clear all possible auth-related storage
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith('supabase.auth.') || key.includes('sb-') || key.includes('auth')) {
           localStorage.removeItem(key);
         }
       });
       
-      // Clear sessionStorage
       Object.keys(sessionStorage).forEach((key) => {
         if (key.startsWith('supabase.auth.') || key.includes('sb-') || key.includes('auth')) {
           sessionStorage.removeItem(key);
         }
       });
 
-      // Set flag to indicate account was deleted
+      // Set flags to indicate account was deleted
       localStorage.setItem('accountDeleted', 'true');
       localStorage.setItem('userSignedOut', 'true');
     } catch (error) {
@@ -43,7 +42,7 @@ const ConfirmDeletion = () => {
   };
 
   const handleConfirmDeletion = async () => {
-    if (!token) {
+    if (!token || !email) {
       toast({
         title: "Error",
         description: "Invalid deletion link.",
@@ -55,40 +54,64 @@ const ConfirmDeletion = () => {
     setLoading(true);
 
     try {
-      console.log('Attempting to delete account for user:', token);
+      console.log('Starting account deletion process for user:', token);
       
       // Clear auth data immediately to prevent auth loops
       clearAllAuthData();
       
-      // Sign out first to clear session
-      await supabase.auth.signOut({ scope: 'global' });
+      // Sign out from all sessions first
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (signOutError) {
+        console.warn('Sign out error (continuing):', signOutError);
+      }
       
-      // Call the delete account function
+      // Call the delete account edge function
+      console.log('Calling delete-account function...');
       const { data, error } = await supabase.functions.invoke('delete-account', {
         body: { userId: token }
       });
 
-      console.log('Delete account response:', data, error);
+      console.log('Delete account response:', { data, error });
 
       if (error) {
-        console.error('Delete account error:', error);
-        throw error;
+        console.error('Delete account function error:', error);
+        throw new Error(error.message || 'Failed to delete account');
       }
 
+      if (!data?.success) {
+        throw new Error(data?.error || 'Account deletion failed');
+      }
+
+      console.log('Account deletion completed successfully');
       setDeleted(true);
+      
+      toast({
+        title: "Account Deleted Successfully! ✅",
+        description: "Your account and all data have been permanently removed.",
+      });
       
       // Redirect after success with a clean slate
       setTimeout(() => {
         // Force a complete page reload to ensure clean state
         window.location.replace('/auth');
-      }, 2000);
+      }, 3000);
     } catch (error: any) {
       console.error('Error deleting account:', error);
+      
+      // Clear auth state even if deletion fails to prevent stuck state
+      clearAllAuthData();
+      
       toast({
         title: "Error deleting account",
-        description: error.message || "Failed to delete account. Please try again or contact support.",
+        description: error.message || "Failed to delete account. Please contact support.",
         variant: "destructive",
       });
+      
+      // Navigate to auth page even on error to prevent being stuck
+      setTimeout(() => {
+        window.location.replace('/auth');
+      }, 2000);
     } finally {
       setLoading(false);
     }

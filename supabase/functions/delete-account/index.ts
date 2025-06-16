@@ -24,11 +24,16 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Starting account deletion for user:', userId);
 
-    // Create admin client
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    // Create admin client with service role key for full access
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
-    // First, delete all user-related data in the correct order
-    // Delete user purchases first
+    // Delete all user-related data in the correct order (foreign key dependencies)
+    console.log('Deleting user purchases...');
     const { error: purchasesError } = await supabaseAdmin
       .from('user_purchases')
       .delete()
@@ -36,12 +41,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (purchasesError) {
       console.error('Error deleting user purchases:', purchasesError);
-      // Don't throw here, continue with deletion
-    } else {
-      console.log('Successfully deleted user purchases');
+      throw new Error(`Failed to delete purchases: ${purchasesError.message}`);
     }
 
-    // Delete user wants
+    console.log('Deleting user wants...');
     const { error: wantsError } = await supabaseAdmin
       .from('user_wants')
       .delete()
@@ -49,12 +52,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (wantsError) {
       console.error('Error deleting user wants:', wantsError);
-      // Don't throw here, continue with deletion
-    } else {
-      console.log('Successfully deleted user wants');
+      throw new Error(`Failed to delete wants: ${wantsError.message}`);
     }
 
-    // Delete user profile
+    console.log('Deleting user profile...');
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .delete()
@@ -62,25 +63,23 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (profileError) {
       console.error('Error deleting profile:', profileError);
-      // Don't throw here, continue with deletion
-    } else {
-      console.log('Successfully deleted user profile');
+      throw new Error(`Failed to delete profile: ${profileError.message}`);
     }
 
-    // Finally, delete the auth user (this should cascade delete any remaining references)
+    console.log('Deleting auth user...');
     const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (authError) {
       console.error('Error deleting auth user:', authError);
-      throw authError;
+      throw new Error(`Failed to delete auth user: ${authError.message}`);
     }
 
-    console.log('Successfully deleted auth user');
-    console.log('Account deletion completed for user:', userId);
+    console.log('Account deletion completed successfully for user:', userId);
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: 'Account and all associated data have been permanently deleted' 
+      message: 'Account and all associated data have been permanently deleted',
+      deletedUserId: userId
     }), {
       status: 200,
       headers: {
@@ -93,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        details: 'Failed to completely delete account. Please contact support.'
+        success: false
       }),
       {
         status: 500,
