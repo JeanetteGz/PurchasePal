@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { AddPurchase } from '@/components/AddPurchase';
@@ -204,7 +203,6 @@ const Index = () => {
               variant={activeView === "purchases" ? "default" : "outline"}
               className="p-6 h-auto flex flex-col items-center gap-2 bg-white/80 dark:bg-gray-800/80 hover:bg-yellow-50 dark:hover:bg-gray-700/80 text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm"
             >
-              <span className="text-2xl">🛍️</span>
               <span className="font-medium">Purchases</span>
             </Button>
             
