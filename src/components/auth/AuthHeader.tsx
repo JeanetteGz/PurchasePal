@@ -8,7 +8,10 @@ export const AuthHeader = () => {
   const handleLogoClick = () => {
     // Clear the visited flag to show landing page again
     localStorage.removeItem('hasVisited');
-    navigate('/');
+    // Force a refresh of the showLanding state by navigating to home
+    navigate('/', { replace: true });
+    // Trigger a custom event to notify App.tsx of the change
+    window.dispatchEvent(new CustomEvent('forceShowLanding'));
   };
 
   return (

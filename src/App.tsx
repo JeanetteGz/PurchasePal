@@ -59,10 +59,17 @@ const AppRoutes = () => {
       }
     };
 
+    // Listen for custom event from AuthHeader
+    const handleForceShowLanding = () => {
+      setShowLanding(true);
+    };
+
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('forceShowLanding', handleForceShowLanding);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('forceShowLanding', handleForceShowLanding);
     };
   }, [location.pathname]);
 
