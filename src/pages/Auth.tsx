@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -87,13 +86,13 @@ const Auth = () => {
       <div className="container mx-auto px-4 py-8 flex items-center justify-center">
         <Card className="w-full max-w-md shadow-xl border-purple-200/50">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-gray-800 dark:text-white">
+            <CardTitle className="text-2xl font-bold text-white">
               {isLogin 
                 ? (isReturningUser ? 'Welcome Back! 👋' : 'Welcome! 👋')
                 : 'Join PurchasePal! 🎉'
               }
             </CardTitle>
-            <CardDescription className="text-gray-600 dark:text-white/80">
+            <CardDescription className="text-white">
               {isLogin 
                 ? 'Sign in to your account to continue your mindful spending journey'
                 : 'Create your account to start your mindful spending journey'
@@ -106,7 +105,7 @@ const Auth = () => {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName" className="text-gray-700 dark:text-white">First Name</Label>
+                      <Label htmlFor="firstName" className="text-white">First Name</Label>
                       <Input
                         id="firstName"
                         type="text"
@@ -114,11 +113,10 @@ const Auth = () => {
                         onChange={(e) => setFirstName(e.target.value)}
                         placeholder="John"
                         required={!isLogin}
-                        className="border-purple-200 focus:border-blue-400 focus:ring-blue-400"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName" className="text-gray-700 dark:text-white">Last Name</Label>
+                      <Label htmlFor="lastName" className="text-white">Last Name</Label>
                       <Input
                         id="lastName"
                         type="text"
@@ -126,12 +124,11 @@ const Auth = () => {
                         onChange={(e) => setLastName(e.target.value)}
                         placeholder="Doe"
                         required={!isLogin}
-                        className="border-purple-200 focus:border-blue-400 focus:ring-blue-400"
                       />
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="age" className="text-gray-700 dark:text-white">Age</Label>
+                    <Label htmlFor="age" className="text-white">Age</Label>
                     <Input
                       id="age"
                       type="number"
@@ -141,14 +138,13 @@ const Auth = () => {
                       min="1"
                       max="120"
                       required={!isLogin}
-                      className="border-purple-200 focus:border-blue-400 focus:ring-blue-400"
                     />
                   </div>
                 </>
               )}
               
               <div>
-                <Label htmlFor="email" className="text-gray-700 dark:text-white">Email</Label>
+                <Label htmlFor="email" className="text-white">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -156,12 +152,11 @@ const Auth = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="john@example.com"
                   required
-                  className="border-purple-200 focus:border-blue-400 focus:ring-blue-400"
                 />
               </div>
               
               <div>
-                <Label htmlFor="password" className="text-gray-700 dark:text-white">Password</Label>
+                <Label htmlFor="password" className="text-white">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -169,7 +164,6 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="border-purple-200 focus:border-blue-400 focus:ring-blue-400"
                 />
               </div>
               
