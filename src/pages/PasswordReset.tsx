@@ -17,61 +17,55 @@ const PasswordReset = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isValidToken, setIsValidToken] = useState(false);
+  const [isValidSession, setIsValidSession] = useState(false);
+  const [checking, setChecking] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleAuthSession = async () => {
-      // Check if we have the required parameters from the password reset email
-      const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
-      const type = searchParams.get('type');
-
-      if (!accessToken || !refreshToken || type !== 'recovery') {
-        toast({
-          title: "Invalid reset link",
-          description: "This password reset link is invalid or has expired. Please request a new one.",
-          variant: "destructive",
-        });
-        navigate('/auth');
-        return;
-      }
-
+    const checkSession = async () => {
       try {
-        // Set the session with the tokens from the URL
-        const { data, error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-
+        // Check if we have a valid session (user should be automatically logged in via the reset link)
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
         if (error) throw error;
-
-        if (data.session) {
-          setIsValidToken(true);
+        
+        if (session && session.user) {
+          console.log('Valid session found for password reset');
+          setIsValidSession(true);
           toast({
             title: "Ready to reset password! 🔑",
             description: "You can now enter your new password below.",
           });
+        } else {
+          // No valid session, redirect to auth page
+          toast({
+            title: "Invalid reset link",
+            description: "This password reset link is invalid or has expired. Please request a new one.",
+            variant: "destructive",
+          });
+          navigate('/auth');
         }
       } catch (error: any) {
-        console.error('Session error:', error);
+        console.error('Session check error:', error);
         toast({
           title: "Invalid reset link",
           description: "This password reset link is invalid or has expired. Please request a new one.",
           variant: "destructive",
         });
         navigate('/auth');
+      } finally {
+        setChecking(false);
       }
     };
 
-    handleAuthSession();
-  }, [searchParams, navigate, toast]);
+    checkSession();
+  }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isValidToken) {
+    if (!isValidSession) {
       toast({
         title: "Invalid session",
         description: "Please use a valid password reset link.",
@@ -126,7 +120,7 @@ const PasswordReset = () => {
     }
   };
 
-  if (!isValidToken) {
+  if (checking) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">

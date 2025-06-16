@@ -37,36 +37,24 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { email, firstName, resetUrl }: PasswordResetEmailRequest = await req.json();
 
-    // Generate a password recovery link that will redirect to our reset page
+    // Generate a password recovery link
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: email,
-      options: {
-        redirectTo: resetUrl,
-      }
     });
 
     if (error) throw error;
 
-    // Extract the hashed token from the action_link
-    const actionLink = data.properties?.action_link;
-    if (!actionLink) {
+    // Use the action_link directly from Supabase - this contains the proper tokens
+    const resetLink = data.properties?.action_link;
+    if (!resetLink) {
       throw new Error("Failed to generate reset link");
     }
 
-    // Parse the URL to extract token parameters
-    const url = new URL(actionLink);
-    const accessToken = url.searchParams.get('access_token');
-    const refreshToken = url.searchParams.get('refresh_token');
-    const tokenType = url.searchParams.get('type');
-
-    // Create our custom reset URL with the proper tokens
-    const customResetUrl = new URL(resetUrl);
-    if (accessToken) customResetUrl.searchParams.set('access_token', accessToken);
-    if (refreshToken) customResetUrl.searchParams.set('refresh_token', refreshToken);
-    if (tokenType) customResetUrl.searchParams.set('type', tokenType);
-
-    const finalResetLink = customResetUrl.toString();
+    // Replace the redirect_to parameter in the Supabase link with our custom URL
+    const url = new URL(resetLink);
+    url.searchParams.set('redirect_to', resetUrl);
+    const finalResetLink = url.toString();
 
     const emailResponse = await resend.emails.send({
       from: "onboarding@resend.dev",
