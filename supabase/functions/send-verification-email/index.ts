@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
             <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
               <p style="color: #6B7280; margin: 0; font-size: 14px;">
                 With love and excitement,<br>
-                <span style="color: #10B981; font-weight: bold;">The PurchasePal Team 💚</span>
+                <span style="color: white; font-weight: bold;">The PurchasePal Team 💜</span>
               </p>
             </div>
           </div>
