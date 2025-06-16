@@ -71,9 +71,9 @@ const PasswordReset = () => {
         description: "Your password has been successfully changed. You can now sign in with your new password.",
       });
 
-      // Sign out to ensure clean state and redirect to auth
+      // Sign out to ensure clean state and redirect to auth with success message
       await supabase.auth.signOut();
-      navigate('/auth');
+      navigate('/auth?reset=success');
     } catch (error: any) {
       toast({
         title: "Error",
@@ -98,7 +98,7 @@ const PasswordReset = () => {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-gray-800 dark:text-white flex items-center justify-center gap-2">
               <KeyRound className="text-blue-500" size={24} />
-              Reset Password
+              Reset Password 🔐
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-300">
               Enter your new password below to update your account

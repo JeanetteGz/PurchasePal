@@ -56,7 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "PurchasePal <security@purchasepal.app>",
+      from: "onboarding@resend.dev",
       to: [email],
       subject: "Reset your PurchasePal password 🔐",
       html: `
