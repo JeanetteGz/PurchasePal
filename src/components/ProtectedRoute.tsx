@@ -9,18 +9,19 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
-  const [timeoutReached, setTimeoutReached] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    // Set a timeout to prevent infinite loading - reduced to 5 seconds
+    // Give auth a reasonable time to load, then mark as checked
     const timeout = setTimeout(() => {
-      setTimeoutReached(true);
-    }, 5000); // 5 seconds
+      setAuthChecked(true);
+    }, 3000); // 3 seconds should be enough
 
     return () => clearTimeout(timeout);
   }, []);
 
-  if (loading && !timeoutReached) {
+  // If auth is still loading and we haven't reached timeout, show loading
+  if (loading && !authChecked) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
@@ -31,23 +32,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  if (timeoutReached && loading) {
-    console.error('Auth loading timeout reached');
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">Authentication timeout. Please refresh the page.</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Refresh Page
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // If no user after auth check is complete, redirect to auth
   if (!user) {
     return <Navigate to="/auth" replace />;
   }

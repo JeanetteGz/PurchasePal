@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import { useState, useEffect, lazy, Suspense } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 // Lazy load components for better performance
@@ -32,24 +31,38 @@ const LoadingSpinner = () => (
   </div>
 );
 
-const AppContent = () => {
-  const { user } = useAuth();
-  const [showLanding, setShowLanding] = useState(!user);
+const AppRoutes = () => {
+  const [showLanding, setShowLanding] = useState(() => {
+    // Check if user has visited before or is on auth page
+    const hasVisited = localStorage.getItem('hasVisited') === 'true';
+    const currentPath = window.location.pathname;
+    return !hasVisited && currentPath === '/';
+  });
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         window.location.href = '/password-reset';
       }
+      if (event === 'SIGNED_IN' && session) {
+        // User signed in, hide landing page
+        setShowLanding(false);
+        localStorage.setItem('hasVisited', 'true');
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  if (showLanding && !user) {
+  const handleGetStarted = () => {
+    setShowLanding(false);
+    localStorage.setItem('hasVisited', 'true');
+  };
+
+  if (showLanding) {
     return (
       <Suspense fallback={<LoadingSpinner />}>
-        <LandingPage onGetStarted={() => setShowLanding(false)} />
+        <LandingPage onGetStarted={handleGetStarted} />
       </Suspense>
     );
   }
@@ -89,7 +102,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <AppContent />
+            <AppRoutes />
           </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>
