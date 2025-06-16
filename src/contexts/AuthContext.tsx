@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -106,8 +107,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 console.log('AuthProvider: No existing profile found, retrying with delays');
                 await fetchUserProfileWithRetry(session.user.id, 3, 500);
               } else {
-                console.log('AuthProvider: Existing profile found, fetching normally');
-                await fetchUserProfile(session.user.id);
+                console.log('AuthProvider: Existing profile found, setting it:', existingProfile);
+                setProfile(existingProfile);
+                setLoading(false);
               }
             } else {
               console.log('AuthProvider: Not a SIGNED_IN event, fetching profile normally');
@@ -158,16 +160,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log('fetchUserProfile: Starting fetch for user:', userId);
+      
+      console.log('fetchUserProfile: Making database query...');
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
-      console.log('fetchUserProfile: Database response:', { data, error });
+      console.log('fetchUserProfile: Database response received:', { data, error });
 
       if (error) {
         console.error('fetchUserProfile: Database error:', error);
+        console.error('fetchUserProfile: Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         setLoading(false);
         return;
       }
@@ -195,6 +205,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log(`fetchUserProfileWithRetry: Attempt ${i + 1}/${maxRetries}`);
       
       try {
+        console.log(`fetchUserProfileWithRetry: Making database query attempt ${i + 1}...`);
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -212,6 +223,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.log('fetchUserProfileWithRetry: Database error on attempt', i + 1, ':', error);
+          console.error('fetchUserProfileWithRetry: Error details:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          });
         } else {
           console.log('fetchUserProfileWithRetry: Profile not found yet, will retry...');
         }
