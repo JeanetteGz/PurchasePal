@@ -8,17 +8,26 @@ export const usePurchases = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('usePurchases: Starting fetchPurchases');
     fetchPurchases();
   }, []);
 
   const fetchPurchases = async () => {
     try {
+      console.log('usePurchases: Fetching purchases from database...');
+      setLoading(true);
+      
       const { data, error } = await supabase
         .from('user_purchases')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('usePurchases: Database error:', error);
+        throw error;
+      }
+      
+      console.log('usePurchases: Raw data from database:', data);
       
       const transformedPurchases = data.map(purchase => ({
         id: purchase.id,
@@ -31,10 +40,12 @@ export const usePurchases = () => {
         user_id: purchase.user_id
       }));
       
+      console.log('usePurchases: Transformed purchases:', transformedPurchases);
       setPurchases(transformedPurchases);
     } catch (error) {
-      console.error('Error fetching purchases:', error);
+      console.error('usePurchases: Error fetching purchases:', error);
     } finally {
+      console.log('usePurchases: Setting loading to false');
       setLoading(false);
     }
   };

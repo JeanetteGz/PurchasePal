@@ -23,6 +23,10 @@ const Index = () => {
   const { purchases, loading, addPurchase, deletePurchase } = usePurchases();
   const [activeView, setActiveView] = useState("dashboard");
 
+  console.log('Index: Component rendering, loading state:', loading);
+  console.log('Index: Profile:', profile);
+  console.log('Index: Purchases count:', purchases.length);
+
   const handlePurchaseSuccess = () => {
     setActiveView("dashboard");
   };
@@ -32,15 +36,19 @@ const Index = () => {
   };
 
   if (loading) {
+    console.log('Index: Showing loading screen');
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-300">Loading your dashboard...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">If this takes too long, please refresh the page</p>
         </div>
       </div>
     );
   }
+
+  console.log('Index: Rendering main dashboard');
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
