@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -76,23 +77,23 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="bg-white/70 backdrop-blur-sm border-b border-white/20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
+      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-b border-white/20 dark:border-gray-700/20">
         <div className="max-w-md mx-auto px-4 py-6 flex justify-center">
           <Logo size="lg" className="scale-125" />
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8 flex items-center justify-center">
-        <Card className="w-full max-w-md shadow-xl border-purple-200/50">
+        <Card className="w-full max-w-md shadow-xl border-purple-200/50 dark:border-purple-800/50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-white">
+            <CardTitle className="text-2xl font-bold text-gray-800 dark:text-white">
               {isLogin 
                 ? (isReturningUser ? 'Welcome Back! 👋' : 'Welcome! 👋')
                 : 'Join PurchasePal! 🎉'
               }
             </CardTitle>
-            <CardDescription className="text-white">
+            <CardDescription className="text-gray-600 dark:text-gray-300">
               {isLogin 
                 ? 'Sign in to your account to continue your mindful spending journey'
                 : 'Create your account to start your mindful spending journey'
@@ -105,7 +106,7 @@ const Auth = () => {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName" className="text-white">First Name</Label>
+                      <Label htmlFor="firstName" className="text-gray-700 dark:text-gray-300">First Name</Label>
                       <Input
                         id="firstName"
                         type="text"
@@ -116,7 +117,7 @@ const Auth = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName" className="text-white">Last Name</Label>
+                      <Label htmlFor="lastName" className="text-gray-700 dark:text-gray-300">Last Name</Label>
                       <Input
                         id="lastName"
                         type="text"
@@ -128,7 +129,7 @@ const Auth = () => {
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="age" className="text-white">Age</Label>
+                    <Label htmlFor="age" className="text-gray-700 dark:text-gray-300">Age</Label>
                     <Input
                       id="age"
                       type="number"
@@ -144,7 +145,7 @@ const Auth = () => {
               )}
               
               <div>
-                <Label htmlFor="email" className="text-white">Email</Label>
+                <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -156,7 +157,7 @@ const Auth = () => {
               </div>
               
               <div>
-                <Label htmlFor="password" className="text-white">Password</Label>
+                <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -180,11 +181,11 @@ const Auth = () => {
             </form>
             
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600 dark:text-purple-200">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
                 <button
                   onClick={() => setIsLogin(!isLogin)}
-                  className="ml-2 text-pink-600 hover:text-pink-700 dark:text-pink-200 dark:hover:text-pink-100 hover:underline font-medium"
+                  className="ml-2 text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 hover:underline font-medium"
                 >
                   {isLogin ? 'Sign up' : 'Sign in'}
                 </button>
