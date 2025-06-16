@@ -88,6 +88,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           try {
             if (event === 'SIGNED_IN') {
               console.log('AuthProvider: SIGNED_IN event - checking for existing profile');
+              console.log('AuthProvider: About to query profiles table...');
+              
               // Check if this is a new user by seeing if profile exists
               const { data: existingProfile, error: checkError } = await supabase
                 .from('profiles')
@@ -95,10 +97,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .eq('id', session.user.id)
                 .maybeSingle();
               
+              console.log('AuthProvider: Profile check completed');
               console.log('AuthProvider: Profile check result:', { existingProfile, checkError });
               
               if (checkError) {
                 console.error('AuthProvider: Error checking for existing profile:', checkError);
+                console.error('AuthProvider: Database error details:', {
+                  message: checkError.message,
+                  details: checkError.details,
+                  hint: checkError.hint,
+                  code: checkError.code
+                });
                 setLoading(false);
                 return;
               }
@@ -117,6 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
           } catch (error) {
             console.error('AuthProvider: Error in profile loading process:', error);
+            console.error('AuthProvider: Error stack:', error instanceof Error ? error.stack : 'No stack trace');
             setLoading(false);
           }
         } else {
@@ -160,14 +170,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log('fetchUserProfile: Starting fetch for user:', userId);
+      console.log('fetchUserProfile: Testing database connection...');
       
-      console.log('fetchUserProfile: Making database query...');
+      // Test database connection first
+      const { data: testData, error: testError } = await supabase
+        .from('profiles')
+        .select('count')
+        .limit(1);
+      
+      console.log('fetchUserProfile: Database connection test result:', { testData, testError });
+      
+      if (testError) {
+        console.error('fetchUserProfile: Database connection failed:', testError);
+        setLoading(false);
+        return;
+      }
+      
+      console.log('fetchUserProfile: Making actual profile query...');
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
+      console.log('fetchUserProfile: Profile query completed');
       console.log('fetchUserProfile: Database response received:', { data, error });
 
       if (error) {
@@ -194,6 +220,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     } catch (error) {
       console.error('fetchUserProfile: Unexpected error:', error);
+      console.error('fetchUserProfile: Error type:', typeof error);
+      console.error('fetchUserProfile: Error constructor:', error?.constructor?.name);
+      if (error instanceof Error) {
+        console.error('fetchUserProfile: Error message:', error.message);
+        console.error('fetchUserProfile: Error stack:', error.stack);
+      }
       setLoading(false);
     }
   };
@@ -234,6 +266,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.log('fetchUserProfileWithRetry: Exception on attempt', i + 1, ':', error);
+        console.error('fetchUserProfileWithRetry: Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       }
 
       // Wait before retrying
