@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, Package, ExternalLink, Calendar } from 'lucide-react';
+import { ChevronRight, Package, ExternalLink, Calendar, Eye } from 'lucide-react';
 
 interface WantItem {
   id: string;
@@ -25,11 +25,11 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
 
   return (
     <Card 
-      className="group cursor-pointer bg-gradient-to-br from-white via-white to-purple-50/50 dark:from-gray-800 dark:via-gray-800 dark:to-purple-900/30 border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.03] overflow-hidden rounded-3xl relative"
+      className="group cursor-pointer bg-white dark:bg-gray-800 border-0 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.03] overflow-hidden rounded-3xl relative"
       onClick={onClick}
     >
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       
       <CardContent className="relative p-8">
         <div className="flex items-center justify-between mb-8">
@@ -38,10 +38,10 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
               <div className="text-7xl filter drop-shadow-lg group-hover:scale-110 transition-transform duration-300">
                 {categoryEmoji}
               </div>
-              <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 capitalize group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 mb-1">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 capitalize group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 mb-1">
                 {category}
               </h3>
               <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
@@ -49,8 +49,8 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
               </p>
             </div>
           </div>
-          <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-2xl group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors duration-300">
-            <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all duration-300" />
+          <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-2xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors duration-300">
+            <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all duration-300" />
           </div>
         </div>
 
@@ -60,7 +60,7 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
             {items.slice(0, 5).map((item, index) => (
               <div
                 key={item.id}
-                className="relative inline-block h-14 w-14 rounded-2xl ring-3 ring-white dark:ring-gray-800 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-purple-900/50 flex items-center justify-center overflow-hidden shadow-lg hover:scale-110 transition-transform duration-300"
+                className="relative inline-block h-16 w-16 rounded-2xl ring-3 ring-white dark:ring-gray-800 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center overflow-hidden shadow-lg hover:scale-110 transition-transform duration-300"
                 style={{ zIndex: 5 - index }}
               >
                 {item.product_image_url ? (
@@ -83,7 +83,7 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
               </div>
             ))}
             {items.length > 5 && (
-              <div className="relative inline-block h-14 w-14 rounded-2xl ring-3 ring-white dark:ring-gray-800 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-300 shadow-lg">
+              <div className="relative inline-block h-16 w-16 rounded-2xl ring-3 ring-white dark:ring-gray-800 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-300 shadow-lg">
                 +{items.length - 5}
               </div>
             )}
@@ -103,10 +103,10 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
 
           {/* Enhanced Latest item preview */}
           {items.length > 0 && (
-            <div className="bg-gradient-to-r from-gray-50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-2xl p-5 mt-4 border border-gray-100 dark:border-gray-600">
+            <div className="bg-gradient-to-r from-gray-50 to-blue-50/50 dark:from-gray-700/50 dark:to-blue-900/20 rounded-2xl p-5 mt-4 border border-gray-100 dark:border-gray-600">
               <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-4 h-4 text-purple-500" />
-                <p className="text-xs text-purple-600 dark:text-purple-400 font-semibold uppercase tracking-wide">
+                <Calendar className="w-4 h-4 text-blue-500" />
+                <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wide">
                   Latest Added
                 </p>
               </div>

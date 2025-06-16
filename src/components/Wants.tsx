@@ -186,11 +186,11 @@ export const Wants = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-gray-900">
-        <div className="container mx-auto px-4 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="container mx-auto px-6 py-12">
           <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500/20 border-t-purple-500 mx-auto mb-6"></div>
-            <p className="text-gray-600 dark:text-gray-300 text-lg">Loading your wishlist...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500/20 border-t-blue-500 mx-auto mb-6"></div>
+            <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">Loading your wishlist...</p>
           </div>
         </div>
       </div>
@@ -198,46 +198,52 @@ export const Wants = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-6 py-8 max-w-7xl">
         <WantsHeader />
 
-        <div className="max-w-4xl mx-auto space-y-6">
-          <WantsSearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-          <WantsAddButton onAddClick={() => setShowAddForm(!showAddForm)} isLoading={addLoading} />
-        </div>
-
-        {showAddForm && (
-          <div className="animate-fade-in max-w-4xl mx-auto">
-            <AddWantForm
-              newWant={newWant}
-              onNewWantChange={setNewWant}
-              onUrlChange={handleUrlChange}
-              onSubmit={addWant}
-              onCancel={() => setShowAddForm(false)}
-              isLoading={addLoading}
-            />
+        <div className="space-y-8">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex-1 w-full sm:max-w-md">
+              <WantsSearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+            </div>
+            <WantsAddButton onAddClick={() => setShowAddForm(!showAddForm)} isLoading={addLoading} />
           </div>
-        )}
 
-        <CategoryDetailModal
-          category={selectedCategory}
-          items={selectedCategory ? wantsByCategory[selectedCategory] || [] : []}
-          categoryEmoji={selectedCategory ? getCategoryEmoji(selectedCategory) : ''}
-          onClose={() => setSelectedCategory(null)}
-          onDeleteWant={deleteWant}
-        />
+          {showAddForm && (
+            <div className="animate-fade-in">
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-gray-200/50 dark:border-gray-700/50">
+                <AddWantForm
+                  newWant={newWant}
+                  onNewWantChange={setNewWant}
+                  onUrlChange={handleUrlChange}
+                  onSubmit={addWant}
+                  onCancel={() => setShowAddForm(false)}
+                  isLoading={addLoading}
+                />
+              </div>
+            </div>
+          )}
 
-        {Object.keys(wantsByCategory).length === 0 ? (
-          <WantsEmptyState searchQuery={searchQuery} />
-        ) : (
-          <WantsCategoriesGrid 
-            wantsByCategory={wantsByCategory} 
-            onCategoryClick={setSelectedCategory} 
+          <CategoryDetailModal
+            category={selectedCategory}
+            items={selectedCategory ? wantsByCategory[selectedCategory] || [] : []}
+            categoryEmoji={selectedCategory ? getCategoryEmoji(selectedCategory) : ''}
+            onClose={() => setSelectedCategory(null)}
+            onDeleteWant={deleteWant}
           />
-        )}
 
-        <WantsStatsSection wants={wants} wantsByCategory={wantsByCategory} />
+          {Object.keys(wantsByCategory).length === 0 ? (
+            <WantsEmptyState searchQuery={searchQuery} />
+          ) : (
+            <WantsCategoriesGrid 
+              wantsByCategory={wantsByCategory} 
+              onCategoryClick={setSelectedCategory} 
+            />
+          )}
+
+          <WantsStatsSection wants={wants} wantsByCategory={wantsByCategory} />
+        </div>
       </div>
     </div>
   );
