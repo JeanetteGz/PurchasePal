@@ -50,8 +50,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           // For new signups, wait a bit longer for profile creation, then retry multiple times
-          if (event === 'SIGNED_UP') {
-            await fetchUserProfileWithRetry(session.user.id, 5, 1000);
+          if (event === 'SIGNED_IN') {
+            // Check if this is a new user by seeing if profile exists
+            const { data: existingProfile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (!existingProfile) {
+              // This is likely a new signup, retry with delays
+              await fetchUserProfileWithRetry(session.user.id, 5, 1000);
+            } else {
+              await fetchUserProfile(session.user.id);
+            }
           } else {
             await fetchUserProfile(session.user.id);
           }
