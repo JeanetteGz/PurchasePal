@@ -1,4 +1,3 @@
-
 import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -60,33 +59,45 @@ const Settings = () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (!user || !profile) return;
+    if (!user || !profile) {
+      toast({
+        title: "Error",
+        description: "User information not available. Please try logging in again.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsDeleting(true);
     
     try {
+      console.log('Sending deletion email for user:', user.id, 'email:', profile.email);
+      
       // Send deletion confirmation email
-      const { error: emailError } = await supabase.functions.invoke('send-deletion-email', {
+      const { data, error: emailError } = await supabase.functions.invoke('send-deletion-email', {
         body: {
           email: profile.email,
-          firstName: profile.first_name,
-          deletionUrl: `${window.location.origin}/confirm-deletion?token=${user.id}&email=${profile.email}`
+          firstName: profile.first_name || 'User',
+          deletionUrl: `${window.location.origin}/confirm-deletion?token=${user.id}&email=${encodeURIComponent(profile.email)}`
         }
       });
 
+      console.log('Email function response:', data, emailError);
+
       if (emailError) {
+        console.error('Email error details:', emailError);
         throw emailError;
       }
 
       toast({
-        title: "📧 Deletion email sent",
-        description: "Please check your email to confirm account deletion.",
+        title: "📧 Account deletion email sent!",
+        description: "Please check your email to confirm account deletion. The email may take a few minutes to arrive.",
       });
     } catch (error: any) {
       console.error('Error sending deletion email:', error);
       toast({
-        title: "Error",
-        description: "Failed to send deletion email. Please try again.",
+        title: "Error sending deletion email",
+        description: error.message || "Failed to send deletion email. Please try again or contact support.",
         variant: "destructive",
       });
     } finally {
@@ -228,12 +239,12 @@ const Settings = () => {
                     <AlertDialogDescription className="space-y-2">
                       <p>This action cannot be undone. This will permanently delete your account and remove all your data from our servers.</p>
                       <p className="font-medium">You will lose:</p>
-                      <ul className="list-disc list-inside space-y-1 text-sm">
-                        <li>All your purchase data and insights</li>
-                        <li>Your profile information</li>
-                        <li>Your spending habits and triggers</li>
-                        <li>All account settings and preferences</li>
-                      </ul>
+                      <div className="space-y-1 text-sm">
+                        <div>• All your purchase data and insights</div>
+                        <div>• Your profile information</div>
+                        <div>• Your spending habits and triggers</div>
+                        <div>• All account settings and preferences</div>
+                      </div>
                       <p className="text-sm text-muted-foreground mt-4">
                         We'll send you an email to confirm this action before proceeding.
                       </p>
@@ -271,7 +282,7 @@ const Settings = () => {
 
         {/* App Info */}
         <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-4">
-          <p>PausePal v1.0.0 ⏸️</p>
+          <p>PurchasePal v1.0.0 🛒</p>
           <p>Made with ❤️ for mindful shoppers</p>
         </div>
       </div>
