@@ -30,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { email, firstName, deletionUrl }: DeletionEmailRequest = await req.json();
 
     const emailResponse = await resend.emails.send({
-      from: "PurchasePal <security@resend.dev>",
+      from: "jeanetteglz99@gmail.com",
       to: [email],
       subject: "🗑️ Confirm Account Deletion - PurchasePal",
       html: `
