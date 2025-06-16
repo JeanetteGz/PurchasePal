@@ -55,8 +55,9 @@ const AppRoutes = () => {
   }, []);
 
   const handleGetStarted = () => {
-    setShowLanding(false);
+    // Instead of hiding landing page, redirect to auth page
     localStorage.setItem('hasVisited', 'true');
+    window.location.href = '/auth';
   };
 
   if (showLanding) {
