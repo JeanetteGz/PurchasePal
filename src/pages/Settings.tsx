@@ -9,7 +9,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Logo } from '@/components/Logo';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -108,7 +107,7 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
       <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-b border-white/20 dark:border-gray-700/20">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-md mx-auto px-4 py-4 flex items-center">
           <Link 
             to="/" 
             className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors hover:bg-white/50 dark:hover:bg-gray-700/50 px-3 py-2 rounded-full"
@@ -116,10 +115,6 @@ const Settings = () => {
             <ArrowLeft size={20} />
             Back
           </Link>
-          <div className="flex-1 flex justify-center">
-            <Logo size="sm" />
-          </div>
-          <div className="w-16"></div>
         </div>
       </div>
 

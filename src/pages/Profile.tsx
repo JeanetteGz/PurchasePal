@@ -1,4 +1,3 @@
-
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, User } from "lucide-react";
@@ -18,7 +17,6 @@ const Profile = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [bio, setBio] = useState("Mindful spender 🧘‍♂️");
   const [tempFile, setTempFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -214,20 +212,6 @@ const Profile = () => {
             />
             <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
               Email cannot be changed 🔒
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1 dark:text-gray-200">Bio 💭</label>
-            <Input
-              value={bio}
-              onChange={e => setBio(e.target.value)}
-              maxLength={80}
-              placeholder="Tell us about yourself"
-              className="rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-            />
-            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
-              {bio.length}/80 characters
             </p>
           </div>
           
