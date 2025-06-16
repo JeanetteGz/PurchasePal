@@ -241,9 +241,9 @@ export const Wants = () => {
           </div>
         )}
 
-        {/* Enhanced Stats Section */}
+        {/* Enhanced Stats Section - Moved further down with more spacing */}
         {wants.length > 0 && (
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto pt-16">
             <Card className="bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100 dark:from-gray-800 dark:via-purple-900/30 dark:to-gray-800 border-0 shadow-2xl rounded-3xl">
               <CardContent className="p-10">
                 <div className="flex items-center gap-3 justify-center mb-8">
