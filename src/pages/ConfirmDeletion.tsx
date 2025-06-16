@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Logo } from '@/components/Logo';
-import { AlertTriangle, CheckCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 
 const ConfirmDeletion = () => {
   const [searchParams] = useSearchParams();
@@ -31,12 +31,31 @@ const ConfirmDeletion = () => {
     setLoading(true);
 
     try {
-      // Call the delete account function
-      const { error } = await supabase.functions.invoke('delete-account', {
+      console.log('Attempting to delete account for user:', token);
+      
+      // Call the delete account function with the user ID
+      const { data, error } = await supabase.functions.invoke('delete-account', {
         body: { userId: token }
       });
 
-      if (error) throw error;
+      console.log('Delete account response:', data, error);
+
+      if (error) {
+        console.error('Delete account error:', error);
+        throw error;
+      }
+
+      // Clear any remaining local storage data
+      try {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+            localStorage.removeItem(key);
+          }
+        });
+        localStorage.removeItem('userSignedOut');
+      } catch (storageError) {
+        console.warn('Error clearing localStorage:', storageError);
+      }
 
       setDeleted(true);
       toast({
@@ -51,8 +70,8 @@ const ConfirmDeletion = () => {
     } catch (error: any) {
       console.error('Error deleting account:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete account. Please try again or contact support.",
+        title: "Error deleting account",
+        description: error.message || "Failed to delete account. Please try again or contact support.",
         variant: "destructive",
       });
     } finally {
@@ -101,7 +120,7 @@ const ConfirmDeletion = () => {
           <AlertTriangle className="mx-auto mb-4 text-red-500" size={48} />
           <CardTitle className="text-red-600">Confirm Account Deletion</CardTitle>
           <CardDescription className="text-red-600">
-            You're about to permanently delete your PausePal account for <strong>{email}</strong>
+            You're about to permanently delete your PurchasePal account for <strong>{email}</strong>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -124,12 +143,20 @@ const ConfirmDeletion = () => {
               disabled={loading}
               className="w-full bg-red-600 hover:bg-red-700"
             >
-              {loading ? "Deleting Account..." : "Yes, Delete My Account"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting Account...
+                </>
+              ) : (
+                "Yes, Delete My Account"
+              )}
             </Button>
             
             <Button
               variant="outline"
               onClick={() => navigate('/')}
+              disabled={loading}
               className="w-full"
             >
               Cancel - Keep My Account

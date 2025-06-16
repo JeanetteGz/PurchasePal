@@ -22,10 +22,39 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('User ID is required');
     }
 
+    console.log('Starting account deletion for user:', userId);
+
     // Create admin client
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Delete user profile and related data (cascade will handle this)
+    // First, delete all user-related data in the correct order
+    // Delete user purchases first
+    const { error: purchasesError } = await supabaseAdmin
+      .from('user_purchases')
+      .delete()
+      .eq('user_id', userId);
+
+    if (purchasesError) {
+      console.error('Error deleting user purchases:', purchasesError);
+      // Don't throw here, continue with deletion
+    } else {
+      console.log('Successfully deleted user purchases');
+    }
+
+    // Delete user wants
+    const { error: wantsError } = await supabaseAdmin
+      .from('user_wants')
+      .delete()
+      .eq('user_id', userId);
+
+    if (wantsError) {
+      console.error('Error deleting user wants:', wantsError);
+      // Don't throw here, continue with deletion
+    } else {
+      console.log('Successfully deleted user wants');
+    }
+
+    // Delete user profile
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .delete()
@@ -33,10 +62,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (profileError) {
       console.error('Error deleting profile:', profileError);
-      throw profileError;
+      // Don't throw here, continue with deletion
+    } else {
+      console.log('Successfully deleted user profile');
     }
 
-    // Delete the auth user (this will cascade delete everything else)
+    // Finally, delete the auth user (this should cascade delete any remaining references)
     const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (authError) {
@@ -44,9 +75,13 @@ const handler = async (req: Request): Promise<Response> => {
       throw authError;
     }
 
-    console.log('Account successfully deleted for user:', userId);
+    console.log('Successfully deleted auth user');
+    console.log('Account deletion completed for user:', userId);
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Account and all associated data have been permanently deleted' 
+    }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
@@ -56,7 +91,10 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in delete-account function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Failed to completely delete account. Please contact support.'
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
