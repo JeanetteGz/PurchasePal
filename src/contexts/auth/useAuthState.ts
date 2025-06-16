@@ -23,110 +23,24 @@ export const useAuthState = () => {
     }
   };
 
-  const loadProfile = async (userId: string, event?: string) => {
+  const loadProfile = async (userId: string, useRetry = false) => {
     try {
-      setLoading(true);
-      
-      if (event === 'SIGNED_IN') {
-        console.log('AuthProvider: SIGNED_IN event - checking for existing profile');
-        console.log('AuthProvider: About to query profiles table...');
-        
-        // Check if this is a new user by seeing if profile exists
-        const { data: existingProfile, error: checkError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .maybeSingle();
-        
-        console.log('AuthProvider: Profile check completed');
-        console.log('AuthProvider: Profile check result:', { existingProfile, checkError });
-        
-        if (checkError) {
-          console.error('AuthProvider: Error checking for existing profile:', checkError);
-          console.error('AuthProvider: Database error details:', {
-            message: checkError.message,
-            details: checkError.details,
-            hint: checkError.hint,
-            code: checkError.code
-          });
-          setLoading(false);
-          return;
-        }
-        
-        if (!existingProfile) {
-          console.log('AuthProvider: No existing profile found, retrying with delays');
-          const profileData = await fetchUserProfileWithRetry(userId, 3, 500);
-          setProfile(profileData);
-        } else {
-          console.log('AuthProvider: Existing profile found, setting it:', existingProfile);
-          setProfile(existingProfile);
-        }
-      } else {
-        console.log('AuthProvider: Not a SIGNED_IN event, fetching profile normally');
-        const profileData = await fetchUserProfile(userId);
-        setProfile(profileData);
-      }
+      const profileData = useRetry
+        ? await fetchUserProfileWithRetry(userId, 3, 500)
+        : await fetchUserProfile(userId);
+      setProfile(profileData);
     } catch (error) {
-      console.error('AuthProvider: Error in profile loading process:', error);
-      console.error('AuthProvider: Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-    } finally {
-      setLoading(false);
+      console.error('AuthProvider: Failed to load profile:', error);
+      setProfile(null); // prevent locking loading state
     }
   };
 
   useEffect(() => {
-    console.log('AuthProvider: Starting initialization');
-    
-    // Clean up any potential Firebase references in localStorage
+    console.log('AuthProvider: Initializing auth state...');
     cleanupFirebaseKeys();
 
-    // Check if account was deleted
-    if (isAccountDeleted()) {
-      console.log('Account was deleted, clearing all state');
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      setLoading(false);
-      return;
-    }
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('AUTH_EVENT:', event, 'User ID:', session?.user?.id);
-        console.log('AuthProvider: Processing auth state change, current loading:', loading);
-        
-        // If account was deleted, don't process auth changes
-        if (isAccountDeleted()) {
-          console.log('Ignoring auth state change - account deleted');
-          setUser(null);
-          setSession(null);
-          setProfile(null);
-          setLoading(false);
-          return;
-        }
-
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          console.log('AuthProvider: User found, starting profile fetch for:', session.user.id);
-          await loadProfile(session.user.id, event);
-        } else {
-          console.log('AuthProvider: No user, clearing profile and setting loading to false');
-          setProfile(null);
-          setLoading(false);
-        }
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('AuthProvider: Checking existing session:', !!session);
-      
-      // If account was deleted, don't process existing session
+    const handleSession = async (session: Session | null, event?: string) => {
       if (isAccountDeleted()) {
-        console.log('Ignoring existing session - account deleted');
         setUser(null);
         setSession(null);
         setProfile(null);
@@ -136,27 +50,58 @@ export const useAuthState = () => {
 
       setSession(session);
       setUser(session?.user ?? null);
+
       if (session?.user) {
-        console.log('AuthProvider: Existing session found, fetching profile');
-        loadProfile(session.user.id).finally(() => {
-          console.log('AuthProvider: Profile fetch completed for existing session');
-        });
+        const userId = session.user.id;
+
+        if (event === 'SIGNED_IN') {
+          console.log('SIGNED_IN: checking for existing profile...');
+          const { data: existingProfile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle();
+
+          if (error) {
+            console.warn('Profile check error:', error);
+            await loadProfile(userId, true); // fallback to retry
+          } else if (!existingProfile) {
+            console.warn('No profile found, retrying...');
+            await loadProfile(userId, true);
+          } else {
+            setProfile(existingProfile);
+          }
+        } else {
+          await loadProfile(userId);
+        }
       } else {
-        console.log('AuthProvider: No existing session, setting loading to false');
-        setLoading(false);
+        setProfile(null);
       }
-    });
 
-    return () => subscription.unsubscribe();
+      setLoading(false);
+    };
+
+    // Handle existing session first
+    supabase.auth.getSession().then(({ data: { session } }) =>
+      handleSession(session)
+    );
+
+    // Subscribe to auth events
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth event:', event);
+        await handleSession(session, event);
+      }
+    );
+
+    return () => subscription?.unsubscribe();
   }, []);
-
-  console.log('AuthProvider: Current state - loading:', loading, 'user:', !!user, 'profile:', !!profile);
 
   return {
     user,
     session,
     profile,
     loading,
-    refreshProfile
+    refreshProfile,
   };
 };
