@@ -48,7 +48,7 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
         .single();
 
       const firstName = profile?.first_name || 'there';
-      const redirectUrl = `${window.location.origin}/auth?reset=true`;
+      const redirectUrl = `${window.location.origin}/password-reset`;
       
       // First, send the default Supabase password reset (this will create the reset token)
       const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
