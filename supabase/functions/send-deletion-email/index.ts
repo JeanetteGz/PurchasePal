@@ -30,13 +30,13 @@ const handler = async (req: Request): Promise<Response> => {
     const { email, firstName, deletionUrl }: DeletionEmailRequest = await req.json();
 
     const emailResponse = await resend.emails.send({
-      from: "PausePal <security@resend.dev>",
+      from: "PurchasePal <security@resend.dev>",
       to: [email],
-      subject: "🗑️ Confirm Account Deletion - PausePal",
+      subject: "🗑️ Confirm Account Deletion - PurchasePal",
       html: `
         <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fafafa;">
-          <!-- Header with Purple to Red Gradient -->
-          <div style="background: linear-gradient(135deg, #8B5CF6, #EF4444); padding: 40px 30px; border-radius: 20px; text-align: center; margin-bottom: 30px;">
+          <!-- Header with Green to Red Gradient -->
+          <div style="background: linear-gradient(135deg, #10B981, #EF4444); padding: 40px 30px; border-radius: 20px; text-align: center; margin-bottom: 30px;">
             <div style="font-size: 48px; margin-bottom: 15px;">🗑️</div>
             <h1 style="color: white; margin: 0; font-size: 32px; font-weight: 700;">Account Deletion Request</h1>
             <p style="color: white; opacity: 0.95; margin: 15px 0 0 0; font-size: 18px;">We're sad to see you go, but we understand! 💔</p>
@@ -48,7 +48,7 @@ const handler = async (req: Request): Promise<Response> => {
             <div style="text-align: center; margin-bottom: 35px;">
               <p style="font-size: 20px; color: #374151; margin: 0; font-weight: 600;">Hey ${firstName}! 👋</p>
               <p style="font-size: 16px; color: #6B7280; margin: 15px 0 0 0; line-height: 1.6;">
-                We received a request to permanently delete your PausePal account.<br>
+                We received a request to permanently delete your PurchasePal account.<br>
                 This is an important security step to protect your data! 🛡️
               </p>
             </div>
@@ -86,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
 
             <!-- Confirmation Button -->
             <div style="text-align: center; margin: 40px 0;">
-              <a href="${deletionUrl}" style="background: linear-gradient(135deg, #8B5CF6, #EF4444); color: white; padding: 18px 40px; text-decoration: none; border-radius: 30px; font-weight: 700; display: inline-block; box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4); font-size: 16px; transition: all 0.3s ease;">
+              <a href="${deletionUrl}" style="background: linear-gradient(135deg, #10B981, #EF4444); color: white; padding: 18px 40px; text-decoration: none; border-radius: 30px; font-weight: 700; display: inline-block; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); font-size: 16px; transition: all 0.3s ease;">
                 🗑️ Confirm Account Deletion
               </a>
               <p style="color: #9CA3AF; margin: 15px 0 0 0; font-size: 13px;">
@@ -110,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
             <div style="text-align: center; margin-top: 40px; padding-top: 25px; border-top: 2px solid #F3F4F6;">
               <p style="color: #6B7280; margin: 0; font-size: 16px; line-height: 1.6;">
                 We hope you'll consider coming back to mindful spending someday! 🌟<br>
-                <span style="background: linear-gradient(135deg, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 18px;">The PausePal Team 💜</span>
+                <span style="background: linear-gradient(135deg, #10B981, #3B82F6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 18px;">The PurchasePal Team 💚</span>
               </p>
             </div>
           </div>
@@ -121,7 +121,7 @@ const handler = async (req: Request): Promise<Response> => {
               📧 This email was sent to <strong>${email}</strong><br>
               If you didn't request this deletion, you can safely ignore this email.<br><br>
               🔗 <strong>Having trouble with the button?</strong> Copy and paste this link:<br>
-              <a href="${deletionUrl}" style="color: #8B5CF6; word-break: break-all; font-size: 12px; text-decoration: none; font-weight: 500;">${deletionUrl}</a>
+              <a href="${deletionUrl}" style="color: #10B981; word-break: break-all; font-size: 12px; text-decoration: none; font-weight: 500;">${deletionUrl}</a>
             </p>
           </div>
         </div>

@@ -30,14 +30,14 @@ const handler = async (req: Request): Promise<Response> => {
     const { email, firstName, verificationUrl }: VerificationEmailRequest = await req.json();
 
     const emailResponse = await resend.emails.send({
-      from: "PausePal <welcome@resend.dev>",
+      from: "PurchasePal <welcome@resend.dev>",
       to: [email],
-      subject: "Welcome to PausePal! Verify your email ⏸️",
+      subject: "Welcome to PurchasePal! Verify your email 🛍️",
       html: `
         <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fafafa;">
           <!-- Cute Header with Gradient -->
-          <div style="background: linear-gradient(135deg, #8B5CF6, #EC4899); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
-            <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to PausePal! 🌟</h1>
+          <div style="background: linear-gradient(135deg, #10B981, #3B82F6); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
+            <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to PurchasePal! 🌟</h1>
             <p style="color: white; opacity: 0.9; margin: 10px 0 0 0;">Your journey to mindful spending starts here!</p>
           </div>
 
@@ -51,7 +51,7 @@ const handler = async (req: Request): Promise<Response> => {
 
             <!-- Confirmation Button -->
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${verificationUrl}" style="background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+              <a href="${verificationUrl}" style="background: linear-gradient(135deg, #10B981, #3B82F6); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                 ✨ Confirm Your Email ✨
               </a>
             </div>
@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
             <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
               <p style="color: #6B7280; margin: 0; font-size: 14px;">
                 With love and excitement,<br>
-                <span style="color: #8B5CF6; font-weight: bold;">The PausePal Team 💜</span>
+                <span style="color: #10B981; font-weight: bold;">The PurchasePal Team 💚</span>
               </p>
             </div>
           </div>

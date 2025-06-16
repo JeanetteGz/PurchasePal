@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Pause } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -29,12 +29,11 @@ export const Logo = ({ size = 'md', showText = true, className = '' }: LogoProps
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {/* Logo Icon - Shopping bag with pause */}
+      {/* Logo Icon - Shopping bag */}
       <div className={`${sizeClasses[size]} relative flex items-center justify-center bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl shadow-lg`}>
-        <Pause 
+        <ShoppingBag 
           size={iconSizeClasses[size]} 
           className="text-white" 
-          fill="currentColor"
         />
       </div>
       
