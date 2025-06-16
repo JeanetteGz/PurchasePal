@@ -34,94 +34,92 @@ const handler = async (req: Request): Promise<Response> => {
       to: [email],
       subject: "🗑️ Confirm Account Deletion - PurchasePal",
       html: `
-        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fafafa;">
-          <!-- Header with Gradient -->
-          <div style="background: linear-gradient(135deg, #10B981, #3B82F6); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
-            <div style="font-size: 48px; margin-bottom: 15px;">🗑️</div>
-            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">Account Deletion Request</h1>
-            <p style="color: white; opacity: 0.9; margin: 10px 0 0 0; font-size: 16px;">We're sad to see you go, but we understand! 💔</p>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #fef2f2;">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 40px 30px; text-align: center; border-radius: 16px 16px 0 0;">
+            <div style="font-size: 64px; margin-bottom: 16px;">🗑️</div>
+            <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">Account Deletion Request</h1>
+            <p style="color: rgba(255, 255, 255, 0.9); margin: 12px 0 0 0; font-size: 18px; font-weight: 400;">We're sad to see you go, but we understand</p>
           </div>
 
           <!-- Main Content -->
-          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-            <!-- Welcome Message -->
-            <div style="text-align: center; margin-bottom: 30px;">
-              <p style="font-size: 18px; color: #4B5563; margin: 0; font-weight: 600;">Hey ${firstName}! 👋</p>
-              <p style="font-size: 16px; color: #6B7280; margin: 10px 0 0 0; line-height: 1.6;">
+          <div style="background: #ffffff; padding: 40px 30px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+            <!-- Greeting -->
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h2 style="font-size: 24px; color: #1f2937; margin: 0 0 12px 0; font-weight: 600;">Hey ${firstName}! 👋</h2>
+              <p style="font-size: 16px; color: #6b7280; margin: 0; line-height: 1.6;">
                 We received a request to permanently delete your PurchasePal account.<br>
-                This is an important security step to protect your data! 🛡️
+                This is an important security step to protect your data 🛡️
               </p>
             </div>
 
-            <!-- Warning Box -->
-            <div style="margin: 30px 0; padding: 25px; background: #FEF2F2; border-radius: 10px; border-left: 5px solid #EF4444;">
-              <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                <span style="font-size: 24px; margin-right: 10px;">⚠️</span>
-                <p style="font-weight: 700; color: #DC2626; margin: 0; font-size: 18px;">This action cannot be undone!</p>
+            <!-- Warning -->
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #ef4444; border-radius: 12px; padding: 24px; margin: 32px 0;">
+              <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                <span style="font-size: 28px; margin-right: 12px;">⚠️</span>
+                <h3 style="font-size: 20px; font-weight: 600; color: #dc2626; margin: 0;">This action cannot be undone!</h3>
               </div>
-              <p style="color: #7F1D1D; margin: 0 0 15px 0; font-size: 15px; line-height: 1.5;">
+              <p style="color: #7f1d1d; margin: 0 0 16px 0; font-size: 15px; line-height: 1.5;">
                 Deleting your account will permanently remove:
               </p>
-              <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 15px;">
+              <div style="background: #ffffff; border-radius: 8px; padding: 20px; margin-top: 16px;">
                 <div style="display: grid; gap: 12px;">
-                  <div style="display: flex; align-items: center; color: #7F1D1D;">
-                    <span style="margin-right: 12px; font-size: 18px;">📊</span>
+                  <div style="display: flex; align-items: center; color: #7f1d1d;">
+                    <span style="margin-right: 12px; font-size: 20px;">📊</span>
                     <span style="font-size: 14px;">All your purchase data and spending insights</span>
                   </div>
-                  <div style="display: flex; align-items: center; color: #7F1D1D;">
-                    <span style="margin-right: 12px; font-size: 18px;">👤</span>
+                  <div style="display: flex; align-items: center; color: #7f1d1d;">
+                    <span style="margin-right: 12px; font-size: 20px;">👤</span>
                     <span style="font-size: 14px;">Your complete profile information</span>
                   </div>
-                  <div style="display: flex; align-items: center; color: #7F1D1D;">
-                    <span style="margin-right: 12px; font-size: 18px;">🎯</span>
+                  <div style="display: flex; align-items: center; color: #7f1d1d;">
+                    <span style="margin-right: 12px; font-size: 20px;">🎯</span>
                     <span style="font-size: 14px;">Your spending habits and trigger data</span>
                   </div>
-                  <div style="display: flex; align-items: center; color: #7F1D1D;">
-                    <span style="margin-right: 12px; font-size: 18px;">⚙️</span>
+                  <div style="display: flex; align-items: center; color: #7f1d1d;">
+                    <span style="margin-right: 12px; font-size: 20px;">⚙️</span>
                     <span style="font-size: 14px;">All account settings and preferences</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Confirmation Button -->
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${deletionUrl}" style="background: linear-gradient(135deg, #10B981, #3B82F6); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); font-size: 16px;">
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${deletionUrl}" style="display: inline-block; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3); transition: all 0.2s ease;">
                 🗑️ Confirm Account Deletion
               </a>
-              <p style="color: #6B7280; margin: 15px 0 0 0; font-size: 13px;">
-                Click the button above to permanently delete your account
-              </p>
+              <p style="color: #9ca3af; margin: 16px 0 0 0; font-size: 14px;">Click the button above to permanently delete your account</p>
             </div>
 
-            <!-- Alternative Message -->
-            <div style="margin: 30px 0; padding: 20px; background: #F0FDF4; border-radius: 10px; border-left: 5px solid #10B981;">
-              <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                <span style="font-size: 24px; margin-right: 10px;">💚</span>
-                <p style="font-weight: 700; color: #059669; margin: 0; font-size: 18px;">Changed your mind?</p>
+            <!-- Alternative -->
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #10b981; border-radius: 12px; padding: 24px; margin: 32px 0;">
+              <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                <span style="font-size: 28px; margin-right: 12px;">💚</span>
+                <h3 style="font-size: 20px; font-weight: 600; color: #059669; margin: 0;">Changed your mind?</h3>
               </div>
-              <p style="color: #065F46; margin: 0; font-size: 15px; line-height: 1.6;">
+              <p style="color: #065f46; margin: 0; font-size: 15px; line-height: 1.6;">
                 If you didn't request this deletion or want to keep your account, simply ignore this email. 
                 Your account will remain active and secure! 🛡️
               </p>
             </div>
 
             <!-- Footer -->
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
-              <p style="color: #6B7280; margin: 0; font-size: 14px; line-height: 1.6;">
+            <div style="text-align: center; margin-top: 40px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; margin: 0; font-size: 16px; line-height: 1.6;">
                 We hope you'll consider coming back to mindful spending someday! 🌟<br>
-                <span style="color: white; font-weight: bold;">The PurchasePal Team 💜</span>
+                <span style="color: #374151; font-weight: 600;">The PurchasePal Team 💜</span>
               </p>
             </div>
           </div>
 
-          <!-- Bottom Note -->
-          <div style="text-align: center; margin-top: 20px; padding: 15px; background: #F8FAFC; border-radius: 10px;">
-            <p style="color: #6B7280; margin: 0; font-size: 12px; line-height: 1.6;">
+          <!-- Footer Note -->
+          <div style="text-align: center; margin-top: 24px; padding: 20px; background: rgba(255, 255, 255, 0.6); border-radius: 12px; backdrop-filter: blur(10px);">
+            <p style="color: #6b7280; margin: 0; font-size: 13px; line-height: 1.5;">
               📧 This email was sent to <strong>${email}</strong><br>
               If you didn't request this deletion, you can safely ignore this email.<br><br>
               🔗 <strong>Having trouble with the button?</strong> Copy and paste this link:<br>
-              <a href="${deletionUrl}" style="color: #10B981; word-break: break-all; font-size: 12px; text-decoration: none; font-weight: 500;">${deletionUrl}</a>
+              <a href="${deletionUrl}" style="color: #10b981; word-break: break-all; font-size: 12px; text-decoration: none; font-weight: 500;">${deletionUrl}</a>
             </p>
           </div>
         </div>

@@ -34,52 +34,66 @@ const handler = async (req: Request): Promise<Response> => {
       to: [email],
       subject: "Welcome to PurchasePal! Verify your email 🛍️",
       html: `
-        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fafafa;">
-          <!-- Cute Header with Gradient -->
-          <div style="background: linear-gradient(135deg, #10B981, #3B82F6); padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
-            <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to PurchasePal! 🌟</h1>
-            <p style="color: white; opacity: 0.9; margin: 10px 0 0 0;">Your journey to mindful spending starts here!</p>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%); padding: 40px 30px; text-align: center; border-radius: 16px 16px 0 0;">
+            <div style="font-size: 64px; margin-bottom: 16px;">🌟</div>
+            <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">Welcome to PurchasePal!</h1>
+            <p style="color: rgba(255, 255, 255, 0.9); margin: 12px 0 0 0; font-size: 18px; font-weight: 400;">Your journey to mindful spending starts here</p>
           </div>
 
           <!-- Main Content -->
-          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-            <!-- Welcome Message -->
-            <div style="text-align: center; margin-bottom: 30px;">
-              <p style="font-size: 18px; color: #4B5563; margin: 0;">Hey ${firstName}! 👋</p>
-              <p style="font-size: 16px; color: #6B7280; margin: 10px 0;">We're so excited to have you join our community of mindful spenders!</p>
+          <div style="background: #ffffff; padding: 40px 30px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+            <!-- Greeting -->
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h2 style="font-size: 24px; color: #1f2937; margin: 0 0 12px 0; font-weight: 600;">Hey ${firstName}! 👋</h2>
+              <p style="font-size: 16px; color: #6b7280; margin: 0; line-height: 1.6;">We're excited to have you join our community of mindful spenders!</p>
             </div>
 
-            <!-- Confirmation Button -->
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${verificationUrl}" style="background: linear-gradient(135deg, #10B981, #3B82F6); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 40px 0;">
+              <a href="${verificationUrl}" style="display: inline-block; background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3); transition: all 0.2s ease;">
                 ✨ Confirm Your Email ✨
               </a>
+              <p style="color: #9ca3af; margin: 16px 0 0 0; font-size: 14px;">Click the button above to verify your account</p>
             </div>
 
-            <!-- Features List -->
-            <div style="margin: 30px 0; padding: 20px; background: #F8FAFC; border-radius: 10px;">
-              <p style="font-weight: bold; color: #4B5563; margin-bottom: 15px;">What's waiting for you: 🎁</p>
-              <ul style="color: #6B7280; margin: 0; padding-left: 20px;">
-                <li style="margin-bottom: 8px;">Track your impulse purchases 📝</li>
-                <li style="margin-bottom: 8px;">Set and manage your budget 💰</li>
-                <li style="margin-bottom: 8px;">Understand your spending patterns 📊</li>
-                <li style="margin-bottom: 8px;">Make smarter financial decisions 🎯</li>
-              </ul>
+            <!-- Features -->
+            <div style="background: #f8fafc; border-radius: 12px; padding: 24px; margin: 32px 0; border: 1px solid #e5e7eb;">
+              <h3 style="font-size: 18px; font-weight: 600; color: #374151; margin: 0 0 16px 0; text-align: center;">What's waiting for you 🎁</h3>
+              <div style="display: grid; gap: 12px;">
+                <div style="display: flex; align-items: center; color: #4b5563;">
+                  <span style="margin-right: 12px; font-size: 20px;">📝</span>
+                  <span style="font-size: 15px;">Track your impulse purchases</span>
+                </div>
+                <div style="display: flex; align-items: center; color: #4b5563;">
+                  <span style="margin-right: 12px; font-size: 20px;">💰</span>
+                  <span style="font-size: 15px;">Set and manage your budget</span>
+                </div>
+                <div style="display: flex; align-items: center; color: #4b5563;">
+                  <span style="margin-right: 12px; font-size: 20px;">📊</span>
+                  <span style="font-size: 15px;">Understand your spending patterns</span>
+                </div>
+                <div style="display: flex; align-items: center; color: #4b5563;">
+                  <span style="margin-right: 12px; font-size: 20px;">🎯</span>
+                  <span style="font-size: 15px;">Make smarter financial decisions</span>
+                </div>
+              </div>
             </div>
 
             <!-- Footer -->
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
-              <p style="color: #6B7280; margin: 0; font-size: 14px;">
+            <div style="text-align: center; margin-top: 40px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; margin: 0; font-size: 16px; line-height: 1.6;">
                 With love and excitement,<br>
-                <span style="color: white; font-weight: bold;">The PurchasePal Team 💜</span>
+                <span style="color: #374151; font-weight: 600;">The PurchasePal Team 💜</span>
               </p>
             </div>
           </div>
 
-          <!-- Bottom Note -->
-          <div style="text-align: center; margin-top: 20px; padding: 15px; background: #F8FAFC; border-radius: 10px;">
-            <p style="color: #6B7280; margin: 0; font-size: 12px;">
-              This email was sent to ${email}<br>
+          <!-- Footer Note -->
+          <div style="text-align: center; margin-top: 24px; padding: 20px; background: rgba(255, 255, 255, 0.6); border-radius: 12px; backdrop-filter: blur(10px);">
+            <p style="color: #6b7280; margin: 0; font-size: 13px; line-height: 1.5;">
+              📧 This email was sent to <strong>${email}</strong><br>
               If you didn't create this account, you can safely ignore this email.
             </p>
           </div>
