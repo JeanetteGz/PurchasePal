@@ -57,16 +57,15 @@ const ConfirmDeletion = () => {
         console.warn('Error clearing localStorage:', storageError);
       }
 
-      setDeleted(true);
-      toast({
-        title: "Account deleted successfully 👋",
-        description: "Your account and all data have been permanently deleted.",
-      });
+      // Sign out from Supabase
+      await supabase.auth.signOut();
 
-      // Redirect to home after 3 seconds
+      setDeleted(true);
+      
+      // Show success message and refresh after a short delay
       setTimeout(() => {
-        navigate('/');
-      }, 3000);
+        window.location.href = '/';
+      }, 2000);
     } catch (error: any) {
       console.error('Error deleting account:', error);
       toast({
@@ -97,14 +96,14 @@ const ConfirmDeletion = () => {
 
   if (deleted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center px-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4">
+        <Card className="w-full max-w-md border-green-200">
           <CardHeader className="text-center">
             <Logo size="sm" className="mx-auto mb-4" />
-            <CheckCircle className="mx-auto mb-4 text-green-500" size={48} />
-            <CardTitle className="text-green-600">Account Deleted</CardTitle>
-            <CardDescription>
-              Your account has been successfully deleted. You'll be redirected to the homepage shortly.
+            <CheckCircle className="mx-auto mb-4 text-green-500" size={64} />
+            <CardTitle className="text-green-600 text-2xl">Account Successfully Deleted</CardTitle>
+            <CardDescription className="text-green-700 text-lg">
+              Your account and all data have been permanently removed. You will be redirected shortly.
             </CardDescription>
           </CardHeader>
         </Card>
