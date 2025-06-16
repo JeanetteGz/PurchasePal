@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +21,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, firstName: string, lastName: string, age: number) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Fetch user profile after successful authentication
           setTimeout(async () => {
             await fetchUserProfile(session.user.id);
-          }, 0);
+          }, 100); // Increased timeout to give more time for profile creation
         } else {
           setProfile(null);
         }
@@ -73,21 +75,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+      
+      console.log('Profile data fetched:', data);
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
   };
 
+  const refreshProfile = async () => {
+    if (user?.id) {
+      await fetchUserProfile(user.id);
+    }
+  };
+
   const signUp = async (email: string, password: string, firstName: string, lastName: string, age: number) => {
     const redirectUrl = `${window.location.origin}/`;
+    
+    console.log('Signing up with metadata:', { first_name: firstName, last_name: lastName, age });
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -102,22 +118,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    // If signup was successful, send verification email
-    if (!error && data.user && !data.user.email_confirmed_at) {
-      try {
-        const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
-          body: {
-            email: email,
-            firstName: firstName,
-            verificationUrl: `${window.location.origin}/auth?token_hash=${data.user.id}&type=signup&redirect_to=${redirectUrl}`
+    // If signup was successful and user is created, wait a bit then fetch profile
+    if (!error && data.user) {
+      console.log('User created, waiting for profile creation...');
+      // Wait a bit longer for the trigger to create the profile
+      setTimeout(async () => {
+        await fetchUserProfile(data.user.id);
+      }, 1000);
+      
+      if (!data.user.email_confirmed_at) {
+        try {
+          const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
+            body: {
+              email: email,
+              firstName: firstName,
+              verificationUrl: `${window.location.origin}/auth?token_hash=${data.user.id}&type=signup&redirect_to=${redirectUrl}`
+            }
+          });
+          
+          if (emailError) {
+            console.error('Error sending verification email:', emailError);
           }
-        });
-        
-        if (emailError) {
-          console.error('Error sending verification email:', emailError);
+        } catch (emailError) {
+          console.error('Failed to send verification email:', emailError);
         }
-      } catch (emailError) {
-        console.error('Failed to send verification email:', emailError);
       }
     }
 
@@ -151,6 +175,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signUp,
     signIn,
     signOut,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

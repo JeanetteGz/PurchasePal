@@ -1,7 +1,6 @@
-
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft, User, RefreshCw } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const Profile = () => {
-  const { profile, user } = useAuth();
+  const { profile, user, refreshProfile } = useAuth();
   const { toast } = useToast();
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -22,9 +21,11 @@ const Profile = () => {
   const [bio, setBio] = useState("Mindful spender 🧘‍♂️");
   const [tempFile, setTempFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Update form fields when profile data is loaded
   useEffect(() => {
+    console.log('Profile data in useEffect:', profile);
     if (profile) {
       setFirstName(profile.first_name || "");
       setLastName(profile.last_name || "");
@@ -34,6 +35,25 @@ const Profile = () => {
       setEmail(user.email || "");
     }
   }, [profile, user]);
+
+  const handleRefreshProfile = async () => {
+    setRefreshing(true);
+    try {
+      await refreshProfile();
+      toast({
+        title: "Profile refreshed! ✨",
+        description: "Your profile data has been updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error refreshing profile",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleAvatarClick = () => {
     if (fileInput.current) fileInput.current.click();
@@ -63,6 +83,9 @@ const Profile = () => {
         .eq('id', user?.id);
 
       if (error) throw error;
+
+      // Refresh the profile data after update
+      await refreshProfile();
 
       toast({
         title: "Profile updated! ✨",
@@ -98,11 +121,27 @@ const Profile = () => {
           <div className="flex-1 flex justify-center">
             <Logo size="sm" />
           </div>
-          <div className="w-16"></div>
+          <Button
+            onClick={handleRefreshProfile}
+            variant="ghost"
+            size="sm"
+            disabled={refreshing}
+            className="text-gray-600 dark:text-gray-300"
+          >
+            <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
+          </Button>
         </div>
       </div>
 
       <div className="max-w-md mx-auto py-10 px-4">
+        {!profile && user && (
+          <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+              Profile data is loading... If your name doesn't appear, try clicking the refresh button above.
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleSave} className="space-y-6">
           <div className="flex flex-col items-center gap-3">
             <div className="relative">
