@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, X, Loader2, Sparkles } from 'lucide-react';
+import { ShoppingBag, X, Loader2, Sparkles, ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface NewWant {
@@ -18,9 +18,10 @@ interface AddWantFormProps {
   onUrlChange: (url: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
-export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, onCancel }: AddWantFormProps) => {
+export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, onCancel, isLoading = false }: AddWantFormProps) => {
   const [isExtractingImage, setIsExtractingImage] = useState(false);
 
   const handleUrlChange = async (url: string) => {
@@ -30,19 +31,16 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-purple-500/5 pointer-events-none"></div>
-        <CardHeader className="relative pb-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+    <div className="max-w-4xl mx-auto">
+      <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-xl rounded-2xl overflow-hidden">
+        <CardHeader className="pb-6 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-900/10 dark:to-pink-900/10 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-4 text-3xl text-purple-600 dark:text-purple-400">
-              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-2xl">
-                <ShoppingBag className="w-8 h-8" />
+            <CardTitle className="flex items-center gap-3 text-2xl text-gray-800 dark:text-gray-200">
+              <div className="p-2.5 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                <ShoppingBag className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Add New Item
-                </span>
+                <span className="font-semibold">Add New Item</span>
                 <div className="flex items-center gap-2 mt-1">
                   <Sparkles className="w-4 h-4 text-purple-400" />
                   <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">
@@ -55,37 +53,41 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
               variant="ghost"
               size="icon"
               onClick={onCancel}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 rounded-2xl h-12 w-12"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 rounded-xl h-10 w-10"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="relative space-y-8 p-8">
-          <form onSubmit={onSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-3">
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+        
+        <CardContent className="p-6 space-y-6">
+          <form onSubmit={onSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Product Name *
                 </label>
                 <input
                   type="text"
                   value={newWant.product_name}
                   onChange={(e) => onNewWantChange({ ...newWant, product_name: e.target.value })}
-                  className="w-full p-5 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-purple-500/25 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200 text-lg placeholder-gray-400"
-                  placeholder="What's catching your eye?"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200 placeholder-gray-400"
+                  placeholder="What's on your wishlist?"
                   required
+                  disabled={isLoading}
                 />
               </div>
-              <div className="space-y-3">
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Category *
                 </label>
                 <select
                   value={newWant.category}
                   onChange={(e) => onNewWantChange({ ...newWant, category: e.target.value })}
-                  className="w-full p-5 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-purple-500/25 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200 text-lg"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
                   required
+                  disabled={isLoading}
                 >
                   <option value="">Choose a category</option>
                   <option value="clothing">👕 Clothing & Fashion</option>
@@ -101,41 +103,41 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
               </div>
             </div>
             
-            <div className="space-y-3">
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                Product URL
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Product URL (Optional)
               </label>
               <div className="relative">
                 <input
                   type="url"
                   value={newWant.product_url}
                   onChange={(e) => handleUrlChange(e.target.value)}
-                  className="w-full p-5 pr-16 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-purple-500/25 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200 text-lg placeholder-gray-400"
+                  className="w-full p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200 placeholder-gray-400"
                   placeholder="https://... (we'll auto-detect the product image)"
+                  disabled={isLoading}
                 />
                 {isExtractingImage && (
-                  <div className="absolute right-6 top-1/2 transform -translate-y-1/2">
-                    <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <Loader2 className="w-5 h-5 animate-spin text-purple-500" />
                   </div>
                 )}
               </div>
               {newWant.product_image_url && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border-2 border-green-200 dark:border-green-800">
-                  <p className="text-sm text-green-700 dark:text-green-400 font-semibold flex items-center gap-2">
-                    <span className="text-lg">✅</span>
-                    Product image detected and ready to display!
+                <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                  <p className="text-sm text-green-700 dark:text-green-400 font-medium flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" />
+                    Product image detected successfully!
                   </p>
                 </div>
               )}
             </div>
             
-            {/* Enhanced Image Preview */}
             {newWant.product_image_url && (
-              <div className="space-y-3">
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Image Preview
                 </label>
-                <div className="relative w-full h-64 bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 dark:from-gray-700 dark:to-purple-900/30 rounded-2xl overflow-hidden shadow-inner border-2 border-purple-100 dark:border-purple-800">
+                <div className="relative w-full h-48 bg-gray-50 dark:bg-gray-700 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600">
                   <img
                     src={newWant.product_image_url}
                     alt="Product preview"
@@ -144,7 +146,7 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
                       e.currentTarget.style.display = 'none';
                       const parent = e.currentTarget.parentElement;
                       if (parent) {
-                        parent.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-6xl">📷</div>';
+                        parent.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-4xl">📷</div>';
                       }
                     }}
                   />
@@ -152,33 +154,39 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
               </div>
             )}
 
-            <div className="space-y-3">
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                Personal Notes
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Personal Notes (Optional)
               </label>
               <textarea
                 value={newWant.notes}
                 onChange={(e) => onNewWantChange({ ...newWant, notes: e.target.value })}
-                className="w-full p-5 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-purple-500/25 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200 text-lg resize-none placeholder-gray-400"
-                rows={4}
-                placeholder="Why do you want this? Any specific details or memories attached?"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200 resize-none placeholder-gray-400"
+                rows={3}
+                placeholder="Why do you want this? Any specific details?"
+                disabled={isLoading}
               />
             </div>
             
-            <div className="flex gap-6 pt-6">
+            <div className="flex gap-4 pt-4">
               <Button
                 type="submit"
-                disabled={isExtractingImage}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 py-6 text-xl rounded-2xl shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 font-semibold"
+                disabled={isExtractingImage || isLoading}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 py-3 rounded-xl shadow-lg transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 font-semibold"
               >
-                {isExtractingImage ? (
+                {isLoading ? (
                   <>
-                    <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Adding to Wishlist...
+                  </>
+                ) : isExtractingImage ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     Processing Image...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-6 h-6 mr-3" />
+                    <Sparkles className="w-5 h-5 mr-2" />
                     Add to Wishlist
                   </>
                 )}
@@ -187,7 +195,8 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
                 type="button"
                 variant="outline"
                 onClick={onCancel}
-                className="px-10 py-6 text-xl rounded-2xl border-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 font-semibold"
+                disabled={isLoading}
+                className="px-8 py-3 rounded-xl border-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 font-semibold"
               >
                 Cancel
               </Button>

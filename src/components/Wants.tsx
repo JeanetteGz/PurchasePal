@@ -11,6 +11,7 @@ import { WantsEmptyState } from './wants/WantsEmptyState';
 import { WantsStatsSection } from './wants/WantsStatsSection';
 import { WantsCategoriesGrid } from './wants/WantsCategoriesGrid';
 import { extractImageFromUrl } from './wants/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface WantItem {
   id: string;
@@ -24,6 +25,7 @@ interface WantItem {
 
 export const Wants = () => {
   const { profile } = useAuth();
+  const { toast } = useToast();
   const [wants, setWants] = useState<WantItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -53,6 +55,11 @@ export const Wants = () => {
       setWants(data || []);
     } catch (error) {
       console.error('Error fetching wants:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load your wishlist items",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -75,12 +82,28 @@ export const Wants = () => {
 
   const addWant = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newWant.product_name || !newWant.category) return;
+    if (!newWant.product_name || !newWant.category) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in the product name and category",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setAddLoading(true);
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
+
+      if (!userData.user) {
+        toast({
+          title: "Authentication Error",
+          description: "You must be logged in to add items to your wishlist",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const extractedImage = newWant.product_url ? await extractImageFromUrl(newWant.product_url) : '';
       
@@ -92,7 +115,7 @@ export const Wants = () => {
           product_url: newWant.product_url || '',
           product_image_url: extractedImage || newWant.product_image_url || null,
           notes: newWant.notes || null,
-          user_id: userData.user?.id
+          user_id: userData.user.id
         })
         .select()
         .single();
@@ -102,8 +125,19 @@ export const Wants = () => {
       setWants(prev => [data, ...prev]);
       setNewWant({ product_name: '', category: '', product_url: '', product_image_url: '', notes: '' });
       setShowAddForm(false);
+      
+      toast({
+        title: "Success!",
+        description: `${data.product_name} has been added to your wishlist`,
+      });
+      
     } catch (error) {
       console.error('Error adding want:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add item to your wishlist. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setAddLoading(false);
     }
@@ -118,8 +152,18 @@ export const Wants = () => {
 
       if (error) throw error;
       setWants(prev => prev.filter(want => want.id !== id));
+      
+      toast({
+        title: "Removed",
+        description: "Item has been removed from your wishlist",
+      });
     } catch (error) {
       console.error('Error deleting want:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove item from your wishlist",
+        variant: "destructive",
+      });
     }
   };
 
@@ -142,10 +186,10 @@ export const Wants = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-gray-900">
         <div className="container mx-auto px-4 py-12">
           <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500/30 border-t-purple-500 mx-auto mb-6"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500/20 border-t-purple-500 mx-auto mb-6"></div>
             <p className="text-gray-600 dark:text-gray-300 text-lg">Loading your wishlist...</p>
           </div>
         </div>
@@ -154,11 +198,11 @@ export const Wants = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8 space-y-8">
         <WantsHeader />
 
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto space-y-6">
           <WantsSearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
           <WantsAddButton onAddClick={() => setShowAddForm(!showAddForm)} isLoading={addLoading} />
         </div>
@@ -171,6 +215,7 @@ export const Wants = () => {
               onUrlChange={handleUrlChange}
               onSubmit={addWant}
               onCancel={() => setShowAddForm(false)}
+              isLoading={addLoading}
             />
           </div>
         )}
