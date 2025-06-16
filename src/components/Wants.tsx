@@ -10,7 +10,7 @@ import { WantsAddButton } from './wants/WantsAddButton';
 import { WantsEmptyState } from './wants/WantsEmptyState';
 import { WantsStatsSection } from './wants/WantsStatsSection';
 import { WantsCategoriesGrid } from './wants/WantsCategoriesGrid';
-import { extractImageFromUrl } from './wants/utils';
+import { extractImageFromUrl, getCategoryEmoji } from './wants/utils';
 import { useToast } from '@/hooks/use-toast';
 
 interface WantItem {
@@ -223,7 +223,7 @@ export const Wants = () => {
         <CategoryDetailModal
           category={selectedCategory}
           items={selectedCategory ? wantsByCategory[selectedCategory] || [] : []}
-          categoryEmoji={selectedCategory ? require('./wants/utils').getCategoryEmoji(selectedCategory) : ''}
+          categoryEmoji={selectedCategory ? getCategoryEmoji(selectedCategory) : ''}
           onClose={() => setSelectedCategory(null)}
           onDeleteWant={deleteWant}
         />
