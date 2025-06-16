@@ -41,6 +41,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Clean up any potential Firebase references in localStorage
+    Object.keys(localStorage).forEach(key => {
+      if (key.includes('firebase') || key.includes('Firebase')) {
+        console.log('Removing Firebase key:', key);
+        localStorage.removeItem(key);
+      }
+    });
+
     // Check if account was deleted
     const accountDeleted = localStorage.getItem('accountDeleted');
     if (accountDeleted === 'true') {
@@ -81,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             
             if (!existingProfile) {
               // This is likely a new signup, retry with delays
-              await fetchUserProfileWithRetry(session.user.id, 3, 500); // Reduced retries for faster loading
+              await fetchUserProfileWithRetry(session.user.id, 3, 500);
             } else {
               await fetchUserProfile(session.user.id);
             }
@@ -203,7 +211,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    // If signup was successful and user is created, the auth state change will handle profile fetching
     if (!error && data.user && !data.user.email_confirmed_at) {
       try {
         const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
