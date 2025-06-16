@@ -357,7 +357,6 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
                   📈 Average Purchase
-                  <ShoppingCart className="w-4 h-4" />
                 </CardTitle>
               </CardHeader>
               <CardContent>
