@@ -2,7 +2,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { extractImageFromUrl } from '@/components/wants/utils';
 
 interface WantItem {
   id: string;
@@ -33,12 +32,14 @@ export const useWants = () => {
 
   const fetchWants = useCallback(async () => {
     try {
+      console.log('Fetching wants from database...');
       const { data, error } = await supabase
         .from('user_wants')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log('Wants fetched successfully:', data);
       setWants(data || []);
     } catch (error) {
       console.error('Error fetching wants:', error);
@@ -53,7 +54,10 @@ export const useWants = () => {
   }, [toast]);
 
   const addWant = useCallback(async (newWant: NewWant): Promise<boolean> => {
+    console.log('addWant called with:', newWant);
+    
     if (!newWant.product_name || !newWant.category) {
+      console.log('Missing required fields');
       toast({
         title: "Missing Information",
         description: "Please fill in the product name and category",
@@ -63,10 +67,12 @@ export const useWants = () => {
     }
 
     try {
+      console.log('Getting user data...');
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
 
       if (!userData.user) {
+        console.log('User not authenticated');
         toast({
           title: "Authentication Error",
           description: "You must be logged in to add items to your wishlist",
@@ -75,8 +81,7 @@ export const useWants = () => {
         return false;
       }
 
-      // Extract image in parallel with insert to speed up the process
-      const extractImagePromise = newWant.product_url ? extractImageFromUrl(newWant.product_url) : Promise.resolve('');
+      console.log('User authenticated, user ID:', userData.user.id);
       
       // Optimistically update UI first
       const tempId = `temp-${Date.now()}`;
@@ -90,24 +95,32 @@ export const useWants = () => {
         created_at: new Date().toISOString()
       };
       
+      console.log('Adding temp item to UI:', tempWant);
       setWants(prev => [tempWant, ...prev]);
 
-      const extractedImage = await extractImagePromise;
+      const insertData = {
+        product_name: newWant.product_name,
+        category: newWant.category,
+        product_url: newWant.product_url || '',
+        product_image_url: newWant.product_image_url || null,
+        notes: newWant.notes || null,
+        user_id: userData.user.id
+      };
+
+      console.log('Inserting data to database:', insertData);
       
       const { data, error } = await supabase
         .from('user_wants')
-        .insert({
-          product_name: newWant.product_name,
-          category: newWant.category,
-          product_url: newWant.product_url || '',
-          product_image_url: extractedImage || newWant.product_image_url || null,
-          notes: newWant.notes || null,
-          user_id: userData.user.id
-        })
+        .insert(insertData)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database insert error:', error);
+        throw error;
+      }
+      
+      console.log('Database insert successful:', data);
       
       // Replace temp item with real item
       setWants(prev => prev.map(want => want.id === tempId ? data : want));

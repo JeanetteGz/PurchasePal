@@ -32,24 +32,28 @@ export const WantsFormHandler = ({ onSubmit, onCancel, isLoading }: WantsFormHan
   const handleUrlChange = async (url: string) => {
     setNewWant(prev => ({ ...prev, product_url: url }));
     
-    if (url) {
+    if (url && url.trim()) {
       setIsExtractingImage(true);
       try {
+        console.log('Starting image extraction for URL:', url);
         const extractedImage = await extractImageFromUrl(url);
+        
         if (extractedImage) {
+          console.log('Image extracted successfully:', extractedImage);
           setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
           toast({
             title: "Image Found!",
             description: "Product image detected successfully",
           });
         } else {
+          console.log('No image extracted, using category placeholder');
           // Use category placeholder if available
           if (newWant.category) {
             const placeholder = getCategoryPlaceholder(newWant.category);
             setNewWant(prev => ({ ...prev, product_image_url: placeholder }));
             toast({
               title: "Using Category Image",
-              description: "Couldn't extract product image, using category placeholder",
+              description: "Using category placeholder image",
             });
           }
         }
@@ -61,13 +65,15 @@ export const WantsFormHandler = ({ onSubmit, onCancel, isLoading }: WantsFormHan
           setNewWant(prev => ({ ...prev, product_image_url: placeholder }));
         }
         toast({
-          title: "Image Extraction Failed",
+          title: "Using Placeholder Image",
           description: "Using category placeholder instead",
-          variant: "destructive",
         });
       } finally {
         setIsExtractingImage(false);
       }
+    } else {
+      // Clear image if URL is empty
+      setNewWant(prev => ({ ...prev, product_image_url: '' }));
     }
   };
 
@@ -82,10 +88,28 @@ export const WantsFormHandler = ({ onSubmit, onCancel, isLoading }: WantsFormHan
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await onSubmit(newWant);
-    if (success) {
-      setNewWant({ product_name: '', category: '', product_url: '', product_image_url: '', notes: '' });
-      onCancel();
+    
+    console.log('Form submission started with data:', newWant);
+    
+    // Ensure we have a placeholder image if none is set
+    let finalWant = { ...newWant };
+    if (!finalWant.product_image_url && finalWant.category) {
+      finalWant.product_image_url = getCategoryPlaceholder(finalWant.category);
+    }
+    
+    console.log('Final want data for submission:', finalWant);
+    
+    try {
+      const success = await onSubmit(finalWant);
+      if (success) {
+        console.log('Item added successfully, resetting form');
+        setNewWant({ product_name: '', category: '', product_url: '', product_image_url: '', notes: '' });
+        onCancel();
+      } else {
+        console.log('Item submission failed');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
     }
   };
 
