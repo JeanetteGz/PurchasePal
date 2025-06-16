@@ -1,10 +1,10 @@
+
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Logo } from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -50,19 +50,66 @@ const Profile = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "User not found. Please try logging in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const { error } = await supabase
+      // First, check if profile exists
+      const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
-        .update({
-          first_name: firstName,
-          last_name: lastName,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user?.id);
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (fetchError) {
+        console.error('Error checking existing profile:', fetchError);
+        throw fetchError;
+      }
+
+      let result;
+      
+      if (existingProfile) {
+        // Update existing profile
+        console.log('Updating existing profile');
+        result = await supabase
+          .from('profiles')
+          .update({
+            first_name: firstName,
+            last_name: lastName,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+      } else {
+        // Create new profile
+        console.log('Creating new profile');
+        result = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email || email,
+            first_name: firstName,
+            last_name: lastName,
+            age: 25, // Default age, you might want to make this configurable
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+      }
+
+      if (result.error) {
+        console.error('Error saving profile:', result.error);
+        throw result.error;
+      }
+
+      console.log('Profile saved successfully');
 
       // Refresh the profile data after update
       await refreshProfile();
@@ -72,6 +119,7 @@ const Profile = () => {
         description: "Your changes have been saved successfully.",
       });
     } catch (error: any) {
+      console.error('Profile save error:', error);
       toast({
         title: "Error updating profile",
         description: error.message,

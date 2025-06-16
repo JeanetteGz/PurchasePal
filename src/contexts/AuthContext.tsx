@@ -49,14 +49,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // For new signups, wait a bit longer for profile creation, then retry multiple times
           if (event === 'SIGNED_IN') {
             // Check if this is a new user by seeing if profile exists
             const { data: existingProfile } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
-              .single();
+              .maybeSingle();
             
             if (!existingProfile) {
               // This is likely a new signup, retry with delays
@@ -94,15 +93,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);
         return;
       }
       
-      console.log('Profile data fetched:', data);
-      setProfile(data);
+      if (data) {
+        console.log('Profile data fetched:', data);
+        setProfile(data);
+      } else {
+        console.log('No profile found for user:', userId);
+        setProfile(null);
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -117,7 +121,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .from('profiles')
           .select('*')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         if (!error && data) {
           console.log('Profile data fetched successfully:', data);
@@ -127,6 +131,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.log('Profile fetch attempt failed:', error);
+        } else {
+          console.log('Profile not found yet, will retry...');
         }
       } catch (error) {
         console.log('Profile fetch attempt error:', error);
