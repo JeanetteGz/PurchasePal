@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,10 +41,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check if account was deleted
+    const accountDeleted = localStorage.getItem('accountDeleted');
+    if (accountDeleted === 'true') {
+      console.log('Account was deleted, clearing all state');
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
+        
+        // If account was deleted, don't process auth changes
+        if (localStorage.getItem('accountDeleted') === 'true') {
+          console.log('Ignoring auth state change - account deleted');
+          setUser(null);
+          setSession(null);
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -60,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             
             if (!existingProfile) {
               // This is likely a new signup, retry with delays
-              await fetchUserProfileWithRetry(session.user.id, 5, 1000);
+              await fetchUserProfileWithRetry(session.user.id, 3, 500); // Reduced retries for faster loading
             } else {
               await fetchUserProfile(session.user.id);
             }
@@ -76,6 +97,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      // If account was deleted, don't process existing session
+      if (localStorage.getItem('accountDeleted') === 'true') {
+        console.log('Ignoring existing session - account deleted');
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -139,9 +170,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('Profile fetch attempt error:', error);
       }
 
-      // Wait before retrying, with increasing delay
+      // Wait before retrying
       if (i < maxRetries - 1) {
-        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
     
@@ -195,6 +226,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signIn = async (email: string, password: string) => {
+    // Clear deleted account flag when signing in
+    localStorage.removeItem('accountDeleted');
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -205,6 +239,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     // Set localStorage flag to indicate user has signed out
     localStorage.setItem('userSignedOut', 'true');
+    localStorage.removeItem('accountDeleted');
     
     await supabase.auth.signOut();
     setUser(null);

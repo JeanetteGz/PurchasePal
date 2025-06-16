@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,31 @@ const ConfirmDeletion = () => {
   const token = searchParams.get('token');
   const email = searchParams.get('email');
 
+  const clearAllAuthData = () => {
+    // Clear all possible auth-related storage
+    try {
+      // Clear localStorage
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-') || key.includes('auth')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Clear sessionStorage
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-') || key.includes('auth')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+
+      // Set flag to indicate account was deleted
+      localStorage.setItem('accountDeleted', 'true');
+      localStorage.setItem('userSignedOut', 'true');
+    } catch (error) {
+      console.warn('Error clearing auth data:', error);
+    }
+  };
+
   const handleConfirmDeletion = async () => {
     if (!token) {
       toast({
@@ -33,7 +57,13 @@ const ConfirmDeletion = () => {
     try {
       console.log('Attempting to delete account for user:', token);
       
-      // Call the delete account function with the user ID
+      // Clear auth data immediately to prevent auth loops
+      clearAllAuthData();
+      
+      // Sign out first to clear session
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Call the delete account function
       const { data, error } = await supabase.functions.invoke('delete-account', {
         body: { userId: token }
       });
@@ -45,26 +75,12 @@ const ConfirmDeletion = () => {
         throw error;
       }
 
-      // Clear any remaining local storage data
-      try {
-        Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-            localStorage.removeItem(key);
-          }
-        });
-        localStorage.removeItem('userSignedOut');
-      } catch (storageError) {
-        console.warn('Error clearing localStorage:', storageError);
-      }
-
-      // Sign out from Supabase
-      await supabase.auth.signOut();
-
       setDeleted(true);
       
-      // Show success message and refresh after a short delay
+      // Redirect after success with a clean slate
       setTimeout(() => {
-        window.location.href = '/';
+        // Force a complete page reload to ensure clean state
+        window.location.replace('/auth');
       }, 2000);
     } catch (error: any) {
       console.error('Error deleting account:', error);
