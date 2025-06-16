@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Heart, Sparkles, Search } from 'lucide-react';
+import { Plus, Heart, Sparkles, Search, Grid3X3, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { AddWantForm } from './wants/AddWantForm';
-import { WantModal } from './wants/WantModal';
-import { WantsCategorySection } from './wants/WantsCategorySection';
+import { CategoryCard } from './wants/CategoryCard';
+import { CategoryDetailModal } from './wants/CategoryDetailModal';
 import { getCategoryEmoji, extractImageFromUrl } from './wants/utils';
 
 interface WantItem {
@@ -25,7 +25,7 @@ export const Wants = () => {
   const [wants, setWants] = useState<WantItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedWant, setSelectedWant] = useState<WantItem | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [newWant, setNewWant] = useState({
     product_name: '',
@@ -144,14 +144,14 @@ export const Wants = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-2xl shadow-xl mb-6">
-            <Heart className="w-7 h-7" />
-            <h1 className="text-3xl font-bold">Your Wishlist</h1>
-            <Sparkles className="w-7 h-7" />
+        <div className="text-center space-y-6">
+          <div className="inline-flex items-center gap-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 text-white px-10 py-6 rounded-3xl shadow-2xl mb-8">
+            <Heart className="w-8 h-8" />
+            <h1 className="text-4xl font-bold">Your Wishlist</h1>
+            <Sparkles className="w-8 h-8" />
           </div>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-lg">
-            Keep track of items you want to buy. Take time to think before making impulse purchases! 🤔💭
+          <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-xl leading-relaxed">
+            Organize your desires by category. Take time to think before making impulse purchases! 🤔💭
           </p>
         </div>
 
@@ -159,13 +159,13 @@ export const Wants = () => {
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
             <input
               type="text"
-              placeholder="Search your wishlist..."
+              placeholder="Search across all categories..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-lg transition-all duration-200 text-lg"
+              className="w-full pl-16 pr-6 py-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-xl transition-all duration-200 text-lg"
             />
           </div>
 
@@ -173,9 +173,9 @@ export const Wants = () => {
           <div className="flex justify-center">
             <Button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl transform transition-all hover:scale-105 px-8 py-4 text-lg rounded-2xl"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-2xl transform transition-all hover:scale-105 px-10 py-6 text-xl rounded-3xl"
             >
-              <Plus className="w-6 h-6 mr-2" />
+              <Plus className="w-7 h-7 mr-3" />
               Add to Wishlist
             </Button>
           </div>
@@ -194,67 +194,88 @@ export const Wants = () => {
           </div>
         )}
 
-        {/* Product Detail Modal */}
-        <WantModal
-          want={selectedWant}
-          categoryEmoji={selectedWant ? getCategoryEmoji(selectedWant.category) : ''}
-          onClose={() => setSelectedWant(null)}
-          onDelete={deleteWant}
+        {/* Category Detail Modal */}
+        <CategoryDetailModal
+          category={selectedCategory}
+          items={selectedCategory ? wantsByCategory[selectedCategory] || [] : []}
+          categoryEmoji={selectedCategory ? getCategoryEmoji(selectedCategory) : ''}
+          onClose={() => setSelectedCategory(null)}
+          onDeleteWant={deleteWant}
         />
 
-        {/* Wishlist Items by Category */}
+        {/* Category Cards */}
         {Object.keys(wantsByCategory).length === 0 ? (
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-800 border-0 shadow-2xl">
-              <CardContent className="text-center py-16">
-                <div className="text-8xl mb-6">🎯</div>
-                <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-4">
+          <div className="max-w-3xl mx-auto">
+            <Card className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-800 border-0 shadow-2xl rounded-3xl">
+              <CardContent className="text-center py-20">
+                <div className="text-9xl mb-8">🎯</div>
+                <h3 className="text-3xl font-bold text-gray-700 dark:text-gray-200 mb-6">
                   {searchQuery ? 'No items found' : 'Your wishlist is empty'}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 text-lg">
-                  {searchQuery ? 'Try a different search term' : 'Start adding items you\'d like to buy in the future! ✨'}
+                <p className="text-gray-500 dark:text-gray-400 text-xl leading-relaxed">
+                  {searchQuery ? 'Try a different search term' : 'Start organizing your future purchases by category! ✨'}
                 </p>
               </CardContent>
             </Card>
           </div>
         ) : (
-          <div className="space-y-12 animate-fade-in">
-            {Object.entries(wantsByCategory).map(([category, items]) => (
-              <WantsCategorySection
-                key={category}
-                category={category}
-                items={items}
-                categoryEmoji={getCategoryEmoji(category)}
-                onViewWant={setSelectedWant}
-                onDeleteWant={deleteWant}
-              />
-            ))}
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex items-center gap-3 justify-center">
+              <Grid3X3 className="w-6 h-6 text-purple-600" />
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                Categories ({Object.keys(wantsByCategory).length})
+              </h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto">
+              {Object.entries(wantsByCategory).map(([category, items]) => (
+                <CategoryCard
+                  key={category}
+                  category={category}
+                  items={items}
+                  categoryEmoji={getCategoryEmoji(category)}
+                  onClick={() => setSelectedCategory(category)}
+                />
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Stats Section */}
+        {/* Enhanced Stats Section */}
         {wants.length > 0 && (
-          <div className="max-w-4xl mx-auto">
-            <Card className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-gray-800 dark:to-purple-900/30 border-0 shadow-xl">
-              <CardContent className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                  <div>
-                    <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+          <div className="max-w-5xl mx-auto">
+            <Card className="bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100 dark:from-gray-800 dark:via-purple-900/30 dark:to-gray-800 border-0 shadow-2xl rounded-3xl">
+              <CardContent className="p-10">
+                <div className="flex items-center gap-3 justify-center mb-8">
+                  <TrendingUp className="w-7 h-7 text-purple-600" />
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                    Wishlist Statistics
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+                  <div className="bg-white dark:bg-gray-700/50 rounded-2xl p-6 shadow-lg">
+                    <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
                       {wants.length}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-300 font-medium">Total Items</div>
+                    <div className="text-gray-600 dark:text-gray-300 font-semibold">Total Items</div>
                   </div>
-                  <div>
-                    <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                  <div className="bg-white dark:bg-gray-700/50 rounded-2xl p-6 shadow-lg">
+                    <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
                       {Object.keys(wantsByCategory).length}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-300 font-medium">Categories</div>
+                    <div className="text-gray-600 dark:text-gray-300 font-semibold">Categories</div>
                   </div>
-                  <div>
-                    <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                  <div className="bg-white dark:bg-gray-700/50 rounded-2xl p-6 shadow-lg">
+                    <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
                       {wants.filter(want => want.product_url).length}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-300 font-medium">With Links</div>
+                    <div className="text-gray-600 dark:text-gray-300 font-semibold">With Links</div>
+                  </div>
+                  <div className="bg-white dark:bg-gray-700/50 rounded-2xl p-6 shadow-lg">
+                    <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                      {wants.filter(want => want.product_image_url).length}
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-300 font-semibold">With Images</div>
                   </div>
                 </div>
               </CardContent>
