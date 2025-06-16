@@ -10,9 +10,13 @@ import { AuthToggle } from '@/components/auth/AuthToggle';
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const isResetMode = searchParams.get('reset') === 'true';
+  const tokenHash = searchParams.get('token_hash');
+  const type = searchParams.get('type');
+  const errorDescription = searchParams.get('error_description');
   
   const [isLogin, setIsLogin] = useState(!isResetMode);
   const [isReturningUser, setIsReturningUser] = useState(false);
+  const [emailVerificationMessage, setEmailVerificationMessage] = useState('');
   
   const { toast } = useToast();
 
@@ -21,14 +25,29 @@ const Auth = () => {
     const hasSignedOut = localStorage.getItem('userSignedOut') === 'true';
     setIsReturningUser(hasSignedOut);
 
-    // Show password reset success message if coming from email
+    // Handle different URL parameters
     if (isResetMode) {
       toast({
         title: "Password Reset Ready! 🔑",
         description: "You can now enter your new password below.",
       });
+    } else if (type === 'signup' && tokenHash && !errorDescription) {
+      // Successfully verified email
+      setEmailVerificationMessage('Email verified! Please log in below.');
+      toast({
+        title: "Email Verified! ✅",
+        description: "Your email has been successfully verified. You can now log in.",
+      });
+      setIsLogin(true); // Ensure we're on login mode
+    } else if (type === 'signup' && errorDescription) {
+      // Email verification failed
+      toast({
+        title: "Verification Failed ❌",
+        description: "There was an issue verifying your email. Please try signing up again.",
+        variant: "destructive",
+      });
     }
-  }, [isResetMode, toast]);
+  }, [isResetMode, tokenHash, type, errorDescription, toast]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
@@ -38,15 +57,19 @@ const Auth = () => {
         <Card className="w-full max-w-md shadow-xl border-purple-200/50 dark:border-purple-800/50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-gray-800 dark:text-white">
-              {isLogin 
-                ? (isReturningUser ? 'Welcome Back! 👋' : 'Welcome! 👋')
-                : 'Join PurchasePal! 🎉'
+              {emailVerificationMessage 
+                ? 'Welcome Back! ✅' 
+                : isLogin 
+                  ? (isReturningUser ? 'Welcome Back! 👋' : 'Welcome! 👋')
+                  : 'Join PurchasePal! 🎉'
               }
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-300">
-              {isLogin 
-                ? 'Sign in to your account to continue your mindful spending journey'
-                : 'Create your account to start your mindful spending journey'
+              {emailVerificationMessage || 
+                (isLogin 
+                  ? 'Sign in to your account to continue your mindful spending journey'
+                  : 'Create your account to start your mindful spending journey'
+                )
               }
             </CardDescription>
           </CardHeader>

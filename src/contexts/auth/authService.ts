@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { cleanupFirebaseKeys, setAccountDeleted, setUserSignedOut } from './utils';
 
 export const signUp = async (email: string, password: string, firstName: string, lastName: string, age: number) => {
-  const redirectUrl = `${window.location.origin}/`;
+  const redirectUrl = `${window.location.origin}/auth`;
   
   console.log('Signing up with metadata:', { first_name: firstName, last_name: lastName, age });
   
@@ -26,7 +26,7 @@ export const signUp = async (email: string, password: string, firstName: string,
         body: {
           email: email,
           firstName: firstName,
-          verificationUrl: `${window.location.origin}/auth?token_hash=${data.user.id}&type=signup&redirect_to=${redirectUrl}`
+          verificationUrl: `${window.location.origin}/auth?token_hash=${data.user.id}&type=signup`
         }
       });
       
