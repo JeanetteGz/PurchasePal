@@ -49,12 +49,17 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
 
       const firstName = profile?.first_name || 'there';
       
+      // Determine the correct reset URL based on environment
+      const resetUrl = window.location.hostname === 'localhost' 
+        ? `${window.location.origin}/password-reset`
+        : `https://${window.location.hostname}/password-reset`;
+      
       // Send our custom styled email via edge function only
       const { error: emailError } = await supabase.functions.invoke('send-password-reset', {
         body: { 
           email, 
           firstName,
-          resetUrl: `${window.location.origin}/password-reset`
+          resetUrl
         }
       });
 

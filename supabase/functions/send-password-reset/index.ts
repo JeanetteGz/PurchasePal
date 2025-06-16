@@ -48,7 +48,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (error) throw error;
 
-    const resetLink = data.properties?.action_link || resetUrl;
+    // Use the generated action link which contains the proper tokens
+    const resetLink = data.properties?.action_link;
+    
+    if (!resetLink) {
+      throw new Error("Failed to generate reset link");
+    }
 
     const emailResponse = await resend.emails.send({
       from: "PurchasePal <welcome@resend.dev>",
