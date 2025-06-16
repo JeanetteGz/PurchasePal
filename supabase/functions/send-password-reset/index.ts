@@ -37,7 +37,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { email, firstName, resetUrl }: PasswordResetEmailRequest = await req.json();
 
-    // Generate a secure password reset link using Supabase admin client
+    // Generate a password recovery link that will redirect to our reset page
     const { data, error } = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: email,
@@ -48,12 +48,25 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (error) throw error;
 
-    // Use the generated action link which contains the proper tokens
-    const resetLink = data.properties?.action_link;
-    
-    if (!resetLink) {
+    // Extract the hashed token from the action_link
+    const actionLink = data.properties?.action_link;
+    if (!actionLink) {
       throw new Error("Failed to generate reset link");
     }
+
+    // Parse the URL to extract token parameters
+    const url = new URL(actionLink);
+    const accessToken = url.searchParams.get('access_token');
+    const refreshToken = url.searchParams.get('refresh_token');
+    const tokenType = url.searchParams.get('type');
+
+    // Create our custom reset URL with the proper tokens
+    const customResetUrl = new URL(resetUrl);
+    if (accessToken) customResetUrl.searchParams.set('access_token', accessToken);
+    if (refreshToken) customResetUrl.searchParams.set('refresh_token', refreshToken);
+    if (tokenType) customResetUrl.searchParams.set('type', tokenType);
+
+    const finalResetLink = customResetUrl.toString();
 
     const emailResponse = await resend.emails.send({
       from: "onboarding@resend.dev",
@@ -78,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
 
             <!-- CTA Button -->
             <div style="text-align: center; margin: 40px 0;">
-              <a href="${resetLink}" style="display: inline-block; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%); color: #ffffff; padding: 18px 36px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3); transition: all 0.2s ease;">
+              <a href="${finalResetLink}" style="display: inline-block; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%); color: #ffffff; padding: 18px 36px; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3); transition: all 0.2s ease;">
                 🔑 Reset Your Password
               </a>
               <p style="color: #9ca3af; margin: 16px 0 0 0; font-size: 14px;">This link will take you to our secure password reset page</p>

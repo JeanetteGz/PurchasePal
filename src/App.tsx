@@ -75,6 +75,7 @@ const AppRoutes = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Handle password recovery event
       if (event === 'PASSWORD_RECOVERY') {
         navigate('/password-reset');
       }
