@@ -65,18 +65,6 @@ PurchasePal features a beautiful gradient-based design with:
 
 ---
 
-## 🚀 Deployment
-
-### Quick Deploy with Lovable
-1. Open [Lovable Project](https://lovable.dev/projects/9b0bf1d7-6832-42a1-a802-be1118441583)
-2. Click Share → Publish
-3. Your app is live! 🎉
-
-### Custom Domain
-Connect your own domain by navigating to Project > Settings > Domains in Lovable.
-
----
-
 ## 💡 Philosophy
 
 At PurchasePal, we believe that mindful spending starts with understanding your emotions. By tracking the feelings that drive our purchases, we can make more intentional decisions about money and develop healthier financial habits.
