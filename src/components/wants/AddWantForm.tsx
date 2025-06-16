@@ -1,8 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, X, Loader2, Sparkles, ImageIcon } from 'lucide-react';
-import { useState } from 'react';
+import { ShoppingBag, X, Loader2, Sparkles, ImageIcon, CheckCircle } from 'lucide-react';
 
 interface NewWant {
   product_name: string;
@@ -16,18 +15,30 @@ interface AddWantFormProps {
   newWant: NewWant;
   onNewWantChange: (want: NewWant) => void;
   onUrlChange: (url: string) => void;
+  onCategoryChange?: (category: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  isExtractingImage?: boolean;
 }
 
-export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, onCancel, isLoading = false }: AddWantFormProps) => {
-  const [isExtractingImage, setIsExtractingImage] = useState(false);
+export const AddWantForm = ({ 
+  newWant, 
+  onNewWantChange, 
+  onUrlChange, 
+  onCategoryChange,
+  onSubmit, 
+  onCancel, 
+  isLoading = false,
+  isExtractingImage = false
+}: AddWantFormProps) => {
 
-  const handleUrlChange = async (url: string) => {
-    setIsExtractingImage(true);
-    await onUrlChange(url);
-    setIsExtractingImage(false);
+  const handleCategoryChange = (category: string) => {
+    if (onCategoryChange) {
+      onCategoryChange(category);
+    } else {
+      onNewWantChange({ ...newWant, category });
+    }
   };
 
   return (
@@ -84,7 +95,7 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
                 </label>
                 <select
                   value={newWant.category}
-                  onChange={(e) => onNewWantChange({ ...newWant, category: e.target.value })}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
                   required
                   disabled={isLoading}
@@ -111,9 +122,9 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
                 <input
                   type="url"
                   value={newWant.product_url}
-                  onChange={(e) => handleUrlChange(e.target.value)}
+                  onChange={(e) => onUrlChange(e.target.value)}
                   className="w-full p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 dark:bg-gray-700 dark:text-white transition-all duration-200 placeholder-gray-400"
-                  placeholder="https://... (we'll auto-detect the product image)"
+                  placeholder="https://... (we'll try to find the product image)"
                   disabled={isLoading}
                 />
                 {isExtractingImage && (
@@ -121,15 +132,12 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
                     <Loader2 className="w-5 h-5 animate-spin text-purple-500" />
                   </div>
                 )}
+                {!isExtractingImage && newWant.product_image_url && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  </div>
+                )}
               </div>
-              {newWant.product_image_url && (
-                <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-                  <p className="text-sm text-green-700 dark:text-green-400 font-medium flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" />
-                    Product image detected successfully!
-                  </p>
-                </div>
-              )}
             </div>
             
             {newWant.product_image_url && (

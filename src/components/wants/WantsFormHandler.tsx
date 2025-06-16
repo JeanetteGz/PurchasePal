@@ -1,7 +1,8 @@
 
 import { useState } from 'react';
 import { AddWantForm } from './AddWantForm';
-import { extractImageFromUrl } from './utils';
+import { extractImageFromUrl, getCategoryPlaceholder } from './utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface NewWant {
   product_name: string;
@@ -18,6 +19,7 @@ interface WantsFormHandlerProps {
 }
 
 export const WantsFormHandler = ({ onSubmit, onCancel, isLoading }: WantsFormHandlerProps) => {
+  const { toast } = useToast();
   const [newWant, setNewWant] = useState<NewWant>({
     product_name: '',
     category: '',
@@ -25,20 +27,57 @@ export const WantsFormHandler = ({ onSubmit, onCancel, isLoading }: WantsFormHan
     product_image_url: '',
     notes: ''
   });
+  const [isExtractingImage, setIsExtractingImage] = useState(false);
 
   const handleUrlChange = async (url: string) => {
     setNewWant(prev => ({ ...prev, product_url: url }));
     
     if (url) {
+      setIsExtractingImage(true);
       try {
         const extractedImage = await extractImageFromUrl(url);
         if (extractedImage) {
           setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
+          toast({
+            title: "Image Found!",
+            description: "Product image detected successfully",
+          });
+        } else {
+          // Use category placeholder if available
+          if (newWant.category) {
+            const placeholder = getCategoryPlaceholder(newWant.category);
+            setNewWant(prev => ({ ...prev, product_image_url: placeholder }));
+            toast({
+              title: "Using Category Image",
+              description: "Couldn't extract product image, using category placeholder",
+            });
+          }
         }
       } catch (error) {
         console.error('Error extracting image:', error);
+        // Use category placeholder on error
+        if (newWant.category) {
+          const placeholder = getCategoryPlaceholder(newWant.category);
+          setNewWant(prev => ({ ...prev, product_image_url: placeholder }));
+        }
+        toast({
+          title: "Image Extraction Failed",
+          description: "Using category placeholder instead",
+          variant: "destructive",
+        });
+      } finally {
+        setIsExtractingImage(false);
       }
     }
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setNewWant(prev => ({ 
+      ...prev, 
+      category,
+      // Set placeholder image if no image is currently set
+      product_image_url: prev.product_image_url || getCategoryPlaceholder(category)
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,9 +96,11 @@ export const WantsFormHandler = ({ onSubmit, onCancel, isLoading }: WantsFormHan
           newWant={newWant}
           onNewWantChange={setNewWant}
           onUrlChange={handleUrlChange}
+          onCategoryChange={handleCategoryChange}
           onSubmit={handleSubmit}
           onCancel={onCancel}
           isLoading={isLoading}
+          isExtractingImage={isExtractingImage}
         />
       </div>
     </div>
