@@ -54,7 +54,9 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
         ? `${window.location.origin}/password-reset`
         : `https://${window.location.hostname}/password-reset`;
       
-      // Send our custom styled email via edge function only
+      console.log('Sending password reset email with URL:', resetUrl);
+      
+      // Send our custom styled email via edge function
       const { error: emailError } = await supabase.functions.invoke('send-password-reset', {
         body: { 
           email, 
@@ -67,12 +69,13 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
 
       toast({
         title: "Password reset email sent! 📧",
-        description: "Check your email for instructions to reset your password.",
+        description: "Check your email for instructions to reset your password. Click the button in the email to go to the reset page.",
       });
       
       setOpen(false);
       setEmail('');
     } catch (error: any) {
+      console.error('Password reset error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to send password reset email. Please try again.",
@@ -93,19 +96,19 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md rounded-3xl">
+      <DialogContent className="sm:max-w-md rounded-3xl bg-white/95 backdrop-blur-sm border border-purple-200/50">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Mail className="text-blue-500" size={20} />
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Mail className="text-blue-500" size={24} />
             Reset Password
           </DialogTitle>
-          <DialogDescription>
-            Enter your email address and we'll send you instructions to reset your password.
+          <DialogDescription className="text-gray-600">
+            Enter your email address and we'll send you a secure link to reset your password.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleResetPassword} className="space-y-4">
+        <form onSubmit={handleResetPassword} className="space-y-6">
           <div>
-            <Label htmlFor="reset-email" className="text-gray-700 dark:text-gray-300">
+            <Label htmlFor="reset-email" className="text-gray-700 font-medium">
               Email Address
             </Label>
             <Input
@@ -115,7 +118,7 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
-              className="mt-1"
+              className="mt-2 h-12 border-gray-200 focus:border-purple-400 focus:ring-purple-400/20"
             />
           </div>
           <div className="flex gap-3">
@@ -123,7 +126,7 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              className="flex-1"
+              className="flex-1 h-12"
               disabled={loading}
             >
               Cancel
@@ -131,7 +134,7 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
             <Button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
             >
               {loading ? (
                 <>
