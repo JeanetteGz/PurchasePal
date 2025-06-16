@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { CategoryDetailModal } from './CategoryDetailModal';
 import { WantsHeader } from './WantsHeader';
 import { WantsSearchBar } from './WantsSearchBar';
@@ -34,7 +34,7 @@ interface WantsContentProps {
   onDeleteWant: (id: string) => void;
 }
 
-export const WantsContent = ({ wants, onAddWant, onDeleteWant }: WantsContentProps) => {
+export const WantsContent = memo(({ wants, onAddWant, onDeleteWant }: WantsContentProps) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,22 +50,26 @@ export const WantsContent = ({ wants, onAddWant, onDeleteWant }: WantsContentPro
     }
   };
 
-  // Filter wants based on search query
-  const filteredWants = wants.filter(want =>
-    want.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    want.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    want.notes?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Memoize filtered wants for better performance
+  const filteredWants = useMemo(() => {
+    return wants.filter(want =>
+      want.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      want.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      want.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [wants, searchQuery]);
 
-  // Group filtered wants by category
-  const wantsByCategory = filteredWants.reduce((acc, want) => {
-    const category = want.category.toLowerCase();
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(want);
-    return acc;
-  }, {} as Record<string, WantItem[]>);
+  // Memoize grouped wants by category
+  const wantsByCategory = useMemo(() => {
+    return filteredWants.reduce((acc, want) => {
+      const category = want.category.toLowerCase();
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(want);
+      return acc;
+    }, {} as Record<string, WantItem[]>);
+  }, [filteredWants]);
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-7xl">
@@ -108,4 +112,6 @@ export const WantsContent = ({ wants, onAddWant, onDeleteWant }: WantsContentPro
       </div>
     </div>
   );
-};
+});
+
+WantsContent.displayName = 'WantsContent';
