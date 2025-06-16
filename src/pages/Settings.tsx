@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Moon, Sun, ArrowLeft, LogOut, Bell, Shield, Trash2, AlertTriangle, User, Palette } from "lucide-react";
+import { Moon, Sun, ArrowLeft, LogOut, Bell, Shield, Trash2, AlertTriangle, User, Palette, Mail, HelpCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -152,6 +152,12 @@ const Settings = () => {
     }
   };
 
+  const handleContactSupport = () => {
+    const subject = encodeURIComponent('PurchasePal - Support Request');
+    const body = encodeURIComponent('Hi PurchasePal Team,\n\nI need help with:\n\n[Please describe your issue here]\n\nThank you!');
+    window.open(`mailto:purchasepalapp@gmail.com?subject=${subject}&body=${body}`);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header */}
@@ -275,6 +281,41 @@ const Settings = () => {
                   className="data-[state=checked]:bg-green-600"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Need Help Section */}
+        <div className="group">
+          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-sm border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white">
+                <HelpCircle size={24} />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Need Help?</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Get support when you need it</p>
+              </div>
+            </div>
+            
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 border border-cyan-200/50 dark:border-cyan-800/50">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="text-2xl">💬</div>
+                <div className="flex-1">
+                  <Label className="font-semibold text-slate-900 dark:text-white text-lg">Contact Support</Label>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                    Having trouble with the app? Our support team is here to help you get back on track.
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={handleContactSupport}
+                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-medium py-3 rounded-2xl shadow-lg"
+              >
+                <Mail size={18} className="mr-2" />
+                Contact Support
+                <span className="text-lg ml-1">📧</span>
+              </Button>
             </div>
           </div>
         </div>
