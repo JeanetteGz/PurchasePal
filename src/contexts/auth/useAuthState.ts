@@ -87,14 +87,14 @@ export const useAuthState = () => {
     );
 
     // Subscribe to auth events
-    const { data: subscription } = supabase.auth.onAuthStateChange(
+    const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event);
         await handleSession(session, event);
       }
     );
 
-    return () => subscription?.unsubscribe();
+    return () => authListener.subscription.unsubscribe();
   }, []);
 
   return {

@@ -32,17 +32,17 @@ export const useWants = () => {
 
 const fetchWants = useCallback(async () => {
   try {
-    console.log('Checking auth state...');
+    console.log('useWants: Checking auth state...');
     const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
-      console.warn('User not authenticated. Skipping fetch.');
+      console.warn('useWants: User not authenticated. Skipping fetch.');
       setWants([]);
       return;
     }
 
     const userId = userData.user.id;
 
-    console.log('Fetching wants from database for user:', userId);
+    console.log('useWants: Fetching wants from database for user:', userId);
     const { data, error } = await supabase
       .from('user_wants')
       .select('*')
@@ -51,10 +51,10 @@ const fetchWants = useCallback(async () => {
 
     if (error) throw error;
 
-    console.log('Wants fetched successfully:', data);
+    console.log('useWants: Wants fetched successfully:', data);
     setWants(data || []);
   } catch (error) {
-    console.error('Error fetching wants:', error);
+    console.error('useWants: Error fetching wants:', error);
     toast({
       title: "Error",
       description: "Failed to load your wishlist items",
@@ -66,10 +66,10 @@ const fetchWants = useCallback(async () => {
 }, [toast]);
 
   const addWant = useCallback(async (newWant: NewWant): Promise<boolean> => {
-    console.log('addWant called with:', newWant);
+    console.log('useWants: addWant called with:', newWant);
     
     if (!newWant.product_name || !newWant.category) {
-      console.log('Missing required fields');
+      console.log('useWants: Missing required fields');
       toast({
         title: "Missing Information",
         description: "Please fill in the product name and category",
@@ -79,12 +79,15 @@ const fetchWants = useCallback(async () => {
     }
 
     try {
-      console.log('Getting user data...');
+      console.log('useWants: Getting user data...');
       const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
+      if (userError) {
+        console.error('useWants: User auth error:', userError);
+        throw userError;
+      }
 
       if (!userData.user) {
-        console.log('User not authenticated');
+        console.log('useWants: User not authenticated');
         toast({
           title: "Authentication Error",
           description: "You must be logged in to add items to your wishlist",
@@ -93,7 +96,7 @@ const fetchWants = useCallback(async () => {
         return false;
       }
 
-      console.log('User authenticated, user ID:', userData.user.id);
+      console.log('useWants: User authenticated, user ID:', userData.user.id);
       
       // Optimistically update UI first
       const tempId = `temp-${Date.now()}`;
@@ -107,7 +110,7 @@ const fetchWants = useCallback(async () => {
         created_at: new Date().toISOString()
       };
       
-      console.log('Adding temp item to UI:', tempWant);
+      console.log('useWants: Adding temp item to UI:', tempWant);
       setWants(prev => [tempWant, ...prev]);
 
       const insertData = {
@@ -119,7 +122,7 @@ const fetchWants = useCallback(async () => {
         user_id: userData.user.id
       };
 
-      console.log('Inserting data to database:', insertData);
+      console.log('useWants: Inserting data to database:', insertData);
       
       const { data, error } = await supabase
         .from('user_wants')
@@ -128,11 +131,12 @@ const fetchWants = useCallback(async () => {
         .single();
 
       if (error) {
-        console.error('Database insert error:', error);
+        console.error('useWants: Database insert error:', error);
+        console.error('useWants: Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
       
-      console.log('Database insert successful:', data);
+      console.log('useWants: Database insert successful:', data);
       
       // Replace temp item with real item
       setWants(prev => prev.map(want => want.id === tempId ? data : want));
@@ -144,12 +148,19 @@ const fetchWants = useCallback(async () => {
       
       return true;
     } catch (error) {
-      console.error('Error adding want:', error);
+      console.error('useWants: Error adding want:', error);
+      console.error('useWants: Error stack:', error.stack);
       // Remove temp item on error
       setWants(prev => prev.filter(want => !want.id.startsWith('temp-')));
+      
+      let errorMessage = "Failed to add item to your wishlist. Please try again.";
+      if (error.message) {
+        errorMessage += ` Error: ${error.message}`;
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to add item to your wishlist. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       return false;
@@ -174,7 +185,7 @@ const fetchWants = useCallback(async () => {
         description: "Item has been removed from your wishlist",
       });
     } catch (error) {
-      console.error('Error deleting want:', error);
+      console.error('useWants: Error deleting want:', error);
       // Restore item on error
       if (itemToDelete) {
         setWants(prev => [itemToDelete, ...prev]);
