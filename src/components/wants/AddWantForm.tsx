@@ -1,7 +1,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, X } from 'lucide-react';
+import { ShoppingBag, X, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 interface NewWant {
   product_name: string;
@@ -20,6 +21,14 @@ interface AddWantFormProps {
 }
 
 export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, onCancel }: AddWantFormProps) => {
+  const [isExtractingImage, setIsExtractingImage] = useState(false);
+
+  const handleUrlChange = async (url: string) => {
+    setIsExtractingImage(true);
+    await onUrlChange(url);
+    setIsExtractingImage(false);
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl">
@@ -82,14 +91,52 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Product URL
               </label>
-              <input
-                type="url"
-                value={newWant.product_url}
-                onChange={(e) => onUrlChange(e.target.value)}
-                className="w-full p-4 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-200 text-lg"
-                placeholder="https://... (image will be auto-detected for Amazon)"
-              />
+              <div className="relative">
+                <input
+                  type="url"
+                  value={newWant.product_url}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className="w-full p-4 pr-12 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-200 text-lg"
+                  placeholder="https://... (product image will be auto-detected)"
+                />
+                {isExtractingImage && (
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <Loader2 className="w-5 h-5 animate-spin text-purple-500" />
+                  </div>
+                )}
+              </div>
+              {newWant.product_image_url && (
+                <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                  <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                    ✅ Product image detected and will be displayed
+                  </p>
+                </div>
+              )}
             </div>
+            
+            {/* Image Preview */}
+            {newWant.product_image_url && (
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Image Preview
+                </label>
+                <div className="w-full h-48 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-700 dark:to-purple-900/30 rounded-xl overflow-hidden">
+                  <img
+                    src={newWant.product_image_url}
+                    alt="Product preview"
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-4xl">❌ Image failed to load</div>';
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Notes
@@ -105,9 +152,17 @@ export const AddWantForm = ({ newWant, onNewWantChange, onUrlChange, onSubmit, o
             <div className="flex gap-4 pt-4">
               <Button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 py-4 text-lg rounded-xl shadow-lg transition-all duration-200 hover:scale-[1.02]"
+                disabled={isExtractingImage}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 py-4 text-lg rounded-xl shadow-lg transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
               >
-                Add to Wishlist
+                {isExtractingImage ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Add to Wishlist'
+                )}
               </Button>
               <Button
                 type="button"
