@@ -86,7 +86,7 @@ export const useAuthState = () => {
       handleSession(session)
     );
 
-    // Subscribe to auth events
+    // Subscribe to auth events - fix the subscription handling
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event);
@@ -94,7 +94,12 @@ export const useAuthState = () => {
       }
     );
 
-    return () => authListener.subscription.unsubscribe();
+    // Return proper cleanup function
+    return () => {
+      if (authListener?.subscription) {
+        authListener.subscription.unsubscribe();
+      }
+    };
   }, []);
 
   return {
