@@ -39,7 +39,37 @@ export const extractImageFromUrl = async (url: string): Promise<string> => {
       return cleanUrl;
     }
 
-    // For other e-commerce sites, use simple pattern matching without fetch
+    // Enhanced e-commerce site support
+    if (cleanUrl.includes('bestbuy.com')) {
+      const skuMatch = cleanUrl.match(/skuId=(\d+)/);
+      if (skuMatch) {
+        const sku = skuMatch[1];
+        const imageUrl = `https://pisces.bbystatic.com/image2/BestBuy_US/images/products/${sku}/${sku}_sd.jpg`;
+        console.log('Best Buy product detected, using image:', imageUrl);
+        return imageUrl;
+      }
+    }
+
+    if (cleanUrl.includes('target.com')) {
+      const productMatch = cleanUrl.match(/\/A-(\d+)/);
+      if (productMatch) {
+        const productId = productMatch[1];
+        const imageUrl = `https://target.scene7.com/is/image/Target/GUEST_${productId}`;
+        console.log('Target product detected, using image:', imageUrl);
+        return imageUrl;
+      }
+    }
+
+    if (cleanUrl.includes('walmart.com')) {
+      const productMatch = cleanUrl.match(/\/ip\/[^\/]+\/(\d+)/);
+      if (productMatch) {
+        const productId = productMatch[1];
+        const imageUrl = `https://i5.walmartimages.com/asr/${productId}_1.jpeg`;
+        console.log('Walmart product detected, using image:', imageUrl);
+        return imageUrl;
+      }
+    }
+
     if (cleanUrl.includes('nike.com')) {
       const productMatch = cleanUrl.match(/\/([A-Z0-9\-]+)(?=\/|\?|$)/);
       if (productMatch) {
@@ -67,8 +97,72 @@ export const extractImageFromUrl = async (url: string): Promise<string> => {
       }
     }
 
-    // If no specific pattern matches, return empty string (don't try proxy services that cause CORS)
-    console.log('No specific pattern matched, returning empty string');
+    // Try to fetch the page and extract Open Graph or meta images
+    try {
+      console.log('Attempting to fetch page content for meta extraction...');
+      
+      // Use a CORS proxy service to fetch the page content
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(cleanUrl)}`;
+      const response = await fetch(proxyUrl);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const htmlContent = data.contents;
+        
+        // Try to extract Open Graph image
+        const ogImageMatch = htmlContent.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i);
+        if (ogImageMatch) {
+          let imageUrl = ogImageMatch[1];
+          // Handle relative URLs
+          if (imageUrl.startsWith('//')) {
+            imageUrl = 'https:' + imageUrl;
+          } else if (imageUrl.startsWith('/')) {
+            const urlObj = new URL(cleanUrl);
+            imageUrl = urlObj.origin + imageUrl;
+          }
+          console.log('Open Graph image found:', imageUrl);
+          return imageUrl;
+        }
+        
+        // Try to extract Twitter card image
+        const twitterImageMatch = htmlContent.match(/<meta[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i);
+        if (twitterImageMatch) {
+          let imageUrl = twitterImageMatch[1];
+          // Handle relative URLs
+          if (imageUrl.startsWith('//')) {
+            imageUrl = 'https:' + imageUrl;
+          } else if (imageUrl.startsWith('/')) {
+            const urlObj = new URL(cleanUrl);
+            imageUrl = urlObj.origin + imageUrl;
+          }
+          console.log('Twitter card image found:', imageUrl);
+          return imageUrl;
+        }
+        
+        // Try to find the first product image in the page
+        const productImageMatch = htmlContent.match(/<img[^>]*src=["']([^"']*product[^"']*)["']/i) ||
+                                 htmlContent.match(/<img[^>]*src=["']([^"']*item[^"']*)["']/i) ||
+                                 htmlContent.match(/<img[^>]*class=["'][^"']*product[^"']*["'][^>]*src=["']([^"']+)["']/i);
+        
+        if (productImageMatch) {
+          let imageUrl = productImageMatch[1];
+          // Handle relative URLs
+          if (imageUrl.startsWith('//')) {
+            imageUrl = 'https:' + imageUrl;
+          } else if (imageUrl.startsWith('/')) {
+            const urlObj = new URL(cleanUrl);
+            imageUrl = urlObj.origin + imageUrl;
+          }
+          console.log('Product image found in HTML:', imageUrl);
+          return imageUrl;
+        }
+      }
+    } catch (fetchError) {
+      console.log('Could not fetch page content:', fetchError);
+    }
+
+    // If no specific pattern matches, return empty string
+    console.log('No image could be extracted from the URL');
     return '';
     
   } catch (error) {
