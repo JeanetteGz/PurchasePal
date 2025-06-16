@@ -1,3 +1,4 @@
+
 import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,7 @@ const Settings = () => {
   const [notifications, setNotifications] = useState(true);
   const [dataCollection, setDataCollection] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isClearingData, setIsClearingData] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signOut, user, profile } = useAuth();
@@ -49,12 +51,59 @@ const Settings = () => {
     navigate("/");
   };
 
-  const handleClearData = () => {
-    toast({
-      title: "🗑️ Data cleared",
-      description: "All your purchase data has been cleared.",
-    });
-    // In a real app, you would clear user data here
+  const handleClearData = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not found. Please try logging in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsClearingData(true);
+    
+    try {
+      console.log('Clearing all data for user:', user.id);
+      
+      // Delete all user purchases
+      const { error: purchasesError } = await supabase
+        .from('user_purchases')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (purchasesError) {
+        console.error('Error deleting user purchases:', purchasesError);
+        throw purchasesError;
+      }
+
+      // Delete all user wants
+      const { error: wantsError } = await supabase
+        .from('user_wants')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (wantsError) {
+        console.error('Error deleting user wants:', wantsError);
+        throw wantsError;
+      }
+
+      console.log('Successfully cleared all user data');
+      
+      toast({
+        title: "🗑️ Data cleared successfully",
+        description: "All your purchase data and wants have been permanently deleted.",
+      });
+    } catch (error: any) {
+      console.error('Error clearing data:', error);
+      toast({
+        title: "Error clearing data",
+        description: error.message || "Failed to clear data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsClearingData(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -189,15 +238,47 @@ const Settings = () => {
           <div className="space-y-4">
             <div>
               <Label className="font-medium text-gray-900 dark:text-white">Clear All Data 🗑️</Label>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">This will permanently delete all your purchases and cannot be undone</p>
-              <Button 
-                variant="destructive" 
-                onClick={handleClearData}
-                className="w-full"
-              >
-                <Trash2 size={16} className="mr-2" />
-                Clear All Data
-              </Button>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">This will permanently delete all your purchases and wants and cannot be undone</p>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    className="w-full"
+                  >
+                    <Trash2 size={16} className="mr-2" />
+                    Clear All Data
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2">
+                      <Trash2 className="text-red-500" size={20} />
+                      Clear All Data?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-2">
+                      <p>This will permanently delete all your data including:</p>
+                      <div className="space-y-1 text-sm">
+                        <div>• All your purchase records</div>
+                        <div>• All your wants and wishlist items</div>
+                        <div>• All spending insights and history</div>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-4 font-medium">
+                        This action cannot be undone. Your account will remain active but all data will be lost.
+                      </p>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleClearData}
+                      disabled={isClearingData}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      {isClearingData ? "Clearing Data..." : "Yes, Clear All Data"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>
