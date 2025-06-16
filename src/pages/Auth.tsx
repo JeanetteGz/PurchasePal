@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,10 +16,17 @@ const Auth = () => {
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isReturningUser, setIsReturningUser] = useState(false);
   
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user has previously signed out (localStorage flag)
+    const hasSignedOut = localStorage.getItem('userSignedOut') === 'true';
+    setIsReturningUser(hasSignedOut);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +36,9 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) throw error;
+        
+        // Clear the signed out flag when user successfully signs in
+        localStorage.removeItem('userSignedOut');
         
         toast({
           title: "Welcome back! 👋",
@@ -77,7 +87,10 @@ const Auth = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">
-              {isLogin ? 'Welcome Back! 👋' : 'Join PausePal! 🎉'}
+              {isLogin 
+                ? (isReturningUser ? 'Welcome Back! 👋' : 'Welcome! 👋')
+                : 'Join PurchasePal! 🎉'
+              }
             </CardTitle>
             <CardDescription>
               {isLogin 

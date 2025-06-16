@@ -114,6 +114,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
+    // Set localStorage flag to indicate user has signed out
+    localStorage.setItem('userSignedOut', 'true');
+    
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
