@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -87,13 +86,13 @@ const Auth = () => {
       <div className="container mx-auto px-4 py-8 flex items-center justify-center">
         <Card className="w-full max-w-md shadow-xl border-purple-200/50">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <CardTitle className="text-2xl font-bold text-white">
               {isLogin 
                 ? (isReturningUser ? 'Welcome Back! 👋' : 'Welcome! 👋')
                 : 'Join PurchasePal! 🎉'
               }
             </CardTitle>
-            <CardDescription className="text-purple-600/80">
+            <CardDescription className="text-white/80">
               {isLogin 
                 ? 'Sign in to your account to continue your mindful spending journey'
                 : 'Create your account to start your mindful spending journey'
@@ -106,7 +105,7 @@ const Auth = () => {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName" className="text-purple-700">First Name</Label>
+                      <Label htmlFor="firstName" className="text-white">First Name</Label>
                       <Input
                         id="firstName"
                         type="text"
@@ -118,7 +117,7 @@ const Auth = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName" className="text-purple-700">Last Name</Label>
+                      <Label htmlFor="lastName" className="text-white">Last Name</Label>
                       <Input
                         id="lastName"
                         type="text"
@@ -131,7 +130,7 @@ const Auth = () => {
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="age" className="text-purple-700">Age</Label>
+                    <Label htmlFor="age" className="text-white">Age</Label>
                     <Input
                       id="age"
                       type="number"
@@ -148,7 +147,7 @@ const Auth = () => {
               )}
               
               <div>
-                <Label htmlFor="email" className="text-purple-700">Email</Label>
+                <Label htmlFor="email" className="text-white">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -161,7 +160,7 @@ const Auth = () => {
               </div>
               
               <div>
-                <Label htmlFor="password" className="text-purple-700">Password</Label>
+                <Label htmlFor="password" className="text-white">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -186,11 +185,11 @@ const Auth = () => {
             </form>
             
             <div className="mt-6 text-center">
-              <p className="text-sm text-purple-600">
+              <p className="text-sm text-purple-200">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
                 <button
                   onClick={() => setIsLogin(!isLogin)}
-                  className="ml-2 text-pink-600 hover:text-pink-700 hover:underline font-medium"
+                  className="ml-2 text-pink-200 hover:text-pink-100 hover:underline font-medium"
                 >
                   {isLogin ? 'Sign up' : 'Sign in'}
                 </button>
