@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -284,7 +285,8 @@ export const Wants = () => {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <CardTitle className="text-xl font-bold flex items-center gap-2">
-                  {getCategoryEmoji(selectedWant.category)} {selectedWant.product_name}
+                  {getCategoryEmoji(selectedWant.category)} 
+                  <span className="font-bold">{selectedWant.product_name}</span>
                 </CardTitle>
                 <Button
                   variant="ghost"
@@ -307,7 +309,7 @@ export const Wants = () => {
                       e.currentTarget.style.display = 'none';
                       const parent = e.currentTarget.parentElement;
                       if (parent) {
-                        parent.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">📷 Image not available</div>';
+                        parent.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 text-2xl">📷 Image not available</div>';
                       }
                     }}
                   />
@@ -429,8 +431,9 @@ export const Wants = () => {
                     </div>
                     
                     <CardContent className="p-6">
-                      <h4 className="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2 line-clamp-2 flex items-center gap-2">
-                        {getCategoryEmoji(want.category)} {want.product_name}
+                      <h4 className="text-lg text-gray-800 dark:text-gray-200 mb-2 line-clamp-2 flex items-center gap-2">
+                        {getCategoryEmoji(want.category)} 
+                        <span className="font-bold">{want.product_name}</span>
                       </h4>
                       {want.notes && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
