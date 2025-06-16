@@ -1,9 +1,11 @@
+
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft, User, Camera } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -135,97 +137,141 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
-      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-b border-white/20 dark:border-gray-700/20">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center">
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-white/30 dark:border-gray-700/30 shadow-sm">
+        <div className="max-w-2xl mx-auto px-6 py-4 flex items-center">
           <Link 
             to="/" 
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors hover:bg-white/50 dark:hover:bg-gray-700/50 px-3 py-2 rounded-full"
+            className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all duration-200 hover:bg-white/60 dark:hover:bg-gray-700/60 px-4 py-2 rounded-full"
           >
             <ArrowLeft size={20} />
-            Back
+            Back to Dashboard
           </Link>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto py-10 px-4">
-        <form onSubmit={handleSave} className="space-y-6">
-          <div className="flex flex-col items-center gap-3">
-            <div className="relative">
-              <Avatar className="h-20 w-20 cursor-pointer ring-2 ring-accent dark:ring-blue-400 hover:ring-4 transition-all" onClick={handleAvatarClick}>
-                {avatarUrl ? (
-                  <AvatarImage src={avatarUrl} />
-                ) : null}
-                <AvatarFallback className="bg-gradient-to-br from-purple-100 to-pink-100 dark:from-blue-900 dark:to-purple-900">
-                  {getInitials() ? (
-                    <span className="text-purple-600 dark:text-blue-300 font-semibold">{getInitials()}</span>
-                  ) : (
-                    <User className="text-purple-400 dark:text-blue-400" size={32} />
-                  )}
-                </AvatarFallback>
-              </Avatar>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                ref={fileInput}
-                onChange={handleFileChange}
-              />
-              <span className="absolute bottom-0 right-0 bg-primary dark:bg-blue-600 text-xs rounded-full px-2 py-1 font-semibold cursor-pointer text-primary-foreground hover:bg-primary/90 dark:hover:bg-blue-700 transition-colors" onClick={handleAvatarClick}>
-                📷
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground dark:text-gray-400 text-center">
-              Click to upload a new profile picture 📸
+      <div className="max-w-2xl mx-auto py-12 px-6">
+        <Card className="shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+              Your Profile ✨
+            </CardTitle>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Manage your personal information and preferences
             </p>
-          </div>
+          </CardHeader>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1 dark:text-gray-200">First Name ✨</label>
-              <Input
-                value={firstName}
-                onChange={e => setFirstName(e.target.value)}
-                maxLength={30}
-                placeholder="First name"
-                className="rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 dark:text-gray-200">Last Name ✨</label>
-              <Input
-                value={lastName}
-                onChange={e => setLastName(e.target.value)}
-                maxLength={30}
-                placeholder="Last name"
-                className="rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-              />
-            </div>
-          </div>
+          <CardContent>
+            <form onSubmit={handleSave} className="space-y-8">
+              {/* Avatar Section */}
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative group">
+                  <Avatar className="h-32 w-32 cursor-pointer ring-4 ring-purple-200 dark:ring-purple-700 hover:ring-purple-300 dark:hover:ring-purple-600 transition-all duration-300 shadow-lg" onClick={handleAvatarClick}>
+                    {avatarUrl ? (
+                      <AvatarImage src={avatarUrl} className="object-cover" />
+                    ) : null}
+                    <AvatarFallback className="bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 text-2xl">
+                      {getInitials() ? (
+                        <span className="text-purple-600 dark:text-purple-300 font-bold">{getInitials()}</span>
+                      ) : (
+                        <User className="text-purple-400 dark:text-purple-400" size={48} />
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full p-3 cursor-pointer hover:from-purple-600 hover:to-blue-600 transition-all duration-200 shadow-lg group-hover:scale-110" onClick={handleAvatarClick}>
+                    <Camera className="text-white" size={16} />
+                  </div>
+                  
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={fileInput}
+                    onChange={handleFileChange}
+                  />
+                </div>
+                
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-xs">
+                  Click on your avatar to upload a new profile picture 📸
+                </p>
+              </div>
+              
+              {/* Name Fields */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    First Name
+                  </label>
+                  <Input
+                    value={firstName}
+                    onChange={e => setFirstName(e.target.value)}
+                    maxLength={30}
+                    placeholder="Enter your first name"
+                    className="rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-500 transition-colors duration-200 bg-white/50 dark:bg-gray-700/50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    Last Name
+                  </label>
+                  <Input
+                    value={lastName}
+                    onChange={e => setLastName(e.target.value)}
+                    maxLength={30}
+                    placeholder="Enter your last name"
+                    className="rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-500 transition-colors duration-200 bg-white/50 dark:bg-gray-700/50"
+                  />
+                </div>
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 dark:text-gray-200">Email 📧</label>
-            <Input
-              value={email}
-              readOnly
-              className="bg-muted dark:bg-gray-700 cursor-not-allowed rounded-xl dark:border-gray-600 dark:text-gray-300"
-              type="email"
-            />
-            <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
-              Email cannot be changed 🔒
-            </p>
-          </div>
-          
-          <div className="flex gap-3">
-            <Button type="submit" className="flex-1 rounded-xl dark:bg-blue-600 dark:hover:bg-blue-700" disabled={loading}>
-              {loading ? "💾 Saving..." : "💾 Save Changes"}
-            </Button>
-            <Link to="/">
-              <Button type="button" variant="outline" className="rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600">
-                ❌ Cancel
-              </Button>
-            </Link>
-          </div>
-        </form>
+              {/* Email Field */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Email Address
+                </label>
+                <Input
+                  value={email}
+                  readOnly
+                  className="rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 cursor-not-allowed"
+                  type="email"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  🔒 Email cannot be changed for security reasons
+                </p>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                <Button 
+                  type="submit" 
+                  className="flex-1 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-3 shadow-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-0.5" 
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                      Saving Changes...
+                    </>
+                  ) : (
+                    <>
+                      💾 Save Changes
+                    </>
+                  )}
+                </Button>
+                
+                <Link to="/" className="flex-1">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 py-3 font-semibold transition-all duration-200"
+                  >
+                    Cancel
+                  </Button>
+                </Link>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
