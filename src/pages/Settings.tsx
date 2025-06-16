@@ -3,12 +3,13 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Moon, Sun, ArrowLeft, LogOut, Bell, Shield, Trash2, AlertTriangle, User, Palette, Mail, HelpCircle } from "lucide-react";
+import { Moon, Sun, ArrowLeft, LogOut, Bell, Shield, Trash2, AlertTriangle, User, Palette, Mail, HelpCircle, Key } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -215,6 +216,43 @@ const Settings = () => {
               <Label htmlFor="theme-toggle" className="font-medium text-slate-700 dark:text-slate-300">
                 {isDark ? "Dark mode" : "Light mode"}
               </Label>
+            </div>
+          </div>
+        </div>
+
+        {/* Account Security */}
+        <div className="group">
+          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-8 shadow-sm border border-slate-200/50 dark:border-slate-700/50 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+                <Key size={24} />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Account Security</h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Manage your account security settings</p>
+              </div>
+            </div>
+            
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200/50 dark:border-indigo-800/50">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="text-2xl">🔐</div>
+                <div className="flex-1">
+                  <Label className="font-semibold text-slate-900 dark:text-white text-lg">Reset Password</Label>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                    Need to change your password? We'll send you a secure reset link via email.
+                  </p>
+                </div>
+              </div>
+              <ForgotPasswordDialog 
+                defaultEmail={profile?.email || ''}
+                trigger={
+                  <Button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 rounded-2xl shadow-lg">
+                    <Key size={18} className="mr-2" />
+                    Reset Password
+                    <span className="text-lg ml-1">🔑</span>
+                  </Button>
+                }
+              />
             </div>
           </div>
         </div>

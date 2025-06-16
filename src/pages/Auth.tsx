@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,9 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/Logo';
+import { ForgotPasswordDialog } from '@/components/ForgotPasswordDialog';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const isResetMode = searchParams.get('reset') === 'true';
+  
+  const [isLogin, setIsLogin] = useState(!isResetMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -27,7 +30,15 @@ const Auth = () => {
     // Check if user has previously signed out (localStorage flag)
     const hasSignedOut = localStorage.getItem('userSignedOut') === 'true';
     setIsReturningUser(hasSignedOut);
-  }, []);
+
+    // Show password reset success message if coming from email
+    if (isResetMode) {
+      toast({
+        title: "Password Reset Ready! 🔑",
+        description: "You can now enter your new password below.",
+      });
+    }
+  }, [isResetMode, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,6 +190,20 @@ const Auth = () => {
                 }
               </Button>
             </form>
+            
+            {/* Forgot Password Link - only show on login */}
+            {isLogin && (
+              <div className="mt-4 text-center">
+                <ForgotPasswordDialog 
+                  defaultEmail={email}
+                  trigger={
+                    <button className="text-sm text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 hover:underline font-medium">
+                      Forgot your password? 🔑
+                    </button>
+                  }
+                />
+              </div>
+            )}
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">
