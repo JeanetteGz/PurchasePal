@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -76,7 +77,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="bg-white/70 backdrop-blur-sm border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-6 flex justify-center">
           <Logo size="lg" className="scale-125" />
@@ -84,15 +85,15 @@ const Auth = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8 flex items-center justify-center">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md shadow-xl border-purple-200/50">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               {isLogin 
                 ? (isReturningUser ? 'Welcome Back! 👋' : 'Welcome! 👋')
                 : 'Join PurchasePal! 🎉'
               }
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-purple-600/80">
               {isLogin 
                 ? 'Sign in to your account to continue your mindful spending journey'
                 : 'Create your account to start your mindful spending journey'
@@ -105,7 +106,7 @@ const Auth = () => {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName" className="text-purple-700">First Name</Label>
                       <Input
                         id="firstName"
                         type="text"
@@ -113,10 +114,11 @@ const Auth = () => {
                         onChange={(e) => setFirstName(e.target.value)}
                         placeholder="John"
                         required={!isLogin}
+                        className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="lastName" className="text-purple-700">Last Name</Label>
                       <Input
                         id="lastName"
                         type="text"
@@ -124,11 +126,12 @@ const Auth = () => {
                         onChange={(e) => setLastName(e.target.value)}
                         placeholder="Doe"
                         required={!isLogin}
+                        className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                       />
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="age">Age</Label>
+                    <Label htmlFor="age" className="text-purple-700">Age</Label>
                     <Input
                       id="age"
                       type="number"
@@ -138,13 +141,14 @@ const Auth = () => {
                       min="1"
                       max="120"
                       required={!isLogin}
+                      className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                     />
                   </div>
                 </>
               )}
               
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-purple-700">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -152,11 +156,12 @@ const Auth = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="john@example.com"
                   required
+                  className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                 />
               </div>
               
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-purple-700">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -164,10 +169,15 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                 />
               </div>
               
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white border-0" 
+                disabled={loading}
+              >
                 {loading 
                   ? (isLogin ? 'Signing in...' : 'Creating account...') 
                   : (isLogin ? 'Sign In 🚀' : 'Create Account 🎉')
@@ -176,11 +186,11 @@ const Auth = () => {
             </form>
             
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-purple-600">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
                 <button
                   onClick={() => setIsLogin(!isLogin)}
-                  className="ml-2 text-primary hover:underline font-medium"
+                  className="ml-2 text-pink-600 hover:text-pink-700 hover:underline font-medium"
                 >
                   {isLogin ? 'Sign up' : 'Sign in'}
                 </button>
