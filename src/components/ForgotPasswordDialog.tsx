@@ -49,14 +49,7 @@ export const ForgotPasswordDialog = ({ trigger, defaultEmail = '' }: ForgotPassw
 
       const firstName = profile?.first_name || 'there';
       
-      // Generate a password reset token using Supabase
-      const { error: tokenError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/password-reset`,
-      });
-
-      if (tokenError) throw tokenError;
-
-      // Send our custom styled email via edge function
+      // Send our custom styled email via edge function only
       const { error: emailError } = await supabase.functions.invoke('send-password-reset', {
         body: { 
           email, 
