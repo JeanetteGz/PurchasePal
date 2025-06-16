@@ -27,6 +27,7 @@ export const Wants = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [addLoading, setAddLoading] = useState(false);
   const [newWant, setNewWant] = useState({
     product_name: '',
     category: '',
@@ -59,9 +60,13 @@ export const Wants = () => {
     setNewWant(prev => ({ ...prev, product_url: url }));
     
     if (url) {
-      const extractedImage = await extractImageFromUrl(url);
-      if (extractedImage) {
-        setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
+      try {
+        const extractedImage = await extractImageFromUrl(url);
+        if (extractedImage) {
+          setNewWant(prev => ({ ...prev, product_image_url: extractedImage }));
+        }
+      } catch (error) {
+        console.error('Error extracting image:', error);
       }
     }
   };
@@ -70,7 +75,11 @@ export const Wants = () => {
     e.preventDefault();
     if (!newWant.product_name || !newWant.category) return;
 
+    setAddLoading(true);
     try {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+
       const extractedImage = newWant.product_url ? await extractImageFromUrl(newWant.product_url) : '';
       
       const { data, error } = await supabase
@@ -78,10 +87,10 @@ export const Wants = () => {
         .insert({
           product_name: newWant.product_name,
           category: newWant.category,
-          product_url: newWant.product_url,
+          product_url: newWant.product_url || '',
           product_image_url: extractedImage || newWant.product_image_url || null,
           notes: newWant.notes || null,
-          user_id: (await supabase.auth.getUser()).data.user?.id
+          user_id: userData.user?.id
         })
         .select()
         .single();
@@ -93,6 +102,8 @@ export const Wants = () => {
       setShowAddForm(false);
     } catch (error) {
       console.error('Error adding want:', error);
+    } finally {
+      setAddLoading(false);
     }
   };
 
@@ -129,7 +140,7 @@ export const Wants = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
         <div className="container mx-auto px-4 py-12">
           <div className="text-center py-20">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500/30 border-t-purple-500 mx-auto mb-6"></div>
@@ -141,49 +152,62 @@ export const Wants = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8 space-y-8">
-        {/* Header */}
+        {/* Modern Header */}
         <div className="text-center space-y-6">
-          <div className="inline-flex items-center gap-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 text-white px-10 py-6 rounded-3xl shadow-2xl mb-8">
-            <Heart className="w-8 h-8" />
-            <h1 className="text-4xl font-bold">Your Wishlist</h1>
-            <Sparkles className="w-8 h-8" />
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 rounded-3xl blur-lg opacity-30 transform scale-110"></div>
+            <div className="relative inline-flex items-center gap-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 text-white px-12 py-8 rounded-3xl shadow-2xl">
+              <Heart className="w-10 h-10" />
+              <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-100">
+                Your Wishlist
+              </h1>
+              <Sparkles className="w-10 h-10" />
+            </div>
           </div>
           <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-xl leading-relaxed">
-            Organize your desires by category. Take time to think before making impulse purchases! 🤔💭
+            Organize your desires by category and think before you buy! 🛍️✨
           </p>
         </div>
 
-        {/* Search and Add Section */}
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
-            <input
-              type="text"
-              placeholder="Search across all categories..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-16 pr-6 py-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-xl transition-all duration-200 text-lg"
-            />
+        {/* Enhanced Search and Add Section */}
+        <div className="max-w-5xl mx-auto space-y-8">
+          {/* Modern Search Bar */}
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+            <div className="relative">
+              <Search className="absolute left-8 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6 z-10" />
+              <input
+                type="text"
+                placeholder="Search across all your wishlist items..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-20 pr-8 py-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-purple-100 dark:border-purple-900/50 rounded-3xl focus:ring-4 focus:ring-purple-500/25 focus:border-purple-400 shadow-xl transition-all duration-300 text-lg placeholder-gray-400"
+              />
+            </div>
           </div>
 
-          {/* Add Item Button */}
+          {/* Enhanced Add Button */}
           <div className="flex justify-center">
             <Button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-2xl transform transition-all hover:scale-105 px-10 py-6 text-xl rounded-3xl"
+              disabled={addLoading}
+              className="group relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-2xl transform transition-all duration-300 hover:scale-105 px-12 py-8 text-xl rounded-3xl border-0"
             >
-              <Plus className="w-7 h-7 mr-3" />
-              Add to Wishlist
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                  <Plus className="w-8 h-8" />
+                </div>
+                <span className="font-semibold">Add to Wishlist</span>
+              </div>
             </Button>
           </div>
         </div>
 
-        {/* Add Form */}
+        {/* Add Form with Animation */}
         {showAddForm && (
-          <div className="animate-fade-in">
+          <div className="animate-fade-in max-w-4xl mx-auto">
             <AddWantForm
               newWant={newWant}
               onNewWantChange={setNewWant}
@@ -203,28 +227,41 @@ export const Wants = () => {
           onDeleteWant={deleteWant}
         />
 
-        {/* Category Cards */}
+        {/* Enhanced Category Cards or Empty State */}
         {Object.keys(wantsByCategory).length === 0 ? (
-          <div className="max-w-3xl mx-auto">
-            <Card className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-800 border-0 shadow-2xl rounded-3xl">
-              <CardContent className="text-center py-20">
-                <div className="text-9xl mb-8">🎯</div>
-                <h3 className="text-3xl font-bold text-gray-700 dark:text-gray-200 mb-6">
-                  {searchQuery ? 'No items found' : 'Your wishlist is empty'}
-                </h3>
-                <p className="text-gray-500 dark:text-gray-400 text-xl leading-relaxed">
-                  {searchQuery ? 'Try a different search term' : 'Start organizing your future purchases by category! ✨'}
-                </p>
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-800 border-0 shadow-2xl rounded-3xl overflow-hidden">
+              <CardContent className="text-center py-24">
+                <div className="space-y-8">
+                  <div className="text-8xl mb-8 animate-bounce">
+                    {searchQuery ? '🔍' : '🎯'}
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-4xl font-bold text-gray-700 dark:text-gray-200">
+                      {searchQuery ? 'No items found' : 'Your wishlist is empty'}
+                    </h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-xl leading-relaxed max-w-md mx-auto">
+                      {searchQuery 
+                        ? 'Try a different search term or add more items to your wishlist' 
+                        : 'Start organizing your future purchases by category! Click the button above to add your first item ✨'
+                      }
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
         ) : (
-          <div className="space-y-8 animate-fade-in">
-            <div className="flex items-center gap-3 justify-center">
-              <Grid3X3 className="w-6 h-6 text-purple-600" />
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                Categories ({Object.keys(wantsByCategory).length})
-              </h2>
+          <div className="space-y-12 animate-fade-in">
+            <div className="flex items-center gap-4 justify-center">
+              <div className="h-1 w-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+              <div className="flex items-center gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-8 py-4 rounded-2xl shadow-lg">
+                <Grid3X3 className="w-6 h-6 text-purple-600" />
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                  Categories ({Object.keys(wantsByCategory).length})
+                </h2>
+              </div>
+              <div className="h-1 w-16 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -241,41 +278,43 @@ export const Wants = () => {
           </div>
         )}
 
-        {/* Enhanced Stats Section - Moved further down with more spacing */}
+        {/* Enhanced Stats Section */}
         {wants.length > 0 && (
-          <div className="max-w-5xl mx-auto pt-16">
-            <Card className="bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100 dark:from-gray-800 dark:via-purple-900/30 dark:to-gray-800 border-0 shadow-2xl rounded-3xl">
-              <CardContent className="p-10">
-                <div className="flex items-center gap-3 justify-center mb-8">
-                  <TrendingUp className="w-7 h-7 text-purple-600" />
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                    Wishlist Statistics
+          <div className="max-w-6xl mx-auto pt-16">
+            <Card className="bg-gradient-to-r from-purple-100/80 via-pink-100/80 to-purple-100/80 dark:from-gray-800/90 dark:via-purple-900/40 dark:to-gray-800/90 border-0 shadow-2xl rounded-3xl backdrop-blur-sm">
+              <CardContent className="p-12">
+                <div className="flex items-center gap-4 justify-center mb-10">
+                  <div className="h-1 w-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                  <TrendingUp className="w-8 h-8 text-purple-600" />
+                  <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-200">
+                    Wishlist Insights
                   </h3>
+                  <div className="h-1 w-12 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-                  <div className="bg-white dark:bg-gray-700/50 rounded-2xl p-6 shadow-lg">
-                    <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                  <div className="bg-white/70 dark:bg-gray-700/60 rounded-3xl p-8 shadow-xl backdrop-blur-sm transform hover:scale-105 transition-transform">
+                    <div className="text-5xl font-bold text-purple-600 dark:text-purple-400 mb-3">
                       {wants.length}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-300 font-semibold">Total Items</div>
+                    <div className="text-gray-600 dark:text-gray-300 font-semibold text-lg">Total Items</div>
                   </div>
-                  <div className="bg-white dark:bg-gray-700/50 rounded-2xl p-6 shadow-lg">
-                    <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                  <div className="bg-white/70 dark:bg-gray-700/60 rounded-3xl p-8 shadow-xl backdrop-blur-sm transform hover:scale-105 transition-transform">
+                    <div className="text-5xl font-bold text-purple-600 dark:text-purple-400 mb-3">
                       {Object.keys(wantsByCategory).length}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-300 font-semibold">Categories</div>
+                    <div className="text-gray-600 dark:text-gray-300 font-semibold text-lg">Categories</div>
                   </div>
-                  <div className="bg-white dark:bg-gray-700/50 rounded-2xl p-6 shadow-lg">
-                    <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                  <div className="bg-white/70 dark:bg-gray-700/60 rounded-3xl p-8 shadow-xl backdrop-blur-sm transform hover:scale-105 transition-transform">
+                    <div className="text-5xl font-bold text-purple-600 dark:text-purple-400 mb-3">
                       {wants.filter(want => want.product_url).length}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-300 font-semibold">With Links</div>
+                    <div className="text-gray-600 dark:text-gray-300 font-semibold text-lg">With Links</div>
                   </div>
-                  <div className="bg-white dark:bg-gray-700/50 rounded-2xl p-6 shadow-lg">
-                    <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                  <div className="bg-white/70 dark:bg-gray-700/60 rounded-3xl p-8 shadow-xl backdrop-blur-sm transform hover:scale-105 transition-transform">
+                    <div className="text-5xl font-bold text-purple-600 dark:text-purple-400 mb-3">
                       {wants.filter(want => want.product_image_url).length}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-300 font-semibold">With Images</div>
+                    <div className="text-gray-600 dark:text-gray-300 font-semibold text-lg">With Images</div>
                   </div>
                 </div>
               </CardContent>

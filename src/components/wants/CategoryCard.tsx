@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, Package, ExternalLink } from 'lucide-react';
+import { ChevronRight, Package, ExternalLink, Calendar } from 'lucide-react';
 
 interface WantItem {
   id: string;
@@ -25,35 +25,43 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
 
   return (
     <Card 
-      className="group cursor-pointer bg-gradient-to-br from-white via-white to-purple-50/30 dark:from-gray-800 dark:via-gray-800 dark:to-purple-900/20 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden rounded-3xl"
+      className="group cursor-pointer bg-gradient-to-br from-white via-white to-purple-50/50 dark:from-gray-800 dark:via-gray-800 dark:to-purple-900/30 border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.03] overflow-hidden rounded-3xl relative"
       onClick={onClick}
     >
-      <CardContent className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="text-6xl filter drop-shadow-lg">
-              {categoryEmoji}
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      
+      <CardContent className="relative p-8">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-5">
+            <div className="relative">
+              <div className="text-7xl filter drop-shadow-lg group-hover:scale-110 transition-transform duration-300">
+                {categoryEmoji}
+              </div>
+              <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 capitalize group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 capitalize group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 mb-1">
                 {category}
               </h3>
               <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                {items.length} item{items.length !== 1 ? 's' : ''} in wishlist
+                {items.length} item{items.length !== 1 ? 's' : ''} waiting
               </p>
             </div>
           </div>
-          <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all duration-200" />
+          <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-2xl group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 transition-colors duration-300">
+            <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all duration-300" />
+          </div>
         </div>
 
-        <div className="space-y-4">
-          {/* Preview items */}
-          <div className="flex -space-x-2 overflow-hidden">
-            {items.slice(0, 4).map((item, index) => (
+        <div className="space-y-6">
+          {/* Enhanced Preview items */}
+          <div className="flex -space-x-3 overflow-hidden">
+            {items.slice(0, 5).map((item, index) => (
               <div
                 key={item.id}
-                className="relative inline-block h-12 w-12 rounded-full ring-2 ring-white dark:ring-gray-800 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-purple-900/30 flex items-center justify-center overflow-hidden"
-                style={{ zIndex: 4 - index }}
+                className="relative inline-block h-14 w-14 rounded-2xl ring-3 ring-white dark:ring-gray-800 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-gray-700 dark:to-purple-900/50 flex items-center justify-center overflow-hidden shadow-lg hover:scale-110 transition-transform duration-300"
+                style={{ zIndex: 5 - index }}
               >
                 {item.product_image_url ? (
                   <img
@@ -65,45 +73,51 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
                       target.style.display = 'none';
                       const parent = target.parentElement;
                       if (parent) {
-                        parent.innerHTML = '<div class="text-xl">📦</div>';
+                        parent.innerHTML = '<div class="text-2xl">📦</div>';
                       }
                     }}
                   />
                 ) : (
-                  <Package className="w-5 h-5 text-gray-400" />
+                  <Package className="w-6 h-6 text-gray-400" />
                 )}
               </div>
             ))}
-            {items.length > 4 && (
-              <div className="relative inline-block h-12 w-12 rounded-full ring-2 ring-white dark:ring-gray-800 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300">
-                +{items.length - 4}
+            {items.length > 5 && (
+              <div className="relative inline-block h-14 w-14 rounded-2xl ring-3 ring-white dark:ring-gray-800 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-300 shadow-lg">
+                +{items.length - 5}
               </div>
             )}
           </div>
 
-          {/* Stats */}
-          <div className="flex gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span>{itemsWithImages} with images</span>
+          {/* Enhanced Stats */}
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="font-medium">{itemsWithImages} with images</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <ExternalLink className="w-3 h-3" />
-              <span>{itemsWithLinks} with links</span>
+            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 bg-green-50 dark:bg-green-900/20 rounded-xl p-3">
+              <ExternalLink className="w-4 h-4 text-green-600" />
+              <span className="font-medium">{itemsWithLinks} with links</span>
             </div>
           </div>
 
-          {/* Latest item preview */}
+          {/* Enhanced Latest item preview */}
           {items.length > 0 && (
-            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-2xl p-4 mt-4">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Latest added:</p>
-              <p className="font-medium text-gray-700 dark:text-gray-300 truncate">
+            <div className="bg-gradient-to-r from-gray-50 to-purple-50/50 dark:from-gray-700/50 dark:to-purple-900/20 rounded-2xl p-5 mt-4 border border-gray-100 dark:border-gray-600">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="w-4 h-4 text-purple-500" />
+                <p className="text-xs text-purple-600 dark:text-purple-400 font-semibold uppercase tracking-wide">
+                  Latest Added
+                </p>
+              </div>
+              <p className="font-bold text-gray-800 dark:text-gray-200 truncate text-lg mb-1">
                 {items[0].product_name}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                 {new Date(items[0].created_at).toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric'
+                  month: 'long', 
+                  day: 'numeric',
+                  year: 'numeric'
                 })}
               </p>
             </div>
