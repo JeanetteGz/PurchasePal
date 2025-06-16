@@ -21,6 +21,7 @@ const Profile = () => {
   const [email, setEmail] = useState("");
   const [tempFile, setTempFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   // Update form fields when profile data is loaded
   useEffect(() => {
@@ -29,6 +30,8 @@ const Profile = () => {
       setFirstName(profile.first_name || "");
       setLastName(profile.last_name || "");
       setEmail(profile.email || "");
+      // Set the avatar URL from the profile
+      setAvatarUrl(profile.avatar_url || null);
     }
     if (user) {
       setEmail(user.email || "");
@@ -39,12 +42,115 @@ const Profile = () => {
     if (fileInput.current) fileInput.current.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const uploadAvatar = async (file: File): Promise<string | null> => {
+    if (!user?.id) return null;
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}/avatar.${fileExt}`;
+
+    try {
+      // Delete existing avatar if it exists
+      if (profile?.avatar_url) {
+        const existingPath = profile.avatar_url.split('/').pop();
+        if (existingPath) {
+          await supabase.storage
+            .from('avatars')
+            .remove([`${user.id}/${existingPath}`]);
+        }
+      }
+
+      // Upload new avatar
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (error) {
+        console.error('Error uploading avatar:', error);
+        return null;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error in uploadAvatar:', error);
+      return null;
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setTempFile(file);
-      const imageUrl = URL.createObjectURL(file);
-      setAvatarUrl(imageUrl);
+    if (!file || !user?.id) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select an image smaller than 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setTempFile(file);
+    setUploadingAvatar(true);
+
+    try {
+      // Upload to Supabase Storage
+      const publicUrl = await uploadAvatar(file);
+      
+      if (publicUrl) {
+        // Update the avatar URL in the database
+        const { error } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', user.id);
+
+        if (error) {
+          console.error('Error updating avatar URL:', error);
+          toast({
+            title: "Error updating avatar",
+            description: "Failed to save avatar URL to profile.",
+            variant: "destructive",
+          });
+        } else {
+          setAvatarUrl(publicUrl);
+          await refreshProfile();
+          toast({
+            title: "Avatar updated! ✨",
+            description: "Your profile picture has been updated successfully.",
+          });
+        }
+      } else {
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload avatar. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error handling file upload:', error);
+      toast({
+        title: "Upload failed",
+        description: "An error occurred while uploading your avatar.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAvatar(false);
+      setTempFile(null);
     }
   };
 
@@ -99,6 +205,7 @@ const Profile = () => {
             first_name: firstName,
             last_name: lastName,
             age: 25, // Default age, you might want to make this configurable
+            avatar_url: avatarUrl,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
@@ -179,7 +286,11 @@ const Profile = () => {
                   </Avatar>
                   
                   <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full p-3 cursor-pointer hover:from-purple-600 hover:to-blue-600 transition-all duration-200 shadow-lg group-hover:scale-110" onClick={handleAvatarClick}>
-                    <Camera className="text-white" size={16} />
+                    {uploadingAvatar ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    ) : (
+                      <Camera className="text-white" size={16} />
+                    )}
                   </div>
                   
                   <input
@@ -188,11 +299,14 @@ const Profile = () => {
                     className="hidden"
                     ref={fileInput}
                     onChange={handleFileChange}
+                    disabled={uploadingAvatar}
                   />
                 </div>
                 
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-xs">
                   Click on your avatar to upload a new profile picture 📸
+                  <br />
+                  <span className="text-xs">Max size: 5MB. Formats: JPG, PNG, GIF</span>
                 </p>
               </div>
               
@@ -245,7 +359,7 @@ const Profile = () => {
                 <Button 
                   type="submit" 
                   className="flex-1 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-3 shadow-lg transition-all duration-200 hover:shadow-xl transform hover:-translate-y-0.5" 
-                  disabled={loading}
+                  disabled={loading || uploadingAvatar}
                 >
                   {loading ? (
                     <>
