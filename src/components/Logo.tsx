@@ -30,7 +30,7 @@ export const Logo = ({ size = 'md', showText = true, className = '' }: LogoProps
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {/* Logo Icon - Shopping bag */}
-      <div className={`${sizeClasses[size]} relative flex items-center justify-center bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl shadow-lg`}>
+      <div className={`${sizeClasses[size]} relative flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl shadow-lg`}>
         <ShoppingBag 
           size={iconSizeClasses[size]} 
           className="text-white" 
@@ -40,7 +40,7 @@ export const Logo = ({ size = 'md', showText = true, className = '' }: LogoProps
       {/* App Name */}
       {showText && (
         <div className="flex flex-col">
-          <h1 className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent leading-tight`}>
+          <h1 className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent leading-tight`}>
             PurchasePal
           </h1>
           {size !== 'sm' && (

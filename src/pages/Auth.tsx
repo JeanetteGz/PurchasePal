@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/Logo';
-import { ArrowLeft } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -70,18 +68,8 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="bg-white/70 backdrop-blur-sm border-b border-white/20">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
-          <Link 
-            to="/" 
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors hover:bg-white/50 px-3 py-2 rounded-full"
-          >
-            <ArrowLeft size={20} />
-            Back
-          </Link>
-          <div className="flex-1 flex justify-center">
-            <Logo size="sm" />
-          </div>
-          <div className="w-16"></div>
+        <div className="max-w-md mx-auto px-4 py-6 flex justify-center">
+          <Logo size="lg" className="scale-125" />
         </div>
       </div>
 
