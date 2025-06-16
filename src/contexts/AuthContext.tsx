@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -90,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, firstName: string, lastName: string, age: number) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -102,6 +101,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
     });
+
+    // If signup was successful, send verification email
+    if (!error && data.user && !data.user.email_confirmed_at) {
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-verification-email', {
+          body: {
+            email: email,
+            firstName: firstName,
+            verificationUrl: `${window.location.origin}/auth?token_hash=${data.user.id}&type=signup&redirect_to=${redirectUrl}`
+          }
+        });
+        
+        if (emailError) {
+          console.error('Error sending verification email:', emailError);
+        }
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError);
+      }
+    }
+
     return { error };
   };
 
