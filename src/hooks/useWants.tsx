@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { extractImageFromUrl } from '@/components/wants/utils';
@@ -31,7 +31,7 @@ export const useWants = () => {
     fetchWants();
   }, []);
 
-  const fetchWants = async () => {
+  const fetchWants = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('user_wants')
@@ -50,9 +50,9 @@ export const useWants = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
-  const addWant = async (newWant: NewWant) => {
+  const addWant = useCallback(async (newWant: NewWant): Promise<boolean> => {
     if (!newWant.product_name || !newWant.category) {
       toast({
         title: "Missing Information",
@@ -75,7 +75,24 @@ export const useWants = () => {
         return false;
       }
 
-      const extractedImage = newWant.product_url ? await extractImageFromUrl(newWant.product_url) : '';
+      // Extract image in parallel with insert to speed up the process
+      const extractImagePromise = newWant.product_url ? extractImageFromUrl(newWant.product_url) : Promise.resolve('');
+      
+      // Optimistically update UI first
+      const tempId = `temp-${Date.now()}`;
+      const tempWant: WantItem = {
+        id: tempId,
+        product_name: newWant.product_name,
+        category: newWant.category,
+        product_url: newWant.product_url || '',
+        product_image_url: newWant.product_image_url || null,
+        notes: newWant.notes || null,
+        created_at: new Date().toISOString()
+      };
+      
+      setWants(prev => [tempWant, ...prev]);
+
+      const extractedImage = await extractImagePromise;
       
       const { data, error } = await supabase
         .from('user_wants')
@@ -92,7 +109,8 @@ export const useWants = () => {
 
       if (error) throw error;
       
-      setWants(prev => [data, ...prev]);
+      // Replace temp item with real item
+      setWants(prev => prev.map(want => want.id === tempId ? data : want));
       
       toast({
         title: "Success!",
@@ -102,6 +120,8 @@ export const useWants = () => {
       return true;
     } catch (error) {
       console.error('Error adding want:', error);
+      // Remove temp item on error
+      setWants(prev => prev.filter(want => !want.id.startsWith('temp-')));
       toast({
         title: "Error",
         description: "Failed to add item to your wishlist. Please try again.",
@@ -109,9 +129,13 @@ export const useWants = () => {
       });
       return false;
     }
-  };
+  }, [toast]);
 
-  const deleteWant = async (id: string) => {
+  const deleteWant = useCallback(async (id: string) => {
+    // Optimistically remove from UI
+    const itemToDelete = wants.find(want => want.id === id);
+    setWants(prev => prev.filter(want => want.id !== id));
+
     try {
       const { error } = await supabase
         .from('user_wants')
@@ -119,7 +143,6 @@ export const useWants = () => {
         .eq('id', id);
 
       if (error) throw error;
-      setWants(prev => prev.filter(want => want.id !== id));
       
       toast({
         title: "Removed",
@@ -127,13 +150,17 @@ export const useWants = () => {
       });
     } catch (error) {
       console.error('Error deleting want:', error);
+      // Restore item on error
+      if (itemToDelete) {
+        setWants(prev => [itemToDelete, ...prev]);
+      }
       toast({
         title: "Error",
         description: "Failed to remove item from your wishlist",
         variant: "destructive",
       });
     }
-  };
+  }, [wants, toast]);
 
   return {
     wants,
