@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
-import { Search, Filter, Trash2 } from 'lucide-react';
+import { Search, Filter, Trash2, X } from 'lucide-react';
 import type { Purchase } from '@/pages/Index';
 
 interface PurchaseViewProps {
@@ -37,6 +37,7 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
   const [filterStore, setFilterStore] = useState('all');
   const [filterTrigger, setFilterTrigger] = useState('all');
   const [sortBy, setSortBy] = useState('date');
+  const [clickedTrigger, setClickedTrigger] = useState<string | null>(null);
 
   // Get unique stores and triggers for filter options
   const uniqueStores = Array.from(new Set(purchases.map(p => p.store))).sort();
@@ -50,8 +51,9 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
                            purchase.notes?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStore = filterStore === 'all' || purchase.store === filterStore;
       const matchesTrigger = filterTrigger === 'all' || purchase.trigger === filterTrigger;
+      const matchesClickedTrigger = clickedTrigger === null || purchase.trigger === clickedTrigger;
       
-      return matchesSearch && matchesStore && matchesTrigger;
+      return matchesSearch && matchesStore && matchesTrigger && matchesClickedTrigger;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -70,14 +72,14 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
 
   const getTriggerColor = (trigger: string) => {
     const colors: { [key: string]: string } = {
-      boredom: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-      stress: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-      sale: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      impulse: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
-      necessities: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      planned: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400',
+      boredom: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700',
+      stress: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/30',
+      sale: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/30',
+      impulse: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/30',
+      necessities: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/30',
+      planned: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/30',
     };
-    return colors[trigger] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+    return colors[trigger] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700';
   };
 
   const getStoreEmoji = (store: string) => {
@@ -112,6 +114,14 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
     return '🏪';
   };
 
+  const handleTriggerClick = (trigger: string) => {
+    setClickedTrigger(clickedTrigger === trigger ? null : trigger);
+  };
+
+  const clearTriggerFilter = () => {
+    setClickedTrigger(null);
+  };
+
   const totalSpent = filteredPurchases.reduce((sum, p) => sum + p.amount, 0);
   const averageSpent = filteredPurchases.length > 0 ? totalSpent / filteredPurchases.length : 0;
 
@@ -126,6 +136,21 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
           <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2">
             📊 {filteredPurchases.length} purchases • 💰 Total: ${totalSpent.toFixed(2)} • 📈 Average: ${averageSpent.toFixed(2)}
           </p>
+          {clickedTrigger && (
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 text-sm px-3 py-1">
+                {getTriggerEmoji(clickedTrigger)} Filtering by: {clickedTrigger}
+              </Badge>
+              <Button
+                onClick={clearTriggerFilter}
+                variant="outline"
+                size="sm"
+                className="h-7 px-2"
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -204,7 +229,10 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                         {purchase.item}
                       </h3>
-                      <Badge className={getTriggerColor(purchase.trigger)}>
+                      <Badge 
+                        className={`${getTriggerColor(purchase.trigger)} cursor-pointer transition-colors`}
+                        onClick={() => handleTriggerClick(purchase.trigger)}
+                      >
                         {getTriggerEmoji(purchase.trigger)} {purchase.trigger}
                       </Badge>
                     </div>
@@ -274,7 +302,7 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
                 No purchases found
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                {searchTerm || filterStore !== 'all' || filterTrigger !== 'all' 
+                {searchTerm || filterStore !== 'all' || filterTrigger !== 'all' || clickedTrigger
                   ? 'Try adjusting your filters or search terms. 🔍'
                   : 'Start tracking your purchases to see them here! 📝'
                 }
