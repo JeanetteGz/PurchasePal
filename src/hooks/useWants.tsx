@@ -30,28 +30,40 @@ export const useWants = () => {
     fetchWants();
   }, []);
 
-  const fetchWants = useCallback(async () => {
-    try {
-      console.log('Fetching wants from database...');
-      const { data, error } = await supabase
-        .from('user_wants')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      console.log('Wants fetched successfully:', data);
-      setWants(data || []);
-    } catch (error) {
-      console.error('Error fetching wants:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load your wishlist items",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+const fetchWants = useCallback(async () => {
+  try {
+    console.log('Checking auth state...');
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData.user) {
+      console.warn('User not authenticated. Skipping fetch.');
+      setWants([]);
+      return;
     }
-  }, [toast]);
+
+    const userId = userData.user.id;
+
+    console.log('Fetching wants from database for user:', userId);
+    const { data, error } = await supabase
+      .from('user_wants')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    console.log('Wants fetched successfully:', data);
+    setWants(data || []);
+  } catch (error) {
+    console.error('Error fetching wants:', error);
+    toast({
+      title: "Error",
+      description: "Failed to load your wishlist items",
+      variant: "destructive",
+    });
+  } finally {
+    setLoading(false);
+  }
+}, [toast]);
 
   const addWant = useCallback(async (newWant: NewWant): Promise<boolean> => {
     console.log('addWant called with:', newWant);
