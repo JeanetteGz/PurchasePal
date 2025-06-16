@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
-import { Search, Filter, Trash2, Calendar, DollarSign, Store, Tag } from 'lucide-react';
+import { Search, Filter, Trash2 } from 'lucide-react';
 import type { Purchase } from '@/pages/Index';
 
 interface PurchaseViewProps {
@@ -118,12 +118,12 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
   return (
     <div className="space-y-6">
       {/* Header with stats and emojis */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+      <div className="flex flex-col items-center gap-6">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 flex items-center justify-center gap-2 mb-4">
             🛍️ Your Purchases
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+          <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2">
             📊 {filteredPurchases.length} purchases • 💰 Total: ${totalSpent.toFixed(2)} • 📈 Average: ${averageSpent.toFixed(2)}
           </p>
         </div>
@@ -205,24 +205,20 @@ export const PurchaseView = ({ purchases, onDeletePurchase }: PurchaseViewProps)
                         {purchase.item}
                       </h3>
                       <Badge className={getTriggerColor(purchase.trigger)}>
-                        <Tag className="w-3 h-3 mr-1" />
                         {getTriggerEmoji(purchase.trigger)} {purchase.trigger}
                       </Badge>
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-2">
-                        <Store className="w-4 h-4" />
                         <span>{getStoreEmoji(purchase.store)} {purchase.store}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
                         <span>📅 {format(new Date(purchase.date), 'MMM dd, yyyy')}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
                         <span className="font-semibold text-lg text-gray-900 dark:text-gray-100">
-                          💵 {purchase.amount.toFixed(2)}
+                          💵 ${purchase.amount.toFixed(2)}
                         </span>
                       </div>
                     </div>
