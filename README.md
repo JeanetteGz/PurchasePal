@@ -1,73 +1,111 @@
-# Welcome to your Lovable project
 
-## Project info
+# 🛍️✨ PurchasePal - Mindful Spending Companion
 
-**URL**: https://lovable.dev/projects/9b0bf1d7-6832-42a1-a802-be1118441583
+*Made with 💜 by Jeanette Gonzalez*
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🌟 What is PurchasePal?
 
-**Use Lovable**
+PurchasePal is your personal companion for developing mindful spending habits through emotional awareness. Our app helps you understand the emotions behind your purchases, track your spending patterns, and make more conscious financial decisions.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9b0bf1d7-6832-42a1-a802-be1118441583) and start prompting.
+### 🎯 Key Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- **💭 Emotional Tracking**: Log how you feel before, during, and after purchases
+- **📊 Spending Insights**: Visualize your spending patterns and emotional triggers  
+- **🎯 Want Lists**: Organize and prioritize your desires mindfully
+- **🧠 Mindful Decisions**: Get gentle reminders to pause and reflect before impulse buys
+- **📈 Analytics**: Discover which emotions drive your purchasing decisions
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
+- Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Follow these steps:
+### Installation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to project directory
+cd purchasepal
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🛠️ Built With
 
-**Use GitHub Codespaces**
+This project is crafted using modern web technologies:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **⚡ Vite** - Lightning fast build tool
+- **🔷 TypeScript** - Type-safe JavaScript
+- **⚛️ React** - UI library for building user interfaces
+- **🎨 Tailwind CSS** - Utility-first CSS framework
+- **🌟 shadcn/ui** - Beautiful, accessible component library
+- **🗄️ Supabase** - Backend as a service for authentication & database
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🌈 Theme & Design
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+PurchasePal features a beautiful gradient-based design with:
+- 🌸 Soft pastels and calming colors
+- 🌙 Dark mode support with smooth transitions
+- 💫 Glassmorphism effects and modern UI patterns
+- 📱 Fully responsive design for all devices
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/9b0bf1d7-6832-42a1-a802-be1118441583) and click on Share -> Publish.
+## 🚀 Deployment
 
-## Can I connect a custom domain to my Lovable project?
+### Quick Deploy with Lovable
+1. Open [Lovable Project](https://lovable.dev/projects/9b0bf1d7-6832-42a1-a802-be1118441583)
+2. Click Share → Publish
+3. Your app is live! 🎉
 
-Yes, you can!
+### Custom Domain
+Connect your own domain by navigating to Project > Settings > Domains in Lovable.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 💡 Philosophy
+
+At PurchasePal, we believe that mindful spending starts with understanding your emotions. By tracking the feelings that drive our purchases, we can make more intentional decisions about money and develop healthier financial habits.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Feel free to:
+- 🐛 Report bugs
+- 💡 Suggest new features  
+- 🔧 Submit pull requests
+
+---
+
+## 📞 Support
+
+Need help? We're here for you! 
+
+📧 **Email**: purchasepalapp@gmail.com
+
+---
+
+## 📄 License
+
+This project is built with 💜 for mindful spenders everywhere.
+
+---
+
+**✨ Start your journey to mindful spending today! ✨**
+
+*Transform your relationship with money through emotional awareness.*
