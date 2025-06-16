@@ -27,20 +27,22 @@ export const WantsCategorySection = ({
   onDeleteWant 
 }: WantsCategorySectionProps) => {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <span className="text-3xl">{categoryEmoji}</span>
-        <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 capitalize">
-          {category}
-        </h3>
-        <div className="bg-purple-100 dark:bg-purple-900/50 px-3 py-1 rounded-full">
-          <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg">
+          <span className="text-4xl">{categoryEmoji}</span>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 capitalize">
+            {category}
+          </h2>
+        </div>
+        <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 rounded-full shadow-lg">
+          <span className="text-sm font-bold text-white">
             {items.length} item{items.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {items.map((want) => (
           <WantCard
             key={want.id}
