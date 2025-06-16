@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,6 +42,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('AuthProvider: Starting initialization');
+    
     // Clean up any potential Firebase references in localStorage
     Object.keys(localStorage).forEach(key => {
       if (key.includes('firebase') || key.includes('Firebase')) {
@@ -64,6 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
+        console.log('AuthProvider: Processing auth state change, loading:', loading);
         
         // If account was deleted, don't process auth changes
         if (localStorage.getItem('accountDeleted') === 'true') {
@@ -79,6 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('AuthProvider: User found, fetching profile for:', session.user.id);
           if (event === 'SIGNED_IN') {
             // Check if this is a new user by seeing if profile exists
             const { data: existingProfile } = await supabase
@@ -88,23 +93,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .maybeSingle();
             
             if (!existingProfile) {
+              console.log('AuthProvider: No existing profile found, retrying with delays');
               // This is likely a new signup, retry with delays
               await fetchUserProfileWithRetry(session.user.id, 3, 500);
             } else {
+              console.log('AuthProvider: Existing profile found, fetching normally');
               await fetchUserProfile(session.user.id);
             }
           } else {
+            console.log('AuthProvider: Not a SIGNED_IN event, fetching profile normally');
             await fetchUserProfile(session.user.id);
           }
         } else {
+          console.log('AuthProvider: No user, clearing profile');
           setProfile(null);
         }
+        console.log('AuthProvider: Setting loading to false');
         setLoading(false);
       }
     );
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('AuthProvider: Checking existing session:', !!session);
+      
       // If account was deleted, don't process existing session
       if (localStorage.getItem('accountDeleted') === 'true') {
         console.log('Ignoring existing session - account deleted');
@@ -118,9 +130,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        console.log('AuthProvider: Existing session found, fetching profile');
         fetchUserProfile(session.user.id);
+      } else {
+        console.log('AuthProvider: No existing session, setting loading to false');
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -254,6 +269,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setProfile(null);
     window.location.href = '/auth';
   };
+
+  console.log('AuthProvider: Current state - loading:', loading, 'user:', !!user, 'profile:', !!profile);
 
   const value = {
     user,
