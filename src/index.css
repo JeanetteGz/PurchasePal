@@ -95,6 +95,8 @@
   body {
     @apply bg-background text-foreground;
     transition: background-color 0.3s ease, color 0.3s ease;
+    /* Improve scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -106,4 +108,32 @@
 /* Smooth transitions for theme switching */
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Mobile-friendly touch interactions */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:scale-105:hover {
+    transform: none;
+  }
+  
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Improve button touch targets on mobile */
+@media (max-width: 640px) {
+  button {
+    min-height: 44px;
+  }
+}
+
+/* Better scrolling behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
 }

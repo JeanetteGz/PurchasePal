@@ -53,7 +53,7 @@ const Index = () => {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
-        <div className="container mx-auto max-w-7xl py-4 sm:py-6 lg:py-8">
+        <div className="container mx-auto max-w-7xl py-2 sm:py-4 lg:py-6 min-h-screen">
           <AppHeader 
             userFirstName={profile?.first_name}
             onSignOut={handleSignOut}
@@ -64,7 +64,7 @@ const Index = () => {
             onViewChange={setActiveView}
           />
 
-          <div className="px-4 sm:px-6 lg:px-8">
+          <div className="px-3 sm:px-6 lg:px-8">
             <AppContent
               activeView={activeView}
               purchases={purchases}

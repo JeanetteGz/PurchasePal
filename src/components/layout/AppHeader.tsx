@@ -11,31 +11,39 @@ interface AppHeaderProps {
 
 export const AppHeader = ({ userFirstName, onSignOut }: AppHeaderProps) => {
   return (
-    <header className="flex flex-col space-y-4 mb-6 px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-center sm:text-left">
-          <Logo size="lg" />
-          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto sm:mx-0 mt-2 px-2 sm:px-0">
-            Welcome back, {userFirstName || 'there'}! 👋 Ready for some mindful spending?
+    <header className="flex flex-col space-y-3 mb-4 px-3 sm:px-6 lg:px-8">
+      <div className="flex flex-col space-y-3">
+        <div className="text-center">
+          <Logo size="md" className="mx-auto" />
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2 px-2">
+            Welcome back, {userFirstName || 'there'}! 👋
           </p>
         </div>
         
-        <nav className="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3">
-          <Link to="/profile" className="rounded-full bg-white/70 dark:bg-gray-700/70 px-3 py-2 shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200">
-            <span role="img" aria-label="profile">👤</span> 
-            <span className="hidden xs:inline">Profile</span>
+        <nav className="flex justify-center gap-2">
+          <Link 
+            to="/profile" 
+            className="flex-1 max-w-24 rounded-xl bg-white/80 dark:bg-gray-700/80 px-3 py-3 shadow-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 flex flex-col items-center gap-1 text-xs font-semibold text-gray-700 dark:text-gray-200 min-h-[60px] active:scale-95"
+          >
+            <span className="text-lg">👤</span>
+            <span>Profile</span>
           </Link>
-          <Link to="/settings" className="rounded-full bg-white/70 dark:bg-gray-700/70 px-3 py-2 shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200">
-            <span role="img" aria-label="settings">⚙️</span> 
-            <span className="hidden xs:inline">Settings</span>
+          
+          <Link 
+            to="/settings" 
+            className="flex-1 max-w-24 rounded-xl bg-white/80 dark:bg-gray-700/80 px-3 py-3 shadow-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 flex flex-col items-center gap-1 text-xs font-semibold text-gray-700 dark:text-gray-200 min-h-[60px] active:scale-95"
+          >
+            <span className="text-lg">⚙️</span>
+            <span>Settings</span>
           </Link>
+          
           <Button 
             onClick={onSignOut}
             variant="outline" 
-            className="rounded-full bg-white/70 dark:bg-gray-700/70 px-3 py-2 shadow hover:bg-red-50 dark:hover:bg-red-900/30 transition flex items-center gap-2 text-xs sm:text-sm font-semibold border-red-200 dark:border-red-800 text-red-600 dark:text-red-400"
+            className="flex-1 max-w-24 rounded-xl bg-white/80 dark:bg-gray-700/80 px-3 py-3 shadow-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-200 flex flex-col items-center gap-1 text-xs font-semibold border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 min-h-[60px] active:scale-95"
           >
-            <LogOut size={14} className="sm:w-4 sm:h-4" />
-            <span className="hidden xs:inline">Sign Out</span>
+            <LogOut size={18} />
+            <span>Sign Out</span>
           </Button>
         </nav>
       </div>
