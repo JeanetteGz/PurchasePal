@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,9 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Auth = lazy(() => import("./pages/Auth"));
 const PasswordReset = lazy(() => import("./pages/PasswordReset"));
 const ConfirmDeletion = lazy(() => import("./pages/ConfirmDeletion"));
+
+// Add the new import
+const AppLanding = lazy(() => import("@/components/AppLanding"));
 
 const queryClient = new QueryClient();
 
@@ -96,9 +98,49 @@ const AppRoutes = () => {
   };
 
   if (showLanding && location.pathname === '/') {
+    // Check if running in mobile app context
+    const isRunningInApp = (): boolean => {
+      // Check for Capacitor (when running as mobile app)
+      if (typeof window !== 'undefined' && (window as any).Capacitor) {
+        return true;
+      }
+
+      // Check for mobile user agents that might indicate app context
+      if (typeof navigator !== 'undefined') {
+        const userAgent = navigator.userAgent || '';
+        
+        // Check for common mobile app webview indicators
+        const appIndicators = [
+          'wv', // WebView
+          'Mobile/',
+          'iPhone.*Mobile/',
+          'Android.*Mobile',
+        ];
+        
+        const isWebView = appIndicators.some(indicator => 
+          new RegExp(indicator).test(userAgent)
+        );
+        
+        // Check if it's a mobile device with specific app characteristics
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+        
+        // Additional checks for standalone mode (PWA)
+        const isStandalone = (window as any).navigator?.standalone || 
+                            window.matchMedia('(display-mode: standalone)').matches;
+        
+        return (isMobile && isWebView) || isStandalone;
+      }
+      
+      return false;
+    };
+
     return (
       <Suspense fallback={<LoadingSpinner />}>
-        <LandingPage onGetStarted={handleGetStarted} />
+        {isRunningInApp() ? (
+          <AppLanding onGetStarted={handleGetStarted} />
+        ) : (
+          <LandingPage onGetStarted={handleGetStarted} />
+        )}
       </Suspense>
     );
   }
