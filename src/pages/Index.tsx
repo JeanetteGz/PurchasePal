@@ -40,9 +40,9 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading your dashboard...</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">If this takes too long, please refresh the page</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-6"></div>
+          <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">Loading your dashboard...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">If this takes too long, please refresh the page</p>
         </div>
       </div>
     );
@@ -53,18 +53,18 @@ const Index = () => {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
-        <div className="container mx-auto max-w-7xl py-2 sm:py-4 lg:py-6 min-h-screen">
-          <AppHeader 
-            userFirstName={profile?.first_name}
-            onSignOut={handleSignOut}
-          />
+        <div className="container mx-auto max-w-md min-h-screen">
+          <div className="px-4 py-4 space-y-4">
+            <AppHeader 
+              userFirstName={profile?.first_name}
+              onSignOut={handleSignOut}
+            />
 
-          <AppNavigation 
-            activeView={activeView}
-            onViewChange={setActiveView}
-          />
+            <AppNavigation 
+              activeView={activeView}
+              onViewChange={setActiveView}
+            />
 
-          <div className="px-3 sm:px-6 lg:px-8">
             <AppContent
               activeView={activeView}
               purchases={purchases}

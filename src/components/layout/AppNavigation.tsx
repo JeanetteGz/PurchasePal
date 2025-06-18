@@ -16,14 +16,14 @@ const navigationItems = [
 
 export const AppNavigation = ({ activeView, onViewChange }: AppNavigationProps) => {
   return (
-    <div className="px-3 sm:px-6 lg:px-8 mb-4">
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-        {navigationItems.map((item) => (
+    <div className="mb-6">
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        {navigationItems.slice(0, 4).map((item) => (
           <Button
             key={item.id}
             onClick={() => onViewChange(item.id)}
             variant={activeView === item.id ? "default" : "outline"}
-            className={`p-4 h-auto flex flex-col items-center gap-2 bg-white/90 dark:bg-gray-800/90 ${item.hoverColor} text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 backdrop-blur-sm text-center min-h-[80px] rounded-xl shadow-lg transition-all duration-200 active:scale-95 ${
+            className={`p-4 h-auto flex flex-col items-center gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm ${item.hoverColor} text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 text-center min-h-[90px] rounded-2xl shadow-lg transition-all duration-200 active:scale-95 ${
               activeView === item.id ? 'ring-2 ring-primary/20 bg-primary/10' : ''
             }`}
           >
@@ -31,6 +31,19 @@ export const AppNavigation = ({ activeView, onViewChange }: AppNavigationProps) 
             <span className="font-medium text-xs leading-tight">{item.label}</span>
           </Button>
         ))}
+      </div>
+      
+      <div className="flex justify-center">
+        <Button
+          onClick={() => onViewChange(navigationItems[4].id)}
+          variant={activeView === navigationItems[4].id ? "default" : "outline"}
+          className={`p-4 h-auto flex flex-col items-center gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm ${navigationItems[4].hoverColor} text-gray-700 dark:text-gray-200 border-gray-200/50 dark:border-gray-600/50 text-center min-h-[90px] rounded-2xl shadow-lg transition-all duration-200 active:scale-95 w-full max-w-[180px] ${
+            activeView === navigationItems[4].id ? 'ring-2 ring-primary/20 bg-primary/10' : ''
+          }`}
+        >
+          <span className="text-2xl">{navigationItems[4].emoji}</span>
+          <span className="font-medium text-xs leading-tight">{navigationItems[4].label}</span>
+        </Button>
       </div>
     </div>
   );
