@@ -52,9 +52,9 @@ const Index = () => {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 safe-area-top safe-area-bottom">
         <div className="container mx-auto max-w-md min-h-screen">
-          <div className="px-4 py-4 space-y-4">
+          <div className="px-4 py-6 space-y-4">
             <AppHeader 
               userFirstName={profile?.first_name}
               onSignOut={handleSignOut}
