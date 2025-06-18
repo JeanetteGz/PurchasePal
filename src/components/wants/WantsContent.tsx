@@ -72,11 +72,11 @@ export const WantsContent = memo(({ wants, onAddWant, onDeleteWant }: WantsConte
   }, [filteredWants]);
 
   return (
-    <div className="container mx-auto px-6 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8 max-w-7xl">
       <WantsHeader />
 
-      <div className="space-y-8">
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
           <div className="flex-1 w-full sm:max-w-md">
             <WantsSearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
           </div>
