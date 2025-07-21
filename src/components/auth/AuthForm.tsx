@@ -147,7 +147,12 @@ export const AuthForm = ({ isLogin, isReturningUser }: AuthFormProps) => {
           disabled={loading}
         >
           {loading 
-            ? (isLogin ? 'Signing in...' : 'Creating account...') 
+            ? (
+              <div className="flex items-center justify-center gap-2">
+                <span className="animate-spin">⏳</span>
+                {isLogin ? 'Signing in...' : 'Creating account...'}
+              </div>
+            ) 
             : (isLogin ? 'Sign In 🚀' : 'Create Account 🎉')
           }
         </Button>

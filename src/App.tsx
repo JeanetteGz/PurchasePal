@@ -9,6 +9,7 @@ import { ThemeProvider } from "next-themes";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { isRunningInApp } from "@/utils/deviceDetection";
+import { CuteLoading } from "@/components/ui/cute-loading";
 
 // Lazy load components for better performance
 const ProtectedRoute = lazy(() => import("@/components/ProtectedRoute"));
@@ -26,10 +27,11 @@ const queryClient = new QueryClient();
 
 const LoadingSpinner = () => (
   <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-      <p className="text-gray-600 dark:text-gray-300">Loading...</p>
-    </div>
+    <CuteLoading 
+      variant="general" 
+      message="Loading app..." 
+      size="lg"
+    />
   </div>
 );
 
