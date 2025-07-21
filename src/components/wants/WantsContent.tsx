@@ -1,4 +1,3 @@
-
 import { useState, useMemo, memo } from 'react';
 import { CategoryDetailModal } from './CategoryDetailModal';
 import { WantsHeader } from './WantsHeader';
@@ -9,7 +8,6 @@ import { WantsStatsSection } from './WantsStatsSection';
 import { WantsCategoriesGrid } from './WantsCategoriesGrid';
 import { WantsFormHandler } from './WantsFormHandler';
 import { getCategoryEmoji } from './utils';
-
 interface WantItem {
   id: string;
   product_name: string;
@@ -19,7 +17,6 @@ interface WantItem {
   notes?: string;
   created_at: string;
 }
-
 interface NewWant {
   product_name: string;
   category: string;
@@ -27,19 +24,20 @@ interface NewWant {
   product_image_url: string;
   notes: string;
 }
-
 interface WantsContentProps {
   wants: WantItem[];
   onAddWant: (newWant: NewWant) => Promise<boolean>;
   onDeleteWant: (id: string) => void;
 }
-
-export const WantsContent = memo(({ wants, onAddWant, onDeleteWant }: WantsContentProps) => {
+export const WantsContent = memo(({
+  wants,
+  onAddWant,
+  onDeleteWant
+}: WantsContentProps) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [addLoading, setAddLoading] = useState(false);
-
   const handleAddWant = async (newWant: NewWant) => {
     setAddLoading(true);
     try {
@@ -52,11 +50,7 @@ export const WantsContent = memo(({ wants, onAddWant, onDeleteWant }: WantsConte
 
   // Memoize filtered wants for better performance
   const filteredWants = useMemo(() => {
-    return wants.filter(want =>
-      want.product_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      want.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      want.notes?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return wants.filter(want => want.product_name.toLowerCase().includes(searchQuery.toLowerCase()) || want.category.toLowerCase().includes(searchQuery.toLowerCase()) || want.notes?.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [wants, searchQuery]);
 
   // Memoize grouped wants by category
@@ -70,9 +64,7 @@ export const WantsContent = memo(({ wants, onAddWant, onDeleteWant }: WantsConte
       return acc;
     }, {} as Record<string, WantItem[]>);
   }, [filteredWants]);
-
-  return (
-    <div className="w-full mx-auto py-4 min-h-screen lg:px-8 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-3xl shadow-lg border border-white/20 dark:border-gray-700/20">
+  return <div className="w-full mx-auto py-4 min-h-screen lg:px-8 backdrop-blur-sm rounded-3xl shadow-lg border border-white/20 dark:border-gray-700/20 bg-transparent">
       <WantsHeader />
 
       <div className="space-y-4">
@@ -81,35 +73,14 @@ export const WantsContent = memo(({ wants, onAddWant, onDeleteWant }: WantsConte
           <WantsAddButton onAddClick={() => setShowAddForm(!showAddForm)} isLoading={addLoading} />
         </div>
 
-        {showAddForm && (
-          <WantsFormHandler
-            onSubmit={handleAddWant}
-            onCancel={() => setShowAddForm(false)}
-            isLoading={addLoading}
-          />
-        )}
+        {showAddForm && <WantsFormHandler onSubmit={handleAddWant} onCancel={() => setShowAddForm(false)} isLoading={addLoading} />}
 
-        <CategoryDetailModal
-          category={selectedCategory}
-          items={selectedCategory ? wantsByCategory[selectedCategory] || [] : []}
-          categoryEmoji={selectedCategory ? getCategoryEmoji(selectedCategory) : ''}
-          onClose={() => setSelectedCategory(null)}
-          onDeleteWant={onDeleteWant}
-        />
+        <CategoryDetailModal category={selectedCategory} items={selectedCategory ? wantsByCategory[selectedCategory] || [] : []} categoryEmoji={selectedCategory ? getCategoryEmoji(selectedCategory) : ''} onClose={() => setSelectedCategory(null)} onDeleteWant={onDeleteWant} />
 
-        {Object.keys(wantsByCategory).length === 0 ? (
-          <WantsEmptyState searchQuery={searchQuery} />
-        ) : (
-          <WantsCategoriesGrid 
-            wantsByCategory={wantsByCategory} 
-            onCategoryClick={setSelectedCategory} 
-          />
-        )}
+        {Object.keys(wantsByCategory).length === 0 ? <WantsEmptyState searchQuery={searchQuery} /> : <WantsCategoriesGrid wantsByCategory={wantsByCategory} onCategoryClick={setSelectedCategory} />}
 
         <WantsStatsSection wants={wants} wantsByCategory={wantsByCategory} />
       </div>
-    </div>
-  );
+    </div>;
 });
-
 WantsContent.displayName = 'WantsContent';

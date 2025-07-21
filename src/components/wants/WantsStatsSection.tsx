@@ -1,7 +1,5 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp } from 'lucide-react';
-
 interface WantItem {
   id: string;
   product_name: string;
@@ -11,19 +9,18 @@ interface WantItem {
   notes?: string;
   created_at: string;
 }
-
 interface WantsStatsSectionProps {
   wants: WantItem[];
   wantsByCategory: Record<string, WantItem[]>;
 }
-
-export const WantsStatsSection = ({ wants, wantsByCategory }: WantsStatsSectionProps) => {
+export const WantsStatsSection = ({
+  wants,
+  wantsByCategory
+}: WantsStatsSectionProps) => {
   if (wants.length === 0) return null;
-
-  return (
-    <div className="pt-6">
+  return <div className="pt-6">
       <Card className="bg-gradient-to-r from-purple-50/20 via-pink-50/20 to-purple-50/20 dark:from-purple-900/10 dark:via-pink-900/10 dark:to-purple-900/10 backdrop-blur-md border border-white/30 dark:border-gray-600/30 shadow-lg rounded-2xl">
-        <CardContent className="p-6">
+        <CardContent className="p-6 bg-transparent">
           <div className="flex items-center gap-3 justify-center mb-6">
             <div className="h-1 w-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
             <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -64,6 +61,5 @@ export const WantsStatsSection = ({ wants, wantsByCategory }: WantsStatsSectionP
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };

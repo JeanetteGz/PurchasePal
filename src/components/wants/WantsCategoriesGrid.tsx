@@ -1,8 +1,6 @@
-
 import { Grid3X3 } from 'lucide-react';
 import { CategoryCard } from './CategoryCard';
 import { getCategoryEmoji } from './utils';
-
 interface WantItem {
   id: string;
   product_name: string;
@@ -12,15 +10,15 @@ interface WantItem {
   notes?: string;
   created_at: string;
 }
-
 interface WantsCategoriesGridProps {
   wantsByCategory: Record<string, WantItem[]>;
   onCategoryClick: (category: string) => void;
 }
-
-export const WantsCategoriesGrid = ({ wantsByCategory, onCategoryClick }: WantsCategoriesGridProps) => {
-  return (
-    <div className="space-y-6 animate-fade-in">
+export const WantsCategoriesGrid = ({
+  wantsByCategory,
+  onCategoryClick
+}: WantsCategoriesGridProps) => {
+  return <div className="space-y-6 animate-fade-in">
       <div className="flex items-center gap-3 justify-center">
         <div className="h-1 w-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
         <div className="flex items-center gap-2 bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border border-white/30 dark:border-gray-600/30 px-4 py-3 rounded-2xl shadow-lg">
@@ -32,17 +30,8 @@ export const WantsCategoriesGrid = ({ wantsByCategory, onCategoryClick }: WantsC
         <div className="h-1 w-8 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full"></div>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-fr">
-        {Object.entries(wantsByCategory).map(([category, items]) => (
-          <CategoryCard
-            key={category}
-            category={category}
-            items={items}
-            categoryEmoji={getCategoryEmoji(category)}
-            onClick={() => onCategoryClick(category)}
-          />
-        ))}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-fr bg-transparent">
+        {Object.entries(wantsByCategory).map(([category, items]) => <CategoryCard key={category} category={category} items={items} categoryEmoji={getCategoryEmoji(category)} onClick={() => onCategoryClick(category)} />)}
       </div>
-    </div>
-  );
+    </div>;
 };
