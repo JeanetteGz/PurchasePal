@@ -25,7 +25,7 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
 
   return (
     <Card 
-      className="group cursor-pointer bg-white/10 dark:bg-gray-800/10 backdrop-blur-md border border-white/20 dark:border-gray-600/30 shadow-lg hover:shadow-xl hover:bg-white/20 dark:hover:bg-gray-800/20 transition-all duration-300 hover:scale-[1.02] overflow-hidden rounded-2xl relative h-full"
+      className="group cursor-pointer bg-gradient-to-br from-white/20 via-purple-50/20 to-blue-50/20 dark:from-gray-800/20 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-md border border-white/30 dark:border-gray-600/30 shadow-lg hover:shadow-xl hover:from-white/30 hover:via-purple-50/30 hover:to-blue-50/30 dark:hover:from-gray-800/30 dark:hover:via-purple-900/20 dark:hover:to-blue-900/20 transition-all duration-300 hover:scale-[1.02] overflow-hidden rounded-2xl relative h-full"
       onClick={onClick}
     >
       <CardContent className="relative p-5 h-full flex flex-col">
@@ -36,7 +36,7 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
               {categoryEmoji}
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 capitalize group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-300">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 capitalize group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors duration-300">
                 {category}
               </h3>
               <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
@@ -44,8 +44,8 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
               </p>
             </div>
           </div>
-          <div className="p-2 bg-white/20 dark:bg-gray-700/30 backdrop-blur-sm rounded-xl group-hover:bg-white/30 dark:group-hover:bg-gray-700/40 transition-colors duration-300">
-            <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 group-hover:translate-x-1 transition-all duration-300" />
+          <div className="p-2 bg-purple-100/30 dark:bg-purple-900/20 backdrop-blur-sm rounded-xl group-hover:bg-purple-200/40 dark:group-hover:bg-purple-800/30 transition-colors duration-300">
+            <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:translate-x-1 transition-all duration-300" />
           </div>
         </div>
 
@@ -85,22 +85,22 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
 
         {/* Stats */}
         <div className="grid grid-cols-1 gap-2 mt-auto">
-          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 bg-white/20 dark:bg-gray-700/30 backdrop-blur-sm rounded-lg p-2">
-            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 bg-blue-100/30 dark:bg-blue-900/20 backdrop-blur-sm rounded-lg p-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
             <span className="font-medium">{itemsWithImages} with images</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 bg-white/20 dark:bg-gray-700/30 backdrop-blur-sm rounded-lg p-2">
-            <ExternalLink className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 bg-green-100/30 dark:bg-green-900/20 backdrop-blur-sm rounded-lg p-2">
+            <ExternalLink className="w-3 h-3 text-green-600" />
             <span className="font-medium">{itemsWithLinks} with links</span>
           </div>
         </div>
 
         {/* Latest item preview */}
         {items.length > 0 && (
-          <div className="bg-white/10 dark:bg-gray-700/20 backdrop-blur-sm rounded-lg p-3 border border-white/20 dark:border-gray-600/30 mt-3">
+          <div className="bg-gradient-to-r from-purple-50/30 to-blue-50/30 dark:from-purple-900/20 dark:to-blue-900/20 backdrop-blur-sm rounded-lg p-3 border border-purple-200/30 dark:border-purple-700/30 mt-3">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-3 h-3 text-gray-600 dark:text-gray-400" />
-              <p className="text-xs text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide">
+              <TrendingUp className="w-3 h-3 text-purple-500" />
+              <p className="text-xs text-purple-600 dark:text-purple-400 font-medium uppercase tracking-wide">
                 Latest
               </p>
             </div>

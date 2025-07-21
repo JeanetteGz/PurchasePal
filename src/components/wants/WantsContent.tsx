@@ -76,7 +76,7 @@ export const WantsContent = memo(({ wants, onAddWant, onDeleteWant }: WantsConte
       <WantsHeader />
 
       <div className="space-y-4">
-        <div className="space-y-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-md border border-white/20 dark:border-gray-600/30 rounded-2xl p-4 shadow-lg">
+        <div className="space-y-4 bg-gradient-to-br from-white/15 via-purple-50/10 to-blue-50/15 dark:from-gray-800/15 dark:via-purple-900/10 dark:to-blue-900/15 backdrop-blur-md border border-white/30 dark:border-gray-600/30 rounded-2xl p-4 shadow-lg">
           <WantsSearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
           <WantsAddButton onAddClick={() => setShowAddForm(!showAddForm)} isLoading={addLoading} />
         </div>
