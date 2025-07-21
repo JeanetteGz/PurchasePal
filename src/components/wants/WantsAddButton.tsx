@@ -18,7 +18,7 @@ export const WantsAddButton = ({ onAddClick, isLoading = false }: WantsAddButton
         <div className="flex items-center justify-center gap-3">
           <div className="p-1.5 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
             {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <span className="animate-spin text-lg">💝</span>
             ) : (
               <Plus className="w-5 h-5" />
             )}
