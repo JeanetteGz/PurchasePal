@@ -82,8 +82,8 @@ export const CategoryCard = ({ category, items, categoryEmoji, onClick }: Catego
               </div>
             ))}
             {items.length > 4 && (
-              <div className="relative inline-block h-12 w-12 rounded-xl ring-2 ring-white dark:ring-gray-800 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-400 shadow-sm">
-                +{items.length - 4}
+              <div className="relative inline-block h-12 w-12 rounded-xl ring-2 ring-white dark:ring-gray-800 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-[10px] sm:text-xs font-bold text-blue-600 dark:text-blue-400 shadow-sm">
+                +{Math.min(items.length - 4, 99)}
               </div>
             )}
           </div>
