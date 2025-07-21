@@ -153,7 +153,7 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
   const recentPurchases = purchases.slice(0, 3);
 
   return (
-    <div className="space-y-6 w-full max-w-sm sm:max-w-md lg:max-w-4xl xl:max-w-6xl mx-auto">
+    <div className="space-y-6 w-full">
       {/* Mindful Tips Card */}
       <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0 shadow-lg">
         <CardHeader>
@@ -185,7 +185,7 @@ export const Dashboard = ({ purchases, onDeletePurchase }: DashboardProps) => {
       </Card>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Total Spent Card */}
         <AlertDialog open={statsOpen} onOpenChange={setStatsOpen}>
           <AlertDialogTrigger asChild>

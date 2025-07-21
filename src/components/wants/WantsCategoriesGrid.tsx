@@ -20,7 +20,7 @@ interface WantsCategoriesGridProps {
 
 export const WantsCategoriesGrid = ({ wantsByCategory, onCategoryClick }: WantsCategoriesGridProps) => {
   return (
-    <div className="space-y-6 animate-fade-in px-4">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex items-center gap-3 justify-center">
         <div className="h-1 w-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
         <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-lg">
@@ -32,7 +32,7 @@ export const WantsCategoriesGrid = ({ wantsByCategory, onCategoryClick }: WantsC
         <div className="h-1 w-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-fr">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-fr">
         {Object.entries(wantsByCategory).map(([category, items]) => (
           <CategoryCard
             key={category}

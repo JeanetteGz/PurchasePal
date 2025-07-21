@@ -21,7 +21,7 @@ export const WantsStatsSection = ({ wants, wantsByCategory }: WantsStatsSectionP
   if (wants.length === 0) return null;
 
   return (
-    <div className="px-4 pt-6">
+    <div className="pt-6">
       <Card className="bg-gradient-to-r from-purple-50/80 via-pink-50/80 to-purple-50/80 dark:from-gray-800/90 dark:via-purple-900/40 dark:to-gray-800/90 border-0 shadow-lg rounded-2xl backdrop-blur-sm">
         <CardContent className="p-6">
           <div className="flex items-center gap-3 justify-center mb-6">
@@ -33,7 +33,7 @@ export const WantsStatsSection = ({ wants, wantsByCategory }: WantsStatsSectionP
             <div className="h-1 w-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white/70 dark:bg-gray-700/60 rounded-xl p-4 shadow-md backdrop-blur-sm transform hover:scale-105 transition-transform">
               <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">
                 {wants.length}

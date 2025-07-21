@@ -20,14 +20,14 @@ interface AppHeaderProps {
 export const AppHeader = ({ userFirstName, avatarUrl, onSignOut }: AppHeaderProps) => {
   return (
     <header className="space-y-4 mb-4 lg:mb-6">
-      <div className="flex items-center justify-between px-4 lg:px-0 pt-4 lg:pt-6">
+      <div className="flex items-center justify-between pt-4 lg:pt-6">
         <Logo size="sm" />
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
               variant="ghost" 
-              className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm px-4 lg:px-6 py-2 lg:py-3 shadow-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 border-0"
+              className="flex items-center gap-2 lg:gap-3 rounded-xl bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm px-4 lg:px-6 py-2 lg:py-3 shadow-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 border-0"
             >
               <div className="flex items-center gap-2">
                 {avatarUrl ? (
@@ -86,7 +86,7 @@ export const AppHeader = ({ userFirstName, avatarUrl, onSignOut }: AppHeaderProp
         </DropdownMenu>
       </div>
       
-      <div className="text-center px-4 lg:px-0">
+      <div className="text-center">
         <p className="text-base lg:text-lg text-gray-600 dark:text-gray-300">
           Welcome back, {userFirstName || 'there'}! 👋
         </p>
