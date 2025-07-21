@@ -72,7 +72,7 @@ export const WantsContent = memo(({ wants, onAddWant, onDeleteWant }: WantsConte
   }, [filteredWants]);
 
   return (
-    <div className="w-full mx-auto py-4 min-h-screen lg:px-8">
+    <div className="w-full mx-auto py-4 min-h-screen lg:px-8 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-3xl shadow-lg border border-white/20 dark:border-gray-700/20">
       <WantsHeader />
 
       <div className="space-y-4">
