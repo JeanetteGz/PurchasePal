@@ -57,6 +57,7 @@ const Index = () => {
           <div className="px-4 py-6 space-y-4">
             <AppHeader 
               userFirstName={profile?.first_name}
+              avatarUrl={profile?.avatar_url}
               onSignOut={handleSignOut}
             />
 
