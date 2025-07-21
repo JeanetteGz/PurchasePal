@@ -53,8 +53,8 @@ const Index = () => {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 safe-area-top safe-area-bottom">
-        <div className="container mx-auto max-w-md min-h-screen">
-          <div className="px-4 py-6 space-y-4">
+        <div className="container mx-auto max-w-sm sm:max-w-md lg:max-w-4xl xl:max-w-6xl min-h-screen">
+          <div className="px-4 lg:px-6 xl:px-8 py-6 space-y-4 lg:space-y-6">
             <AppHeader 
               userFirstName={profile?.first_name}
               avatarUrl={profile?.avatar_url}

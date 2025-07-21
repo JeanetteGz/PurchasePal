@@ -33,7 +33,7 @@ export const WantsStatsSection = ({ wants, wantsByCategory }: WantsStatsSectionP
             <div className="h-1 w-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-4">
             <div className="bg-white/70 dark:bg-gray-700/60 rounded-xl p-4 shadow-md backdrop-blur-sm transform hover:scale-105 transition-transform">
               <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">
                 {wants.length}

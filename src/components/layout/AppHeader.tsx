@@ -19,29 +19,29 @@ interface AppHeaderProps {
 
 export const AppHeader = ({ userFirstName, avatarUrl, onSignOut }: AppHeaderProps) => {
   return (
-    <header className="space-y-4 mb-4">
-      <div className="flex items-center justify-between px-4 pt-4">
+    <header className="space-y-4 mb-4 lg:mb-6">
+      <div className="flex items-center justify-between px-4 lg:px-0 pt-4 lg:pt-6">
         <Logo size="sm" />
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
               variant="ghost" 
-              className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm px-4 py-2 shadow-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 border-0"
+              className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm px-4 lg:px-6 py-2 lg:py-3 shadow-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-all duration-200 border-0"
             >
               <div className="flex items-center gap-2">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
                     alt="Profile"
-                    className="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-gray-600"
+                    className="w-8 h-8 lg:w-10 lg:h-10 rounded-full object-cover border-2 border-white dark:border-gray-600"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold text-sm">
+                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold text-sm lg:text-base">
                     {userFirstName?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                 )}
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                <span className="text-sm lg:text-base font-medium text-gray-700 dark:text-gray-200 hidden sm:inline">
                   {userFirstName || 'User'}
                 </span>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -86,8 +86,8 @@ export const AppHeader = ({ userFirstName, avatarUrl, onSignOut }: AppHeaderProp
         </DropdownMenu>
       </div>
       
-      <div className="text-center px-4">
-        <p className="text-base text-gray-600 dark:text-gray-300">
+      <div className="text-center px-4 lg:px-0">
+        <p className="text-base lg:text-lg text-gray-600 dark:text-gray-300">
           Welcome back, {userFirstName || 'there'}! 👋
         </p>
       </div>

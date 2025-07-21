@@ -32,7 +32,7 @@ export const WantsCategoriesGrid = ({ wantsByCategory, onCategoryClick }: WantsC
         <div className="h-1 w-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"></div>
       </div>
       
-      <div className="grid grid-cols-1 gap-4 auto-rows-fr">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-fr">
         {Object.entries(wantsByCategory).map(([category, items]) => (
           <CategoryCard
             key={category}

@@ -73,8 +73,10 @@ export const AppContent = ({
   };
 
   return (
-    <div className="mb-8">
-      {renderContent()}
+    <div className="mb-8 w-full">
+      <div className="w-full">
+        {renderContent()}
+      </div>
     </div>
   );
 };
